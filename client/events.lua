@@ -1,25 +1,3 @@
---[[local function GetAllEvents()
-    local events = {}
-    for k, v in pairs(_G) do
-        if type(v) == 'table' and v.name ~= nil then
-            events[#events + 1] = v.name
-        end
-    end
-    return events
-end]]
-
---[[---@param group number | 0 = SCRIPT_EVENT_QUEUE_AI (CEventGroupScriptAI), 1 = SCRIPT_EVENT_QUEUE_NETWORK (CEventGroupScriptNetwork)
-local function GetAllEvents(group)
-    local events = {}
-    for i = 1, GetNumberOfEvents(group) do
-        local name = GetEventAtIndex(group, i)
-        events[#events + 1] = name
-    end
-    return events
-end]]
-
--- exports('GetAllEvents', function(group) return GetAllEvents(group) end)
-
 --------------------------------- Damage Events --------------------------------- [Credits goes to: evTestingPizza | https://github.com/DevTestingPizza/DamageEvents]
 
 ---@param vehicle number | Vehicle Entity Handle
@@ -237,7 +215,7 @@ local function EntityDamaged(entity, attacker, weapon, isMelee, flags)
 	TriggerEvent('duf:entityDamaged', entity, attacker, weapon, isMelee, flags)
 end
 
---------------------------------- Game Events --------------------------------- [Credits goes to: FiveM Docs and FiveM Forums | https://docs.fivem.net/docs/game-references/game-events/]
+--------------------------------- Network Game Events --------------------------------- [Credits goes to: FiveM Docs and FiveM Forums | https://docs.fivem.net/docs/game-references/game-events/]
 -- NOTE: This is not a complete list of game events, I'm going through each event and finding their unknown parameters. If you know any of the unknown parameters, please let me know.
 
 AddEventHandler('gameEventTriggered', function(name, args)
@@ -291,6 +269,54 @@ AddEventHandler('gameEventTriggered', function(name, args)
 		local _text = "gameEventTriggered \npid: "..PlayerPedId().."\nname: "..name.."\nargs: "..json.encode(args)
 		print(_text)
 	end
+end)
+
+--------------------------------- Game Events ---------------------------------
+
+---@param peds table | Array of entity handles who are agitated 
+AddEventHandler('CEventAgitated', function(peds)
+	-- local _text = "CEventAgitated \nPeds: "..json.encode(peds)
+	-- print(_text)
+end)
+
+---@param peds table | Array of entity handles who are agitated
+---@param entity number | Handle of the entity which triggered the event
+AddEventHandler('CEventAgitatedAction', function(peds, entity)
+	-- local _text = "CEventAgitatedAction \nPlyPId: "..PlayerPedId().."\nSource: "..entity.."\nPeds: "..json.encode(peds)
+	-- print(_text)
+end)
+
+---@param entities table | Array of entity handles to send the event to
+---@param entity number | Handle of the entity which is sharing the event
+AddEventHandler('CEventCommunicateEvent', function(entities, entity)
+	-- local _text = "CEventCommunicateEvent \nSource: "..entity.."\nEntities: "..json.encode(entities)
+	-- print(_text)
+end)
+
+---@param witnesses table | Array of entity handles who witnessed the event
+---@param ped number | Entity handle of the ped who fired the gun
+AddEventHandler('CEventGunShot', function(witnesses, ped)
+	-- local _text = "CEventGunShot \nPlyPId: "..PlayerPedId().."\nShooter: "..ped.."\nWitnesses: "..json.encode(witnesses)
+	-- print(_text)
+end)
+
+---@param peds table | Array of entity handles who received the command
+AddEventHandler('CEventScriptCommand', function(peds)
+	-- local _text = "CEventScriptCommand \nPed: "..json.encode(peds)
+	-- print(_text)
+end)
+
+---@param peds table | Array of entity handles who received the task
+AddEventHandler('CEventGivePedTask', function(peds)
+	-- local _text = "CEventGivePedTask \nPeds: "..json.encode(peds)
+	-- print(_text)
+end)
+
+---@param entities table | Array of entities receiving position event
+---@param ped number | Ped entity that is calling out shouting positon
+AddEventHandler('CEventShoutTargetPosition', function(entities, ped)
+	-- local _text = "CEventShoutTargetPosition \nEntities: "..json.encode(entities).."\nPed: "..ped
+	-- print(_text)
 end)
 
 --------------------------------- Shocking Events ---------------------------------
@@ -356,6 +382,16 @@ AddEventHandler('CEventShockingCarPileUp', function(witnesses, driver, x, y, z)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
+---@param animal number | Entity handle of the animal who triggered the event
+---@param x number | X coord of animal
+---@param y number | Y coord of animal
+---@param z number | Z coord of animal
+AddEventHandler('CEventShockingDangerousAnimal', function(witnesses, animal, x, y, z)
+	-- local _text = "CEventShockingDangerousAnimal \nAnimal: "..animal.."\nWitnesses: "..json.encode(witnesses).."\nargs: "..json.encode(x, y, z)
+	-- print(_text)
+end)
+
+---@param witnesses table | Array of entity handles who witnessed the event
 ---@param ped number | Entity handle of the ped who triggered the event
 ---@param x number | X coord of ped
 ---@param y number | Y coord of ped
@@ -372,6 +408,16 @@ end)
 ---@param z number | Z coord of vehicle
 AddEventHandler('CEventShockingDrivingOnPavement', function(witnesses, vehicle, x, y, z)
 	-- local _text = "CEventShockingDrivingOnPavement \nVehicle: "..vehicle.."\nWitnesses: "..json.encode(witnesses).."\nCoords: "..json.encode(x, y, z)
+	-- print(_text)
+end)
+
+---@param witnesses table | Array of entity handles who witnessed the event
+---@param vehicle number | Entity handle of the vehicle which triggered the event
+---@param x number | X coord of vehicle
+---@param y number | Y coord of vehicle
+---@param z number | Z coord of vehicle
+AddEventHandler('CEventShockingEngineRevved', function(witnesses, vehicle, x, y, z)
+	-- local _text = "CEventShockingEngineRevved \nVehicle: "..vehicle.."\nWitnesses: "..json.encode(witnesses).."\nargs: "..json.encode(x, y, z)
 	-- print(_text)
 end)
 
@@ -392,6 +438,16 @@ end)
 ---@param z number | Z coordinate of the fire
 AddEventHandler('CEventShockingFire', function(witnesses, entity, x, y, z)
 	-- local _text = "CEventShockingFire \npid: "..PlayerPedId().."\nSource: "..entity.."\nWitnesses: "..json.encode(witnesses).."\nCoords: "..json.encode(x, y, z)
+	-- print(_text)
+end)
+
+---@param witnesses table | Array of entity handles who witnessed the event
+---@param attacker number | Handle of the entity that triggered the event
+---@param x number | X coord of attacker
+---@param y number | Y coord of attacker
+---@param z number | Z coord of attacker
+AddEventHandler('CEventShockingGunFight', function(witnesses, attacker, x, y, z)
+	-- local _text = "CEventShockingGunFight \nAttacker: "..attacker.."\nWitnesses: "..json.encode(witnesses).."\nCoords: "..json.encode(x, y, z)
 	-- print(_text)
 end)
 
@@ -505,6 +561,36 @@ AddEventHandler('CEventShockingPedShot', function(witnesses, attacker, x, y, z)
 	-- print(_text)
 end)
 
+---@param witnesses table | Array of entity handles who witnessed the event
+---@param vehicle number | Entity handle of the plane that triggered the event
+---@param x number | X coordinate of the plane
+---@param y number | Y coordinate of the plane
+---@param z number | Z coordinate of the plane
+AddEventHandler('CEventShockingPlaneFlyby', function(witnesses, vehicle, x, y, z)
+	-- local _text = "CEventShockingPlaneFlyby \nWitnesses: "..json.encode(witnesses).."\nVehicle: "..vehicle.."\nCoords: "..json.encode(x, y, z)
+	-- print(_text)
+end)
+
+---@param witnesses table | Array of entity handles who witnessed the event
+---@param entity number | Handle of the entity scared? by the event
+---@param x number | X coordinate of the event
+---@param y number | Y coordinate of the event
+---@param z number | Z coordinate of the event
+AddEventHandler('CEventShockingPotentialBlast', function(witnesses, entity, x, y, z)
+	-- local _text = "CEventShockingPotentialBlast \npid: "..PlayerPedId().."\nWitnesses: "..json.encode(witnesses).."\nEntity: "..entity.."\nCoords: "..json.encode(x, y, z)
+	-- print(_text)
+end)
+
+---@param witnesses table | Array of entity handles who witnessed the event
+---@param attacker number | Handle of the entity who triggered the event
+---@param x number | X coord of entity
+---@param y number | Y coord of entity
+---@param z number | Z coord of entity
+AddEventHandler('CEventShockingPropertyDamage', function(witnesses, attacker, x, y, z)
+	-- local _text = "CEventShockingPropertyDamage \nPlyPId: "..PlayerPedId().."\nAttacker: "..attacker.."\nWitnesses: "..json.encode(witnesses).."\nCoords: "..json.encode(x, y, z)
+	-- print(_text)
+end)
+
 ---@param witnesses table | Array of entity handles that witnessed the event
 ---@param ped number | Entity handle of the ped is running
 ---@param x number | X coordinate of the ped
@@ -555,6 +641,36 @@ AddEventHandler('CEventShockingSeenNiceCar', function(witnesses, vehicle, x, y, 
 	-- print(_text)
 end)
 
+---@param witnesses table | Table of entities that witnessed the event
+---@param attacker number | Ped handle of the attacker
+---@param x number | X coord of the attacker
+---@param y number | Y coord of the attacker
+---@param z number | Z coord of the attacker
+AddEventHandler('CEventShockingSeenPedKilled', function(witnesses, attacker, x, y, z)
+	-- local _text = "CEventShockingSeenPedKilled \nPlyPId: "..PlayerPedId().."\nAttacker: "..attacker.."\nWitnesses: "..json.encode(witnesses).."\nCoords: "..json.encode(x, y, z)
+	-- print(_text)
+end)
+
+---@param witnesses table | Table of entities that witnessed the event
+---@param vehicle number | Entity of the vehicle that triggered the event
+---@param x number | X coord of the vehicle
+---@param y number | Y coord of the vehicle
+---@param z number | Z coord of the vehicle
+AddEventHandler('CEventShockingSiren', function(witnesses, vehicle, x, y, z)
+	-- local _text = "CEventShockingSiren \nvehicle: "..vehicle.."\nWitnesses: "..json.encode(witnesses).."\nCoords: "..json.encode(x, y, z)
+	-- print(_text)
+end)
+
+---@param witnesses table | Array of entities that witnessed the event
+---@param vehicle number | Entity handle of the vehicle towing
+---@param x number | X coordinate of the vehicle towing
+---@param y number | Y coordinate of the vehicle towing
+---@param z number | Z coordinate of the vehicle towing
+AddEventHandler('CEventShockingVehicleTowed', function(witnesses, vehicle, x, y, z)
+	-- local _text = "CEventShockingVehicleTowed \nTow Vehicle: "..vehicle.."\nWitnesses: "..json.encode(witnesses).."\nCoords: "..json.encode(x, y, z)"
+	-- print(_text)
+end)
+
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param ped number | Entity handle of the ped who triggered the event
 ---@param x number | X coord of ped
@@ -575,47 +691,6 @@ AddEventHandler('CEventShockingWeaponThreat', function(witnesses, ped, x, y, z)
 	-- print(_text)
 end)
 
---------------------------------- Events ---------------------------------
-
----@param peds table | Array of entity handles who are agitated 
-AddEventHandler('CEventAgitated', function(peds)
-	-- local _text = "CEventAgitated \nPeds: "..json.encode(peds)
-	-- print(_text)
-end)
-
----@param peds table | Array of entity handles who are agitated
----@param entity number | Handle of the entity which triggered the event
-AddEventHandler('CEventAgitatedAction', function(peds, entity)
-	-- local _text = "CEventAgitatedAction \nPlyPId: "..PlayerPedId().."\nSource: "..entity.."\nPeds: "..json.encode(peds)
-	-- print(_text)
-end)
-
----@param entities table | Array of entity handles to send the event to
----@param entity number | Handle of the entity which is sharing the event
-AddEventHandler('CEventCommunicateEvent', function(entities, entity)
-	-- local _text = "CEventCommunicateEvent \nSource: "..entity.."\nEntities: "..json.encode(entities)
-	-- print(_text)
-end)
-
----@param witnesses table | Array of entity handles who witnessed the event
----@param ped number | Entity handle of the ped who fired the gun
-AddEventHandler('CEventGunShot', function(witnesses, ped)
-	-- local _text = "CEventGunShot \nPlyPId: "..PlayerPedId().."\nShooter: "..ped.."\nWitnesses: "..json.encode(witnesses)
-	-- print(_text)
-end)
-
----@param peds table | Array of entity handles who received the command
-AddEventHandler('CEventScriptCommand', function(peds)
-	-- local _text = "CEventScriptCommand \nPed: "..json.encode(peds)
-	-- print(_text)
-end)
-
----@param peds table | Array of entity handles who received the task
-AddEventHandler('CEventGivePedTask', function(peds)
-	-- local _text = "CEventGivePedTask \nPeds: "..json.encode(peds)
-	-- print(_text)
-end)
-
 --------------------------------- Unknown Parameters ---------------------------------
 
 AddEventHandler('CEventShocking', function(entities, eventEntity, args)
@@ -628,11 +703,6 @@ AddEventHandler('CEventShockingCarChase', function(entities, eventEntity, args)
 	print(_text)
 end)
 
-AddEventHandler('CEventShockingDangerousAnimal', function(entities, eventEntity, args)
-	local _text = "CEventShockingDangerousAnimal \nPlyPId: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
-	print(_text)
-end)
-
 AddEventHandler('CEventCallForCover', function(entities, eventEntity, args)
 	local _text = "CEventCallForCover \npid: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
 	print(_text)
@@ -640,16 +710,6 @@ end)
 
 AddEventHandler('CEventCombatTaunt', function(entities, eventEntity, args)
 	local _text = "CEventCombatTaunt \npid: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
-	print(_text)
-end)
-
-AddEventHandler('CEventShockingEngineRevved', function(entities, eventEntity, args)
-	local _text = "CEventShockingEngineRevved \nPlyPId: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
-	print(_text)
-end)
-
-AddEventHandler('CEventShockingGunFight', function(entities, eventEntity, args)
-	local _text = "CEventShockingGunFight \nPlyPId: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
 	print(_text)
 end)
 
@@ -668,21 +728,6 @@ AddEventHandler('CEventShockingNonViolentWeaponAimedAt', function(entities, even
 	print(_text)
 end)
 
-AddEventHandler('CEventShockingPlaneFlyby', function(entities, eventEntity, args)
-	local _text = "CEventShockingPlaneFlyby \npid: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
-	print(_text)
-end)
-
-AddEventHandler('CEventShockingPotentialBlast', function(entities, eventEntity, args)
-	local _text = "CEventShockingPotentialBlast \npid: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
-	print(_text)
-end)
-
-AddEventHandler('CEventShockingPropertyDamage', function(entities, eventEntity, args)
-	local _text = "CEventShockingPropertyDamage \nPlyPId: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
-	print(_text)
-end)
-
 AddEventHandler('CEventShockingSeenConfrontation', function(entities, eventEntity, args)
 	local _text = "CEventShockingSeenConfrontation \npid: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
 	print(_text)
@@ -698,18 +743,8 @@ AddEventHandler('CEventShockingSeenInsult', function(entities, eventEntity, args
 	print(_text)
 end)
 
-AddEventHandler('CEventShockingSiren', function(entities, eventEntity, args)
-	local _text = "CEventShockingSiren \nPlyPId: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
-	print(_text)
-end)
-
 AddEventHandler('CEventShockingStudioBomb', function(entities, eventEntity, args)
 	local _text = "CEventShockingStudioBomb \npid: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
-	print(_text)
-end)
-
-AddEventHandler('CEventShockingVehicleTowed', function(entities, eventEntity, args)
-	local _text = "CEventShockingVehicleTowed \nPlyPId: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
 	print(_text)
 end)
 
@@ -725,11 +760,6 @@ end)
 
 AddEventHandler('CEventShoutBlockingLos', function(entities, eventEntity, args)
 	local _text = "CEventShoutBlockingLos \npid: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
-	print(_text)
-end)
-
-AddEventHandler('CEventShoutTargetPosition', function(entities, eventEntity, args)
-	local _text = "CEventShoutTargetPosition \npid: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
 	print(_text)
 end)
 
@@ -765,16 +795,6 @@ end)
 
 AddEventHandler('CEventDataResponseTaskShockingEventInvestigate', function(entities, eventEntity, args)
 	local _text = "CEventDataResponseTaskShockingEventInvestigate \npid: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
-	print(_text)
-end)
-
-AddEventHandler('CEventShockingSeenDeadBody', function(entities, eventEntity, args)
-	local _text = "CEventShockingSeenDeadBody \nPlyPId: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
-	print(_text)
-end)
-
-AddEventHandler('CEventShockingInDangerousVehicle', function(entities, eventEntity, args)
-	local _text = "CEventShockingInDangerousVehicle \nPlyPId: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
 	print(_text)
 end)
 
