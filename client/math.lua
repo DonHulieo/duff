@@ -60,5 +60,5 @@ local function GetEntityRightVector(entity)
 	return rightVector
 end
 
-exports('GetEntityUpVector', function(entity) return GetEntityUpVector(entity) end)
-exports('GetEntityRightVector', function(entity) return GetEntityRightVector(entity) end)
+exports('Cl_GetEntityUpVector', function(entity) return GetEntityUpVector(entity) end)
+exports('Cl_GetEntityRightVector', function(entity) return GetEntityRightVector(entity) end)

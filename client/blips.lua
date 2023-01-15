@@ -32,7 +32,7 @@ end
 exports('GetAllBlips', function() return GetAllBlips() end)
 exports('GetOnScreenBlips', function() return GetOnScreenBlips() end)
 --[[
-    local blips = GetAllBlips()
+    local blips = export['duf']:GetAllBlips()
     for i = 1, #blips do 
         local blip = blips[i]
         -- Do something with blip

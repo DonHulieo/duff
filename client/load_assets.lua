@@ -136,9 +136,13 @@ exports('ReqWeaponAsset', function(asset) return ReqWeaponAsset(asset) end)
 ---@param text string | Text to draw
 ---@param scale number | Scale of text
 local function DrawText3D(x, y, z, text, scale)
+    if type(x) == 'vector3' then
+        scale = z
+        text = y
+        x, y, z = x.x, x.y, x.z
+    end
     local onScreen, _x, _y = World3dToScreen2d(x, y, z)
     local coords = GetFinalRenderedCamCoord()
-    local pX, pY, pZ = coords.x, coords.y, coords.z
     local dist = #(coords - vector3(x, y, z))
     local scale = (1 / dist) * scale
     local fov = (1 / GetGameplayCamFov()) * 100
@@ -164,5 +168,5 @@ exports('DrawText3D', function(x, y, z, text, scale) return DrawText3D(x, y, z, 
 --[[ 
     Example usage:
     local coords = GetEntityCoords(PlayerPedId())
-    exports['duf']:DrawText3D(coords.x, coords.y, coords.z, 'Hello World!', 0.35)
+    exports['duf']:DrawText3D(coords, 'Hello World!', 0.35)
 ]]
