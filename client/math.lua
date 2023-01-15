@@ -1,17 +1,3 @@
---------------------------------- CompareTables ---------------------------------
-
----@param t1 table
----@param t2 table
-local function CompareTables(t1, t2)
-    if #t1 ~= #t2 then return false end
-    for k, v in pairs(t1) do
-        if t2[k] ~= v then return false end
-    end
-    return true
-end
-
-exports('CompareTables', function(t1, t2) return CompareTables(t1, t2) end)
-
 --------------------------------- Line of Sight Utility Functions ---------------------------------
 
 ---@param source Entity
