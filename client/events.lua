@@ -32,17 +32,21 @@ local function VehicleDestroyed(vehicle, attacker, weapon, isMelee, flags)
 		if IsEntityAVehicle(attacker) then
 			-- Vehicle Killed by Vehicle Event
 			print('Vehicle killed with a vehicle!')
+			TriggerEvent('duf:vehicleKilledByVehicle', vehicle, attacker, weapon, isMelee, flags)
 		elseif IsEntityAPed(attacker) then
 			if IsPedAPlayer(attacker) then
 				-- Player Killed Vehicle Event
 				print('Player killed a vehicle!')
+				TriggerEvent('duf:playerKilledVehicle', vehicle, attacker, weapon, isMelee, flags)
 			else
 				-- Ped Killed Vehicle Event
 				print('Ped killed a vehicle!')
+				TriggerEvent('duf:pedKilledVehicle', vehicle, attacker, weapon, isMelee, flags)
 			end
 		else
 			-- Vehicle Killed Event
 			print('Vehicle killed!')
+			TriggerEvent('duf:vehicleDestroyed', vehicle, attacker, weapon, isMelee, flags)
 		end
 	end
 end
@@ -57,9 +61,11 @@ local function PedKilledByVehicle(ped, vehicle, weapon, isMelee, flags)
 		if IsPedAPlayer(ped) then
 			-- Player Killed by Vehicle Event
 			print('Player killed by a vehicle!')
+			TriggerEvent('duf:playerKilledByVehicle', ped, vehicle, weapon, isMelee, flags)
 		else
 			-- Ped Killed by Vehicle Event
 			print('Ped killed by a vehicle!')
+			TriggerEvent('duf:pedKilledByVehicle', ped, vehicle, weapon, isMelee, flags)
 		end
 	end
 end
@@ -73,9 +79,11 @@ local function PedKilledByPlayer(ped, player, weapon, isMelee)
 		if IsPedAPlayer(ped) then
 			-- Player Killed by Player Event
 			print('Player killed by a player!')
+			TriggerEvent('duf:playerKilledByPlayer', ped, player, weapon, isMelee)
 		else
 			-- Ped Killed by Player Event
 			print('Ped killed by a player!')
+			TriggerEvent('duf:pedKilledByPlayer', ped, player, weapon, isMelee)
 		end
 	end
 end
@@ -89,9 +97,11 @@ local function PedKilledByPed(ped, attacker, weapon, isMelee)
 		if IsPedAPlayer(ped) then
 			-- Player Killed by Ped Event
 			print('Player killed by a ped!')
+			TriggerEvent('duf:playerKilledByPed', ped, attacker, weapon, isMelee)
 		else
 			-- Ped Killed by Ped Event
 			print('Ped killed by a ped!')
+			TriggerEvent('duf:pedKilledByPed', ped, attacker, weapon, isMelee)
 		end
 	end
 end
@@ -106,9 +116,11 @@ local function PedKilled(ped, attacker, weapon, isMelee, flags)
 		if IsPedAPlayer(ped) then
 			-- Player Killed Event
 			print('Player killed!')
+			TriggerEvent('duf:playerKilled', ped, attacker, weapon, isMelee, flags)
 		else
 			-- Ped Killed Event
 			print('Ped killed!')
+			TriggerEvent('duf:pedKilled', ped, attacker, weapon, isMelee, flags)
 		end
 	end
 end
@@ -120,6 +132,7 @@ end
 ---@param flags number | Damage Flags
 local function EntityKilled(entity, attacker, weapon, isMelee, flags)
 	print('Something killed!')
+	TriggerEvent('duf:entityKilled', entity, attacker, weapon, isMelee, flags)
 end
 
 ---@param vehicle number | Vehicle Entity Handle
@@ -132,17 +145,21 @@ local function VehicleDamaged(vehicle, attacker, weapon, isMelee, flags)
 		if IsEntityAVehicle(attacker) then
 			-- Vehicle Damaged by Vehicle Event
 			print('Vehicle damaged with a vehicle!')
+			TriggerEvent('duf:vehicleDamagedByVehicle', vehicle, attacker, weapon, isMelee, flags)
 		elseif IsEntityAPed(attacker) then
 			if IsPedAPlayer(attacker) then
 				-- Player Damaged Vehicle Event
 				print('Player damaged a vehicle!')
+				TriggerEvent('duf:playerDamagedVehicle', vehicle, attacker, weapon, isMelee, flags)
 			else
 				-- Ped Damaged Vehicle Event
 				print('Ped damaged a vehicle!')
+				TriggerEvent('duf:pedDamagedVehicle', vehicle, attacker, weapon, isMelee, flags)
 			end
 		else
 			-- Vehicle Damaged Event
 			print('Vehicle damaged!')
+			TriggerEvent('duf:vehicleDamaged', vehicle, attacker, weapon, isMelee, flags)
 		end
 	end
 end
@@ -157,9 +174,11 @@ local function PedDamagedByVehicle(ped, vehicle, weapon, isMelee, flags)
 		if IsPedAPlayer(ped) then
 			-- Player Damaged by Vehicle Event
 			print('Player damaged by a vehicle!')
+			TriggerEvent('duf:playerDamagedByVehicle', ped, vehicle, weapon, isMelee, flags)
 		else
 			-- Ped Damaged by Vehicle Event
 			print('Ped damaged by a vehicle!')
+			TriggerEvent('duf:pedDamagedByVehicle', ped, vehicle, weapon, isMelee, flags)
 		end
 	end
 end
@@ -173,9 +192,11 @@ local function PedDamagedByPlayer(ped, player, weapon, isMelee)
 		if IsPedAPlayer(ped) then
 			-- Player Damaged by Player Event
 			print('Player damaged by a player!')
+			TriggerEvent('duf:playerDamagedByPlayer', ped, player, weapon, isMelee)
 		else
 			-- Ped Damaged by Player Event
 			print('Ped damaged by a player!')
+			TriggerEvent('duf:pedDamagedByPlayer', ped, player, weapon, isMelee)
 		end
 	end
 end
@@ -189,9 +210,11 @@ local function PedDamagedByPed(ped, attacker, weapon, isMelee)
 		if IsPedAPlayer(ped) then
 			-- Player Damaged by Ped Event
 			print('Player damaged by a ped!')
+			TriggerEvent('duf:playerDamagedByPed', ped, attacker, weapon, isMelee)
 		else
 			-- Ped Damaged by Ped Event
 			print('Ped damaged by a ped!')
+			TriggerEvent('duf:pedDamagedByPed', ped, attacker, weapon, isMelee)
 		end
 	end
 end
@@ -206,9 +229,11 @@ local function PedDamaged(ped, attacker, weapon, isMelee, flags)
 		if IsPedAPlayer(ped) then
 			-- Player Damaged Event
 			print('Player damaged!')
+			TriggerEvent('duf:playerDamaged', ped, attacker, weapon, isMelee, flags)
 		else
 			-- Ped Damaged Event
 			print('Ped damaged!')
+			TriggerEvent('duf:pedDamaged', ped, attacker, weapon, isMelee, flags)
 		end
 	end
 end
@@ -220,7 +245,11 @@ end
 ---@param flags number | Damage Flags
 local function EntityDamaged(entity, attacker, weapon, isMelee, flags)
 	print('Something damaged!')
+	TriggerEvent('duf:entityDamaged', entity, attacker, weapon, isMelee, flags)
 end
+
+--------------------------------- Game Events --------------------------------- [Credits goes to: FiveM Docs and FiveM Forums | https://docs.fivem.net/docs/game-references/game-events/]
+-- NOTE: This is not a complete list of game events, I'm going through each event and finding their unknown parameters. If you know any of the unknown parameters, please let me know.
 
 AddEventHandler('gameEventTriggered', function(name, args)
 	if name == 'CEventNetworkEntityDamage' then
@@ -233,62 +262,38 @@ AddEventHandler('gameEventTriggered', function(name, args)
 		if victim and attacker then
 			if isDead then
 				if IsEntityAVehicle(victim) then
-					-- Vehilce Death Event
-					print('Vehicle Destroyed')
 					VehicleDestroyed(victim, attacker, weapon, isMelee, flags)
 				elseif IsEntityAPed(victim) then
 					if IsEntityAVehicle(attacker) then
-						-- Ped Killed by Vehicle Event
-						print('Ped killed with a vehicle!')
 						PedKilledByVehicle(victim, attacker, weapon, isMelee, flags)
 					elseif IsEntityAPed(attacker) then
 						if IsPedAPlayer(attacker) then
-							-- Player Killed Ped Event
-							print('Player killed a ped!')
 							PedKilledByPlayer(victim, attacker, weapon, isMelee)
 						else
-							-- Ped Killed Ped Event
-							print('Ped killed a ped!')
 							PedKilledByPed(victim, attacker, weapon, isMelee)
 						end
 					else
-						-- Ped Killed Event
-						print('Ped killed!')
 						PedKilled(victim, attacker, weapon, isMelee, flags)
 					end
 				else
-					-- Something Died Event
-					print('Something died!')
 					EntityKilled(victim, attacker, weapon, isMelee)
 				end
 			else
 				if IsEntityAVehicle(victim) then
-					-- Vehicle Damaged Event
-					print('Vehicle Damaged')
 					VehicleDamaged(victim, attacker, weapon, isMelee, flags)
 				elseif IsEntityAPed(victim) then
 					if IsEntityAVehicle(attacker) then
-						-- Ped Damaged by Vehicle Event
-						print('Ped damaged with a vehicle!')
 						PedDamagedByVehicle(victim, attacker, weapon, isMelee, flags)
 					elseif IsEntityAPed(attacker) then
 						if IsPedAPlayer(attacker) then
-							-- Player Damaged Ped Event
-							print('Player damaged a ped!')
 							PedDamagedByPlayer(victim, attacker, weapon, isMelee)
 						else
-							-- Ped Damaged Ped Event
-							print('Ped damaged a ped!')
 							PedDamagedByPed(victim, attacker, weapon, isMelee)
 						end
 					else
-						-- Ped Damaged Event
-						print('Ped damaged!')
 						PedDamaged(victim, attacker, weapon, isMelee, flags)
 					end
 				else
-					-- Something Damaged Event
-					print('Something damaged!')
 					EntityDamaged(victim, attacker, weapon, isMelee, flags)
 				end
 			end
@@ -298,6 +303,91 @@ AddEventHandler('gameEventTriggered', function(name, args)
 		print(_text)
 	end
 end)
+
+--------------------------------- Shocking Events ---------------------------------
+
+---@param witnesses table | Array of entity handles who witnessed the event
+---@param ped number | Entity handle of the ped who triggered the event
+---@param x number | X coord of ped
+---@param y number | Y coord of ped
+---@param z number | Z coord of ped
+AddEventHandler('CEventShockingVisibleWeapon', function(witnesses, ped, x, y, z)
+	local _text = "CEventShockingVisibleWeapon \nPlyPId: "..PlayerPedId().."\nPed: "..ped.."\nWitnesses: "..json.encode(witnesses).."\nargs: "..json.encode(x, y, z)
+	print(_text)
+end)
+
+---@param witnesses table | Array of entity handles who witnessed the event
+---@param ped number | Entity handle of the ped who triggered the event
+---@param x number | X coord of ped
+---@param y number | Y coord of ped
+---@param z number | Z coord of ped
+AddEventHandler('CEventShockingWeaponThreat', function(witnesses, ped, x, y, z)
+	local _text = "CEventShockingWeaponThreat \nPlyPId: "..PlayerPedId().."\nPed: "..ped.."\nWitnesses: "..json.encode(witnesses).."\nargs: "..json.encode(x, y, z)
+	print(_text)
+end)
+
+---@param witnesses table | Array of entity handles who witnessed the event
+---@param ped number | Entity handle of the ped who triggered the event
+---@param x number | X coord of ped
+---@param y number | Y coord of ped
+---@param z number | Z coord of ped
+AddEventHandler('CEventShockingGunshotFired', function(witnesses, ped, x, y, z)
+	local _text = "CEventShockingGunshotFired \nPlyPId: "..PlayerPedId().."\nShooter: "..ped.."\nWitnesses: "..json.encode(witnesses).."\nCoords: "..json.encode(x, y, z)
+	print(_text)
+end)
+
+---@param witnesses table | Array of entity handles who witnessed the event
+---@param ped number | Entity handle of the ped who triggered the event
+---@param x number | X coord of ped
+---@param y number | Y coord of ped
+---@param z number | Z coord of ped
+AddEventHandler('CEventShockingMadDriver', function(witnesses, ped, x, y, z)
+	local _text = "CEventShockingMadDriver \nPlyPId: "..PlayerPedId().."\nPed: "..ped.."\nWitnesses: "..json.encode(witnesses).."\nCoords: "..json.encode(x, y, z)
+	print(_text)
+end)
+
+---@param witnesses table | Array of entity handles who witnessed the event
+---@param ped number | Entity handle of the ped who triggered the event
+---@param x number | X coord of ped
+---@param y number | Y coord of ped
+---@param z number | Z coord of ped
+AddEventHandler('CEventShockingMadDriverExtreme', function(ped, witnesses, x, y, z)
+	local _text = "CEventShockingMadDriverExtreme \nPlyPId: "..PlayerPedId().."\nPed: "..ped.."\nWitnesses: "..json.encode(witnesses).."\naCoords: "..json.encode(x, y, z)
+	print(_text)
+end)
+
+---@param witnesses table | Array of entity handles who witnessed the event
+---@param vehicle number | Entity handle of the vehicle who triggered the event
+---@param x number | X coord of vehicle
+---@param y number | Y coord of vehicle
+---@param z number | Z coord of vehicle
+AddEventHandler('CEventShockingSeenNiceCar', function(witnessess, vehicle, x, y, z)
+	local _text = "CEventShockingSeenNiceCar \nPlyPId: "..PlayerPedId().."\nVehicle: "..vehicle.."\nWitnesses: "..json.encode(witnessess).."\nCoords: "..json.encode(x, y, z)
+	print(_text)
+end)
+
+--------------------------------- Events ---------------------------------
+
+---@param witnesses table | Array of entity handles who witnessed the event
+---@param ped number | Entity handle of the ped who fired the gun
+AddEventHandler('CEventGunShot', function(witnesses, ped)
+	local _text = "CEventGunShot \nPlyPId: "..PlayerPedId().."\nShooter: "..ped.."\nWitnesses: "..json.encode(witnesses)
+	print(_text)
+end)
+
+---@param peds table | Array of entity handles who received the command
+AddEventHandler('CEventScriptCommand', function(peds)
+	local _text = "CEventScriptCommand \nPlyPId: "..PlayerPedId().."\nPed: "..json.encode(peds)
+	print(_text)
+end)
+
+---@param peds table | Array of entity handles who received the task
+AddEventHandler('CEventGivePedTask', function(peds)
+	local _text = "CEventGivePedTask \npid: "..PlayerPedId().."\nPeds: "..json.encode(peds)
+	print(_text)
+end)
+
+--------------------------------- Unknown Parameters ---------------------------------
 
 AddEventHandler('CEventDataResponseTaskShockingEventWatch', function(entities, eventEntity, args)
 	local _text = "CEventDataResponseTaskShockingEventWatch \npid: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
@@ -324,37 +414,6 @@ AddEventHandler('CEventDataResponseTaskShockingEventInvestigate', function(entit
 	print(_text)
 end)
 
----@param witnesses table | Array of entity handles who witnessed the event
----@param ped number | Entity handle of the ped who triggered the event
----@param x number | X coord of ped
----@param y number | Y coord of ped
----@param z number | Z coord of ped
-AddEventHandler('CEventShockingGunshotFired', function(witnesses, ped, x, y, z)
-	local _text = "CEventShockingGunshotFired \nPlyPId: "..PlayerPedId().."\nShooter: "..ped.."\nWitnesses: "..json.encode(witnesses).."\nCoords: "..json.encode(x, y, z)
-	print(_text)
-end)
-
----@param witnesses table | Array of entity handles who witnessed the event
----@param ped number | Entity handle of the ped who triggered the event
----@param x number | X coord of ped
----@param y number | Y coord of ped
----@param z number | Z coord of ped
-AddEventHandler('CEventShockingVisibleWeapon', function(witnesses, ped, x, y, z)
-	local _text = "CEventShockingVisibleWeapon \nPlyPId: "..PlayerPedId().."\nPed: "..ped.."\nWitnesses: "..json.encode(witnesses).."\nargs: "..json.encode(x, y, z)
-	print(_text)
-end)
-
-
----@param witnesses table | Array of entity handles who witnessed the event
----@param ped number | Entity handle of the ped who triggered the event
----@param x number | X coord of ped
----@param y number | Y coord of ped
----@param z number | Z coord of ped
-AddEventHandler('CEventShockingWeaponThreat', function(witnesses, ped, x, y, z)
-	local _text = "CEventShockingWeaponThreat \nPlyPId: "..PlayerPedId().."\nPed: "..ped.."\nWitnesses: "..json.encode(witnesses).."\nargs: "..json.encode(x, y, z)
-	print(_text)
-end)
-
 AddEventHandler('CEventShockingSeenDeadBody', function(entities, eventEntity, args)
 	local _text = "CEventShockingSeenDeadBody \nPlyPId: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
 	print(_text)
@@ -365,62 +424,13 @@ AddEventHandler('CEventShockingInDangerousVehicle', function(entities, eventEnti
 	print(_text)
 end)
 
----@param witnesses table | Array of entity handles who witnessed the event
----@param ped number | Entity handle of the ped who triggered the event
----@param x number | X coord of ped
----@param y number | Y coord of ped
----@param z number | Z coord of ped
-AddEventHandler('CEventShockingMadDriver', function(witnesses, ped, x, y, z)
-	local _text = "CEventShockingMadDriver \nPlyPId: "..PlayerPedId().."\nPed: "..ped.."\nWitnesses: "..json.encode(witnesses).."\nCoords: "..json.encode(x, y, z)
-	print(_text)
-end)
-
----@param witnesses table | Array of entity handles who witnessed the event
----@param ped number | Entity handle of the ped who triggered the event
----@param x number | X coord of ped
----@param y number | Y coord of ped
----@param z number | Z coord of ped
-AddEventHandler('CEventShockingMadDriverExtreme', function(ped, witnesses, x, y, z)
-	local _text = "CEventShockingMadDriverExtreme \nPlyPId: "..PlayerPedId().."\nPed: "..ped.."\nWitnesses: "..json.encode(witnesses).."\naCoords: "..json.encode(x, y, z)
-	print(_text)
-end)
-
 AddEventHandler('CEventReactionEnemyPed', function(entities, eventEntity, args)
 	local _text = "CEventReactionEnemyPed \npid: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
 	print(_text)
 end)
 
----@param witnesses table | Array of entity handles who witnessed the event
----@param vehicle number | Entity handle of the vehicle who triggered the event
----@param x number | X coord of vehicle
----@param y number | Y coord of vehicle
----@param z number | Z coord of vehicle
-AddEventHandler('CEventShockingSeenNiceCar', function(witnessess, vehicle, x, y, z)
-	local _text = "CEventShockingSeenNiceCar \nPlyPId: "..PlayerPedId().."\nVehicle: "..vehicle.."\nWitnesses: "..json.encode(witnessess).."\nCoords: "..json.encode(x, y, z)
-	print(_text)
-end)
-
----@param witnesses table | Array of entity handles who witnessed the event
----@param ped number | Entity handle of the ped who fired the gun
-AddEventHandler('CEventGunShot', function(witnesses, ped)
-	local _text = "CEventGunShot \nPlyPId: "..PlayerPedId().."\nShooter: "..ped.."\nWitnesses: "..json.encode(witnesses)
-	print(_text)
-end)
-
----@param peds table | Array of entity handles who received the command
-AddEventHandler('CEventScriptCommand', function(peds)
-	local _text = "CEventScriptCommand \nPlyPId: "..PlayerPedId().."\nPed: "..json.encode(peds)
-	print(_text)
-end)
-
 AddEventHandler('CEventScriptWithData', function(entities, eventEntity, args)
 	local _text = "CEventScriptWithData \npid: "..PlayerPedId().."\neventEnt: "..eventEntity.."\nentities: "..json.encode(entities).."\nargs: "..json.encode(args)
-	print(_text)
-end)
-
----@param peds table | Array of entity handles who received the task
-AddEventHandler('CEventGivePedTask', function(peds)
-	local _text = "CEventGivePedTask \npid: "..PlayerPedId().."\nPeds: "..json.encode(peds)
 	print(_text)
 end)
 
