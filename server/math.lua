@@ -1,5 +1,7 @@
 --------------------------------- GetOffsetFromEntityInWorldCoords --------------------------------- [Credits goes to: draobrehtom | https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297]
 
+---@param element number | Entity to get the matrix from
+---@return table
 local function getEntityMatrix(element)
     local rot = GetEntityRotation(element) -- ZXY
     local rx, ry, rz = rot.x, rot.y, rot.z
@@ -31,6 +33,11 @@ local function getEntityMatrix(element)
     return matrix
 end
 
+---@param entity number | Entity to get the offset from
+---@param offX number | X offset
+---@param offY number | Y offset
+---@param offZ number | Z offset
+---@return 'vector3'
 local function GetOffsetFromEntityInWorldCoords(entity, offX, offY, offZ)
     local m = getEntityMatrix(entity)
     local x = offX * m[1][1] + offY * m[2][1] + offZ * m[3][1] + m[4][1]
@@ -43,21 +50,37 @@ exports('GetOffsetFromEntityInWorldCoords', function(entity, offX, offY, offZ) r
 
 --------------------------------- GetEntityVectors --------------------------------- [Credits goes to: VenomXNL | https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980]
 
+---@param entity number | Entity to get the forward vector from
+---@return 'vector3'
 local function GetEntityForwardVector(entity)
     local matrix = getEntityMatrix(entity)
     return vector3(matrix[1][2], matrix[2][2], matrix[3][2])
 end
 
+---@param entity number | Entity to get the up vector from
+---@return 'vector3'
 local function GetEntityUpVector(entity)
     local matrix = getEntityMatrix(entity)
     return vector3(matrix[1][3], matrix[2][3], matrix[3][3])
 end
 
+---@param entity number | Entity to get the right vector from
+---@return 'vector3'
 local function GetEntityRightVector(entity)
     local matrix = getEntityMatrix(entity)
     return vector3(matrix[1][1], matrix[2][1], matrix[3][1])
 end
 
-exports('GetEntityForwardVector', function(entity) return GetEntityForwardVector(entity) end)
-exports('GetEntityUpVector', function(entity) return GetEntityUpVector(entity) end)
-exports('GetEntityRightVector', function(entity) return GetEntityRightVector(entity) end)
+exports('Sv_GetEntityForwardVector', function(entity) return GetEntityForwardVector(entity) end)
+exports('Sv_GetEntityUpVector', function(entity) return GetEntityUpVector(entity) end)
+exports('Sv_GetEntityRightVector', function(entity) return GetEntityRightVector(entity) end)
+
+--------------------------------- GetEntityMatrix ---------------------------------
+
+---@param entity number | Entity to get the matrix from
+---@return 'vector3', 'vector3', 'vector3', 'vector3'
+exports('GetEntityMatrix', function(entity) 
+    local matrix = getEntityMatrix(entity)
+    local forwardVector, upVector, rightVector, position = vector3(matrix[1][2], matrix[2][2], matrix[3][2]), vector3(matrix[1][3], matrix[2][3], matrix[3][3]), vector3(matrix[1][1], matrix[2][1], matrix[3][1]), vector3(matrix[4][1], matrix[4][2], matrix[4][3])
+    return forwardVector, upVector, rightVector, position
+end)
