@@ -9,6 +9,6 @@ server_script {'server/commands.lua', 'server/events.lua', 'server/math.lua'}
 
 client_script {'client/blips.lua', 'client/enumerators.lua', 'client/events.lua', 'client/load_assets.lua', 'client/math.lua'}
 
-shared_script {'shared/config.lua', 'shared/math.lua'}
+shared_script {'shared/math.lua'}
 
 lua54 'yes'
