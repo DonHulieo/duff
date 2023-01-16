@@ -40,7 +40,7 @@ exports('IsEntityInLOS', function(source, target, flags) return IsEntityInLOS(so
     ------------------------------------------------------------------
     Example usage:
     local ped = exports['duf']:GetClosest('ped', GetEntityCoords(PlayerPedId()))
-    local hit, coords = IsEntityInLOS(PlayerPedId(), ped, 4294967295)
+    local hit, coords = exports['duf']:IsEntityInLOS(PlayerPedId(), ped, 8)
     if hit then
         print('hit', coords)
     end
