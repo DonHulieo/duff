@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'DonHulieo'
 description 'Don\'s Utility Functions for FiveM'
-version '0.0.1'
+version '0.5.0'
 
 server_script {'server/commands.lua', 'server/events.lua', 'server/math.lua'}
 

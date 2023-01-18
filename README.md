@@ -7,6 +7,8 @@ Don's Utility Functions for FiveM
 Has you're script gone up the *[duff](https://www.urbandictionary.com/define.php?term=Up%20The%20Duff)*? 
 Well, this is the solution for you! This is a collection of *optimised utility functions* that are exports for you to use in your scripts.
 
+- *This is a work in progress, and I'll be adding more functions as I go along.*
+
 ## Dependencies
 
 * **None!**
@@ -19,70 +21,328 @@ Well, this is the solution for you! This is a collection of *optimised utility f
 
 ## Documentation
 
-### 1. Math Functions
+### 1. Blips
 
-#### 1.1 Shared
+#### 1.1. Create Blip
 
-##### 1.1.1 exports['duf']:CompareTables(table1, table2)
+```lua
+---@param blipType string | Type of blip (e.g. 'entity', 'coord', 'pickup')
+---@param info any | Either a Handle or Vector3 (e.g. entity, coords, pickup)
+---@param text string | Blip Text
+---@param sprite number | Blip Sprite 
+---@param colour number | Blip Colour 
+---@param scale number | Blip Scale
+---@param category number | Blip Category
+---@param display number | Blip Display
+---@param shortRange boolean | Blip Short Range
+---@return number | Blip Handle
+local blip = exports['duf']:CreateBlipFor(blipType, info, text, sprite, colour, scale, category, display, shortRange)
+```
 
-Compares two tables and returns true if they are the same, false if they are not.
+#### 1.2. Get All Blips
 
-##### 1.1.2 exports['duf']:RoundNumber(number, decimalPlaces)
+```lua
+---@return table | All blips
+local blips = exports['duf']:GetAllBlips()
+```
 
-Rounds a number to a specified number of decimal places.
+#### 1.3. Get Blip On Screen Blips
 
-##### 1.1.3 exports['duf']:ConvertToVec2(table)
+```lua
+---@return table | All blips on screen
+local blips = exports['duf']:GetOnScreenBlips()
+```
 
-Converts a table to a vector2.
+### 2. Enumerators
 
-##### 1.1.4 exports['duf']:ConvertToVec3(table)
+#### 2.1. Base Enumerator Functions
 
-Converts a table to a vector3.
+```lua
+---@return table | All Object Handles
+local objects = exports['duf']:EnumerateObjects()
 
-##### 1.1.5 exports['duf']:ConvertToVec4(table)
+---@return table | All Ped Handles
+local peds = exports['duf']:EnumeratePeds()
 
-Converts a table to a vector4.
+---@return table | All Vehicle Handles
+local vehicles = exports['duf']:EnumerateVehicles()
 
-##### 1.1.6 exports['duf']:GetHeadingBetweenCoords(x1, y1, z1, x2, y2, z2)
+---@return table | All Pickup Handles
+local pickups = exports['duf']:EnumeratePickups()
+```
 
-Gets the heading between two coordinates.
+#### 2.2. Return Entities with Model
 
-#### 1.2 Client
+```lua
+---@param entityType string | Type of entity (e.g. 'object', 'ped', 'vehicle', 'pickup')
+---@param model string or hash | Model of entity (e.g. 'prop_rock_1_a')
+---@return table | All entities with model
+local entities = exports['duf']:ReturnEntitiesWithModel(entityType, model)
+```
 
-##### 1.2.1 exports['duf']:FindEntitiesInLOS(entity, flags, maxDistance)
+#### 2.3. Return Entities in Zone
 
-Finds all entities in the line of sight of an entity.
+```lua
+---@param entityType string | Type of entity (e.g. 'object', 'ped', 'vehicle', 'pickup')
+---@param zone 'vector3' | Zone of entity (e.g. 'AIRP')
+---@return table | All entities in zone
+local entities = exports['duf']:ReturnEntitiesInZone(entityType, zone)
+```
 
-##### 1.2.2 exports['duf']:IsEntityInLOS(source, target, flags)
+#### 2.4. Get Closest Entity
 
-Checks if an entity is in the line of sight of another entity.
+```lua
+---@param entityType string | Type of entity (e.g. 'object', 'ped', 'vehicle', 'pickup')
+---@param coords 'vector3' | Coords of origin
+---@param model string or hash | Model of entity (e.g. 'prop_rock_1_a')
+---@return number, number | Entity Handle, Distance
+local entity, distance = exports['duf']:GetClosest(entityType, coords, model)
+```
 
-##### 1.2.3 exports['duf']:Cl_GetEntityUpVector(entity)
+### 3. Events
 
-Gets the up vector of an entity.
+* NOTE: This started as a project of creating my own events, but I decided to used this to document the Base Game Events, found [here](https://docs.fivem.net/docs/game-references/game-events/). The events are prepackaged with the game, and I've been unable to find the parameters for each event documented anywhere. So I've set about finding them myself, due to the nature of this (and the over 1000 lines of Events and Comments), I can't provide documentation for each event, but by looking at client/events.lua, you can see the parameters for each event. I'll try to keep this up to date with the latest events, but if you find any missing, please let me know.
 
-##### 1.2.4 exports['duf']:Cl_GetEntityRightVector(entity)
+### 4. Loading Assets
 
-Gets the right vector of an entity.
+#### 4.1. Request Model
 
-#### 1.3 Server
+```lua
+---@param model string or hash | Model of entity (e.g. 'prop_rock_1_a')
+---@param return boolean | Returns true if model is loaded
+local modelLoaded = exports['duf']:ReqModel(model)
+```
 
-##### 1.3.1 exports['duf']:GetEntityMatrix(entity)
+#### 4.2. Request Collision
 
-Gets the matrix of an entity.
+```lua
+---@param model string or hash | Model of entity (e.g. 'prop_rock_1_a')
+---@param return boolean | Returns true if collision is loaded
+local collisionLoaded = exports['duf']:ReqCollision(model)
+```
 
-#### 1.3.2 exports['duf']:GetOffsetFromEntityInWorldCoords(entity)
+#### 4.3. Request Anim Dict
 
-Gets the offset from an entity in world coordinates.
+```lua
+---@param animDict string | Animation Dictionary (e.g. 'anim@mp_player_intcelebrationmale@face_palm')
+---@param return boolean | Returns true if anim dict is loaded
+local animDictLoaded = exports['duf']:ReqAnimDict(animDict)
+```
 
-##### 1.3.3 exports['duf']:Sv_GetEntityForwardVector(entity)
+#### 4.4. Request Anim/Clip Set
 
-Gets the forward vector of an entity.
+```lua
+---@param animSet string | Animation Set (e.g. 'move_m@intimidation@cop@unarmed')
+---@param return boolean | Returns true if anim set is loaded
+local animSetLoaded = exports['duf']:ReqAnimSet(animSet)
+-------------------------------------------------------------------------------------
+---@param clipSet string | Clip Set (e.g. 'MOVE_M@TOUGH_GUY@')
+---@param return boolean | Returns true if clip set is loaded
+local clipSetLoaded = exports['duf']:ReqClipSet(clipSet)
+```
 
-##### 1.3.4 exports['duf']:Sv_GetEntityUpVector(entity)
+#### 4.5. Request IPL
 
-Gets the up vector of an entity.
+```lua
+---@param ipl string | IPL (e.g. 'prologue01')
+---@param return boolean | Returns true if IPL is loaded
+local iplLoaded = exports['duf']:ReqIPL(ipl)
+```
 
-##### 1.3.5 exports['duf']:Sv_GetEntityRightVector(entity)
+#### 4.6 Request PTFX Asset
 
-Gets the right vector of an entity.
+```lua
+---@param asset string | PTFX Asset (e.g. 'scr_jewelheist')
+---@return boolean | Returns true if PTFX Asset is loaded
+local assetLoaded = exports['duf']:ReqNamedPtfxAsset(asset)
+```
+
+#### 4.7 Request Scaleform
+
+```lua
+---@param scaleform string | Scaleform (e.g. 'mp_big_message_freemode')
+---@return boolean | Returns true if Scaleform is loaded
+local scaleformLoaded = exports['duf']:ReqScaleformMovie(scaleform)
+```
+
+#### 4.8 Request Named Texture Dict
+
+```lua
+---@param textureDict string | Texture Dictionary (e.g. 'mpinventory')
+---@return boolean | Returns true if the Texture Dict loaded
+local textDictLoaded = exports['duf']:ReqNamedTextureDict(textureDict)
+```
+
+#### 4.9 Request Weapon Asset
+
+```lua
+---@param weapon string or hash | Weapon (e.g. 'WEAPON_PISTOL')
+---@param return boolean | Returns true if Weapon Asset is loaded
+local weaponAssetLoaded = exports['duf']:ReqWeaponAsset(weapon)
+```
+
+### 5. Math Library
+
+#### 5.1. Shared Functions
+
+##### 5.1.1. Compare Tables
+
+```lua
+---@param table1 table | Table 1
+---@param table2 table | Table 2
+---@return boolean | Returns true if tables are equal
+local tablesEqual = exports['duf']:CompareTables(table1, table2)
+```
+
+##### 5.1.2. Round Number
+
+```lua
+---@param num number | Number to round
+---@param idp number | Number of decimal places
+---@return number | Rounded number
+local roundedNum = exports['duf']:RoundNumber(num, idp)
+```
+
+##### 5.1.3. Get Random Number
+
+```lua
+---@param min number | Minimum number
+---@param max number | Maximum number
+---@return number | Random number
+local randomNum = exports['duf']:GetRandomNumber(min, max)
+```
+
+##### 5.1.4. Convert Table to Vector 
+
+```lua
+---@param table table | Table to convert
+---@return 'vector2' | Vector2
+local vector2 = exports['duf']:ConvertToVec2(table)
+
+---@param table table | Table to convert
+---@return 'vector3' | Vector3
+local vector3 = exports['duf']:ConvertToVec3(table)
+
+---@param table table | Table to convert
+---@return 'vector4' | Vector4
+local vector4 = exports['duf']:ConvertToVec4(table)
+```
+
+##### 5.1.5. Get Distance Between Coords
+
+```lua
+---@param coords1 'vector2' | Coords 1
+---@param coords2 'vector2' | Coords 2
+---@return number | Distance between coords
+local distance = exports['duf']:GetDistVec2(coords1, coords2)
+
+---@param coords1 'vector3' | Coords 1
+---@param coords2 'vector3' | Coords 2
+---@return number | Distance between coords
+local distance = exports['duf']:GetDistVec3(coords1, coords2)
+```
+
+##### 5.1.6. Get Heading Between Coords
+
+```lua
+---@param coords1 'vector3' | Coords 1
+---@param coords2 'vector3' | Coords 2
+---@return number | Heading between coords
+local heading = exports['duf']:GetHeadingBetweenCoords(coords1, coords2)
+```
+
+#### 5.2. Client Functions
+
+##### 5.2.1. Find Entities in Line of Sight
+
+```lua
+---@param source number | Entity Handle
+---@param flags number | Flags
+---@param maxDistance number | Max Distance
+---@return table | Entities in line of sight
+local entities = exports['duf']:FindEntitiesInLOS(source, flags, maxDistance)
+```
+
+Where `flags` is a combination of the following:
+
+```lua
+local flags = {
+    IntersectWorld = 1, 
+    IntersectVehicles = 2, 
+    IntersectPedsSimpleCollision = 4, 
+    IntersectPeds = 8, 
+    IntersectObjects = 16, 
+    IntersectWater = 32, 
+    IntersectFoliage = 256, 
+    IntersectEverything = 4294967295
+}
+```
+
+##### 5.2.2. Is Entity in Line of Sight
+
+```lua
+---@param source number | Entity Handle
+---@param target number | Entity Handle
+---@param flags number | Flags
+---@return boolean, 'vector3' | Returns true if entity is in line of sight, and the coords of the entity
+local inLOS, coords = exports['duf']:IsEntityInLOS(source, target, flags)
+```
+
+Where `flags` is the same as above.
+
+##### 5.2.3. Get Entity Vectors
+
+```lua
+---@param entity number | Entity Handle
+---@return 'vector3' | Entity Up Vector
+local upVector = exports['duf']:Cl_GetEntityUpVector(entity)
+
+---@param entity number | Entity Handle
+---@return 'vector3' | Entity Right Vector
+local rightVector = exports['duf']:Cl_GetEntityRightVector(entity)
+```
+
+#### 5.3. Server Functions
+
+##### 5.3.1. Get Offset From Entity In World Coords
+
+```lua
+---@param entity number | Entity Handle
+---@param offX number | X Offset
+---@param offY number | Y Offset
+---@param offZ number | Z Offset
+---@return 'vector3' | Offset Coords
+local offsetCoords = exports['duf']:Sv_GetOffsetFromEntityInWorldCoords(entity, offX, offY, offZ)
+```
+
+##### 5.3.2. Get Entity Vectors
+
+```lua
+---@param entity number | Entity Handle
+---@return 'vector3' | Entity Forward Vector
+local forwardVector = exports['duf']:Sv_GetEntityForwardVector(entity)
+
+---@param entity number | Entity Handle
+---@return 'vector3' | Entity Up Vector
+local upVector = exports['duf']:Sv_GetEntityUpVector(entity)
+
+---@param entity number | Entity Handle
+---@return 'vector3' | Entity Right Vector
+local rightVector = exports['duf']:Sv_GetEntityRightVector(entity)
+```
+
+##### 5.3.3. Get Entity Matrix
+
+```lua
+---@param entity number | Entity Handle
+---@return 'vector3', 'vector3', 'vector3' | Entity Forward Vector, Entity Right Vector, Entity Up Vector
+local forwardVector, rightVector, upVector = exports['duf']:Sv_GetEntityMatrix(entity)
+```
+
+## Credits
+
+- [negbook](https://github.com/negbook/nbk_blips)
+- [IllidanS4](https://gist.github.com/IllidanS4/9865ed17f60576425369fc1da70259b2)
+- [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
+- [Swkeep](https://github.com/swkeep)
+- [draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297)
