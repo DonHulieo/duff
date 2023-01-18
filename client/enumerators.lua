@@ -30,18 +30,22 @@ local function EnumerateEntities(initFunc, moveFunc, disposeFunc)
     end)
 end
 
+---@return table | Array of all object handles
 local function EnumerateObjects()
     return EnumerateEntities(FindFirstObject, FindNextObject, EndFindObject)
 end
 
+---@return table | Array of all ped handles
 local function EnumeratePeds()
     return EnumerateEntities(FindFirstPed, FindNextPed, EndFindPed)
 end
 
+---@return table | Array of all vehicle handles
 local function EnumerateVehicles()
     return EnumerateEntities(FindFirstVehicle, FindNextVehicle, EndFindVehicle)
 end
 
+---@return table | Array of all pickup handles
 local function EnumeratePickups()
     return EnumerateEntities(FindFirstPickup, FindNextPickup, EndFindPickup)
 end
@@ -61,6 +65,7 @@ exports('EnumeratePickups', function() return EnumeratePickups() end)
 
 ---@param entityType string | Type of entity to search for (object, ped, vehicle, pickup)
 ---@param model string or hash | Model to search for
+---@return table | Table of entities with the specified model
 local function ReturnEntitiesWithModel(entityType, model)
     if type(model) == 'string' then
         model = joaat(model)
@@ -106,6 +111,7 @@ exports('ReturnEntitiesWithModel', function(entityType, model) return ReturnEnti
 
 ---@param entityType string | Type of entity to search for (object, ped, vehicle, pickup)
 ---@param zone vector3 | Zone to search for entities in
+---@return table | Entities in zone
 local function ReturnEntitiesInZone(entityType, zone)
     if type(zone) == 'vector3' then
         SetFocusPosAndVel(zone)
@@ -157,7 +163,7 @@ exports('ReturnEntitiesInZone', function(entityType, zone) return ReturnEntities
 ---@param entityType string | Type of entity to search for (object, ped, vehicle, pickup)
 ---@param coords vector3 | Coordinates to search for entities around
 ---@param model string or hash | Model to search for
----@param excludePlayer boolean | Exclude player from search
+---@return number, number | Entity, Distance
 local function GetClosest(entityType, coords, model)
     if model and type(model) == 'string' then
         model = joaat(model)

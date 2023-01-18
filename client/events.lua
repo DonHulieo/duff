@@ -326,6 +326,13 @@ AddEventHandler('CEventCommunicateEvent', function(entities, entity)
 	-- print(_text)
 end)
 
+---@param victims table | Array of entities that were damaged
+---@param attacker number | Entity that caused the damage
+AddEventHandler('CEventDamage', function(victims, attacker)
+	local _text = 'CEventDamage \npid: '..PlayerPedId()..'\nAttacker: '..attacker..'\nVictims: '..json.encode(victims)
+	print(_text)
+end)
+
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param ped number | Entity handle of the ped who fired the gun
 AddEventHandler('CEventGunShot', function(witnesses, ped)
@@ -333,15 +340,22 @@ AddEventHandler('CEventGunShot', function(witnesses, ped)
 	-- print(_text)
 end)
 
----@param peds table | Array of entity handles who received the command
-AddEventHandler('CEventScriptCommand', function(peds)
-	-- local _text = 'CEventScriptCommand \nPed: '..json.encode(peds)
-	-- print(_text)
-end)
-
 ---@param peds table | Array of entity handles who received the task
 AddEventHandler('CEventGivePedTask', function(peds)
 	-- local _text = 'CEventGivePedTask \nPeds: '..json.encode(peds)
+	-- print(_text)
+end)
+
+---@param entities table | Array of entities that are in the air (usually peds)
+---@param eventEntity number | Entity that triggered the event
+AddEventHandler('CEventInAir', function(entities, eventEntity)
+	-- local _text = 'CEventInAir \npid: '..PlayerPedId()..'\nEvent Entity: '..eventEntity..'\nEntities: '..json.encode(entities)
+	-- print(_text)
+end)
+
+---@param entities table | Array of entity handles that are involved in the event (usually the ped which collided with the object)
+AddEventHandler('CEventObjectCollision', function(entities)
+	-- local _text = 'CEventObjectCollision \npid: '..PlayerPedId()..'\nEntities: '..json.encode(entities)
 	-- print(_text)
 end)
 
@@ -365,10 +379,22 @@ AddEventHandler('CEventRespondedToThreat', function(peds, initPed)
 	-- print(_text)
 end)
 
+---@param peds table | Array of entity handles who received the command
+AddEventHandler('CEventScriptCommand', function(peds)
+	-- local _text = 'CEventScriptCommand \nPed: '..json.encode(peds)
+	-- print(_text)
+end)
+
 ---@param entities table | Array of entities receiving position event
 ---@param ped number | Ped entity that is calling out shouting positon
 AddEventHandler('CEventShoutTargetPosition', function(entities, ped)
 	-- local _text = 'CEventShoutTargetPosition \nEntities: '..json.encode(entities)..'\nPed: '..ped
+	-- print(_text)
+end)
+
+---@param entities table | Array of entity handles that have reached max count
+AddEventHandler('CEventStaticCountReachedMax', function(entities)
+	-- local _text = 'CEventStaticCountReachedMax \npid: '..PlayerPedId()..'\nEntities: '..json.encode(entities)
 	-- print(_text)
 end)
 
@@ -927,11 +953,6 @@ AddEventHandler('CEventOnFire', function(entities, eventEntity, args)
 	print(_text)
 end)
 
-AddEventHandler('CEventObjectCollision', function(entities, eventEntity, args)
-	local _text = 'CEventObjectCollision \npid: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
-	print(_text)
-end)
-
 AddEventHandler('CEventMustLeaveBoat', function(entities, eventEntity, args)
 	local _text = 'CEventMustLeaveBoat \npid: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
 	print(_text)
@@ -1054,11 +1075,6 @@ end)
 
 AddEventHandler('CEventStuckInAir', function(entities, eventEntity, args)
 	local _text = 'CEventStuckInAir \npid: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
-	print(_text)
-end)
-
-AddEventHandler('CEventStaticCountReachedMax', function(entities, eventEntity, args)
-	local _text = 'CEventStaticCountReachedMax \npid: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
 	print(_text)
 end)
 

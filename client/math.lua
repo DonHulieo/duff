@@ -3,6 +3,7 @@
 ---@param source Entity
 ---@param flags number |  IntersectWorld = 1, IntersectVehicles = 2, IntersectPedsSimpleCollision = 4, IntersectPeds = 8, IntersectObjects = 16, IntersectWater = 32, IntersectFoliage = 256, IntersectEverything = 4294967295
 ---@param maxDistance number | Max distance to check for entities
+---@return table | Entities found in line of sight
 local function FindEntitiesInLOS(source, flags, maxDistance)
     local start = GetEntityCoords(source)
     local finish = GetOffsetFromEntityInWorldCoords(source, 0.0, maxDistance, 0.0)
@@ -21,6 +22,7 @@ end
 ---@param source entity
 ---@param target entity
 ---@param flags number |  IntersectWorld = 1, IntersectVehicles = 2, IntersectPedsSimpleCollision = 4, IntersectPeds = 8, IntersectObjects = 16, IntersectWater = 32, IntersectFoliage = 256, IntersectEverything = 4294967295
+---@return boolean, vector3 | Hit, Coords
 local function IsEntityInLOS(source, target, flags) 
     local start = GetEntityCoords(source)
     local finish = GetEntityCoords(target)
@@ -49,12 +51,14 @@ exports('IsEntityInLOS', function(source, target, flags) return IsEntityInLOS(so
 --------------------------------- GetEntityVectors --------------------------------- [Credits go to: VenomXNL | https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980]
 
 ---@param entity Entity
+---@return 'vector3' | upVector 
 local function GetEntityUpVector(entity)
 	local forwardVector, rightVector, upVector, posVector = GetEntityMatrix(entity)
 	return upVector
 end
 
 ---@param entity Entity
+---@return 'vector3' | rightVector
 local function GetEntityRightVector(entity)
 	local forwardVector, rightVector, upVector, posVector = GetEntityMatrix(entity)
 	return rightVector

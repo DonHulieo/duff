@@ -1,116 +1,158 @@
 --------------------------------- Loading Assets --------------------------------- 
 
 ---@param model string or hash | Model to load
+---@return boolean | Returns true if model is loaded
 local function ReqModel(model)
+    local loaded = false
+    if not IsModelInCdimage(model) or not IsModelAVehicle(model) then print('^3DUF^7: ^1Invalid model requested^7: ' .. model) return loaded end
     if type(model) == 'string' then
         model = joaat(model)
     end
 
-    if not HasModelLoaded(model) then
+    loaded = HasModelLoaded(model)
+    if not loaded then
         RequestModel(model)
-        while not HasModelLoaded(model) do
-            Wait(0)
+        while not loaded do
+            Wait(100)
         end
     end
+    return loaded
 end
 
 ---@param model string or hash | Model to load collision for
+---@return boolean | Returns true if collision is loaded
 local function ReqCollision(model)
+    local loaded = false
+    if not IsModelInCdimage(model) or not IsModelAVehicle(model) then print('^3DUF^7: ^1Invalid model requested^7: ' .. model) return loaded end
     if type(model) == 'string' then
         model = joaat(model)
     end
 
-    if not HasCollisionForModelLoaded(model) then
+    loaded = HasCollisionForModelLoaded(model)
+    if not loaded then
         RequestCollisionForModel(model)
-        while not HasCollisionForModelLoaded(model) do
-            Wait(0)
+        while not loaded do
+            Wait(100)
         end
     end
+    return loaded
 end
 
 ---@param dict string | Animation Dictionary (e.g. 'anim@mp_player_intmenu@key_fob@')
+---@return boolean | Returns true if animation dictionary is loaded
 local function ReqAnimDict(dict)
-    if not HasAnimDictLoaded(dict) then
+    local loaded = false
+    loaded = HasAnimDictLoaded(dict)
+    if not loaded then
         RequestAnimDict(dict)
-        while not HasAnimDictLoaded(dict) do
-            Wait(0)
+        while not loaded do
+            Wait(100)
         end
     end
+    return loaded
 end
 
 ---@param dict string | Animation Set (e.g. 'MOVE_M@DRUNK@VERYDRUNK')
+---@return boolean | Returns true if animation set is loaded
 local function ReqAnimSet(animSet)
-    if not HasAnimSetLoaded(animSet) then
+    local loaded = false
+    loaded = HasAnimSetLoaded(animSet)
+    if not loaded then
         RequestAnimSet(animSet)
-        while not HasAnimSetLoaded(animSet) do
-            Wait(0)
+        while not loaded do
+            Wait(100)
         end
     end
+    return loaded
 end
 
 ---@param dict string | Animation Set (e.g. 'MOVE_M@DRUNK@VERYDRUNK')
+---@return boolean | Returns true if animation set is loaded
 local function ReqClipSet(clipSet)
-    if not HasClipSetLoaded(clipSet) then
+    local loaded = false
+    loaded = HasClipSetLoaded(clipSet)
+    if not loaded then
         RequestClipSet(clipSet)
-        while not HasClipSetLoaded(clipSet) do
-            Wait(0)
+        while not loaded do
+            Wait(100)
         end
     end
+    return loaded
 end
 
 ---@param ipl string | IPL to load (e.g. 'TrevorsTrailerTrash')
+---@return boolean | Returns true if IPL is loaded
 local function ReqIpl(ipl)
-    if not IsIplActive(ipl) then
+    local loaded = false
+    loaded = IsIplActive(ipl)
+    if not loaded then
         RequestIpl(ipl)
-        while not IsIplActive(ipl) do
-            Wait(0)
+        while not loaded do
+            Wait(100)
         end
     end
+    return loaded
 end
 
 ---@param asset string | Particle FX Asset (e.g. 'scr_jewelheist')
+---@return boolean | Returns true if Particle FX Asset is loaded
 local function ReqNamedPtfxAsset(asset)
-    if not HasNamedPtfxAssetLoaded(asset) then
+    local loaded = false
+    loaded = HasNamedPtfxAssetLoaded(asset)
+    if not loaded then
         RequestNamedPtfxAsset(asset)
-        while not HasNamedPtfxAssetLoaded(asset) do
-            Wait(0)
+        while not loaded do
+            Wait(100)
         end
     end
-    UseParticleFxAsset(asset)
+    if loaded then UseParticleFxAsset(asset) end
+    return loaded
 end
 
 ---@param scaleform string | Scaleform to load (e.g. 'mp_big_message_freemode')
+---@param return boolean | Returns true if Scaleform is loaded
 local function ReqScaleformMovie(scaleform)
-    if not HasScaleformMovieLoaded(scaleform) then
+    local loaded = false
+    loaded = HasScaleformMovieLoaded(scaleform)
+    if not loaded then
         RequestScaleformMovie(scaleform)
-        while not HasScaleformMovieLoaded(scaleform) do
-            Wait(0)
+        while not loaded do
+            Wait(100)
         end
     end
+    return loaded
 end
 
 ---@param dict string | Texture Dictionary to load (e.g. 'mpleaderboard')
+---@return boolean | Returns true if Texture Dictionary is loaded
 local function ReqStreamedTextureDict(dict)
-    if not HasStreamedTextureDictLoaded(dict) then
+    local loaded = false
+    loaded = HasStreamedTextureDictLoaded(dict)
+    if not loaded then
         RequestStreamedTextureDict(dict, true)
-        while not HasStreamedTextureDictLoaded(dict) do
-            Wait(0)
+        while not loaded do
+            Wait(100)
         end
     end
+    return loaded
 end
 
 ---@param asset string or hash | Weapon Asset to load (e.g. 'WEAPON_PISTOL')
+---@return boolean | Returns true if Weapon Asset is loaded
 local function ReqWeaponAsset(asset)
+    local loaded = false
     if type(asset) == 'string' then
         asset = joaat(asset)
     end
 
-    if not HasWeaponAssetLoaded(asset) then
+    loaded = HasWeaponAssetLoaded(asset)
+    if not loaded then
         RequestWeaponAsset(asset, 31, 0)
-        while not HasWeaponAssetLoaded(asset) do
-            Wait(0)
+        while not loaded do
+            Wait(100)
         end
     end
+    return loaded
 end
 
 exports('ReqModel', function(model) return ReqModel(model) end)

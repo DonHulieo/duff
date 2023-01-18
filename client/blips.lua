@@ -1,5 +1,6 @@
 --------------------------------- Blip Enumerators --------------------------------- [Credits go to: negbook | https://github.com/negbook/nbk_blips]
 
+---@return table | Array of all blip handles
 local function GetAllBlips() 
     local blips = {}
     for i = 1, 826 do 
@@ -17,6 +18,7 @@ local function GetAllBlips()
     return blips
 end
 
+---@return table | Array of all on screen blip handles
 local function GetOnScreenBlips()
     local blips = GetAllBlips()
     local onScreenBlips = {}
@@ -86,21 +88,24 @@ exports('GetBlipsBySprite', function(sprite) return GetBlipsBySprite(sprite) end
     end
 ]]
 
+---@param blipType string | Type of blip (e.g. 'entity', 'coord', 'pickup')
+---@param info any | Info (e.g. entity, coords, pickup)
 ---@param text string | Text
 ---@param sprite number | Sprite 
 ---@param colour number | Colour 
 ---@param scale number | Scale
 ---@param category number | Category
 ---@param display number | Display
----@param blipType string | Type of blip (e.g. 'entity', 'coord', 'pickup')
----@param info any | Info (e.g. entity, coords, pickup)
-local function CreateBlipFor(blipType, info, text, sprite, colour, scale, category, display) 
+---@param shortRange boolean | Short Range
+---@return number | Blip Handle
+local function CreateBlipFor(blipType, info, text, sprite, colour, scale, category, display, shortRange) 
     local blip = nil
     if not sprite then sprite = 1 end
     if not colour then colour = 1 end
     if not scale then scale = 0.5 end
     if not category then category = 1 end
     if not display then display = 2 end
+    if not shortRange then shortRange = true end
     if blipType == 'entity' then
         blip = AddBlipForEntity(info)
     elseif blipType == 'coords' then
@@ -114,7 +119,7 @@ local function CreateBlipFor(blipType, info, text, sprite, colour, scale, catego
         SetBlipScale(blip, scale)
         SetBlipCategory(blip, category)
         SetBlipDisplay(blip, display)
-        SetBlipAsShortRange(blip, true)
+        SetBlipAsShortRange(blip, shortRange)
         AddTextEntry(text, text)
         BeginTextCommandSetBlipName(text)
         EndTextCommandSetBlipName(blip)
