@@ -46,7 +46,7 @@ local function GetOffsetFromEntityInWorldCoords(entity, offX, offY, offZ)
     return vector3(x, y, z)
 end
 
-exports('GetOffsetFromEntityInWorldCoords', function(entity, offX, offY, offZ) return GetOffsetFromEntityInWorldCoords(entity, offX, offY, offZ) end)
+exports('Sv_GetOffsetFromEntityInWorldCoords', function(entity, offX, offY, offZ) return GetOffsetFromEntityInWorldCoords(entity, offX, offY, offZ) end)
 
 --------------------------------- GetEntityVectors --------------------------------- [Credits goes to: VenomXNL | https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980]
 
