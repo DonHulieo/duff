@@ -109,7 +109,7 @@ local entity, distance = exports['duf']:GetClosest(entityType, coords, model)
 
 ```lua
 ---@param model string or hash | Model of entity (e.g. 'prop_rock_1_a')
----@param return boolean | Returns true if model is loaded
+---@return boolean | Returns true if model is loaded
 local modelLoaded = exports['duf']:ReqModel(model)
 ```
 
@@ -117,7 +117,7 @@ local modelLoaded = exports['duf']:ReqModel(model)
 
 ```lua
 ---@param model string or hash | Model of entity (e.g. 'prop_rock_1_a')
----@param return boolean | Returns true if collision is loaded
+---@return boolean | Returns true if collision is loaded
 local collisionLoaded = exports['duf']:ReqCollision(model)
 ```
 
@@ -125,7 +125,7 @@ local collisionLoaded = exports['duf']:ReqCollision(model)
 
 ```lua
 ---@param animDict string | Animation Dictionary (e.g. 'anim@mp_player_intcelebrationmale@face_palm')
----@param return boolean | Returns true if anim dict is loaded
+---@return boolean | Returns true if anim dict is loaded
 local animDictLoaded = exports['duf']:ReqAnimDict(animDict)
 ```
 
@@ -133,11 +133,11 @@ local animDictLoaded = exports['duf']:ReqAnimDict(animDict)
 
 ```lua
 ---@param animSet string | Animation Set (e.g. 'move_m@intimidation@cop@unarmed')
----@param return boolean | Returns true if anim set is loaded
+---@return boolean | Returns true if anim set is loaded
 local animSetLoaded = exports['duf']:ReqAnimSet(animSet)
 -------------------------------------------------------------------------------------
 ---@param clipSet string | Clip Set (e.g. 'MOVE_M@TOUGH_GUY@')
----@param return boolean | Returns true if clip set is loaded
+---@return boolean | Returns true if clip set is loaded
 local clipSetLoaded = exports['duf']:ReqClipSet(clipSet)
 ```
 
@@ -145,7 +145,7 @@ local clipSetLoaded = exports['duf']:ReqClipSet(clipSet)
 
 ```lua
 ---@param ipl string | IPL (e.g. 'prologue01')
----@param return boolean | Returns true if IPL is loaded
+---@return boolean | Returns true if IPL is loaded
 local iplLoaded = exports['duf']:ReqIPL(ipl)
 ```
 
@@ -177,7 +177,7 @@ local textDictLoaded = exports['duf']:ReqNamedTextureDict(textureDict)
 
 ```lua
 ---@param weapon string or hash | Weapon (e.g. 'WEAPON_PISTOL')
----@param return boolean | Returns true if Weapon Asset is loaded
+---@return boolean | Returns true if Weapon Asset is loaded
 local weaponAssetLoaded = exports['duf']:ReqWeaponAsset(weapon)
 ```
 
@@ -263,7 +263,7 @@ local heading = exports['duf']:GetHeadingBetweenCoords(coords1, coords2)
 local entities = exports['duf']:FindEntitiesInLOS(source, flags, maxDistance)
 ```
 
-Where `flags` is a combination of the following:
+Where `flags` is one of the following:
 
 ```lua
 local flags = {
