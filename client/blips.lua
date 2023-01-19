@@ -134,3 +134,6 @@ exports('CreateBlipFor', function(blipType, info, text, sprite, colour, scale, c
     local entity = CreateVehicle(joaat('adder'), coords, 0.0, true, false)
     local blip = exports['duf']:CreateBlipFor('entity', entity, 'Sick Car!', 1, 1, 0.5, 1, 2)
 ]]
+
+------------------------------------------------------------------
+

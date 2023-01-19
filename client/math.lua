@@ -66,3 +66,37 @@ end
 
 exports('Cl_GetEntityUpVector', function(entity) return GetEntityUpVector(entity) end)
 exports('Cl_GetEntityRightVector', function(entity) return GetEntityRightVector(entity) end)
+
+--------------------------------- Calculate Incline ---------------------------------
+
+---@param entity number | Entity Handle 
+---@param ms number | Milliseconds to calculate incline over
+---@return number | Incline in degrees
+local function CalculateIncline(entity, ms)
+    local entity = entity or PlayerPedId()
+    local ms = ms or 1000
+    local startCoords = GetEntityCoords(entity)
+    Wait(ms)
+    local endCoords = GetEntityCoords(entity)
+    local dist = GetDistVec3(startCoords, endCoords)
+    local incline = math.deg(math.atan2(dist, ms))
+    return incline
+end
+
+exports('CalculateIncline', function(entity, ms) return CalculateIncline(entity, ms) end)
+
+--------------------------------- Calculate Fuel Consumption ---------------------------------
+
+---@param vehicle Entity
+---@param speed number | Speed in MPH
+---@param incline number | Incline in degrees
+---@return number | Fuel consumption in L/100km
+local function CalculateFuelConsumption(vehicle, speed, incline)
+    local vehicle = vehicle or GetVehiclePedIsIn(PlayerPedId(), false)  
+    local speed = speed or GetEntitySpeed(vehicle) * 2.236936
+    local incline = incline or CalculateIncline(vehicle, 1000)
+    local fuelConsumption = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fPetrolTankVolume') * GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fPetrolTankVolume') * (speed / 100) * (incline / 100)
+    return fuelConsumption
+end
+
+exports('CalculateFuelConsumption', function(vehicle, speed, incline) return CalculateFuelConsumption(vehicle, speed, incline) end)

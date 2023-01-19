@@ -63,6 +63,23 @@ exports('EnumeratePickups', function() return EnumeratePickups() end)
 
 --------------------------------- Enumerator Utility Functions ---------------------------------
 
+---@param entity Entity | Entity to check
+---@return string | Entity type
+local function GetEntityType(entity)
+    if IsEntityAPed(entity) then
+        return 'ped'
+    elseif IsEntityAVehicle(entity) then
+        return 'vehicle'
+    elseif IsEntityAnObject(entity) then
+        return 'object'
+    elseif IsEntityAPickup(entity) then
+        return 'pickup'
+    end
+    return 'unknown'
+end
+
+exports('GetEntityType', function(entity) return GetEntityType(entity) end)
+
 ---@param entityType string | Type of entity to search for (object, ped, vehicle, pickup)
 ---@param model string or hash | Model to search for
 ---@return table | Table of entities with the specified model
@@ -163,6 +180,72 @@ exports('ReturnEntitiesInZone', function(entityType, zone) return ReturnEntities
 ---@param entityType string | Type of entity to search for (object, ped, vehicle, pickup)
 ---@param coords vector3 | Coordinates to search for entities around
 ---@param model string or hash | Model to search for
+---@param radius number | Radius to search for entities in
+---@return table | Entities in radius
+local function GetEntitiesInRadius(entityType, coords, model, radius)
+    if model and type(model) == 'string' then
+        model = joaat(model)
+    end
+    local entities = {}
+    if entityType == 'object' then
+        for obj in EnumerateObjects() do
+            if model then
+                if GetEntityModel(obj) == model then
+                    entities[#entities + 1] = obj
+                end
+            else
+                entities[#entities + 1] = obj
+            end
+        end
+    elseif entityType == 'ped' then
+        for ped in EnumeratePeds() do
+            if ped ~= PlayerPedId() then
+                if model then
+                    if GetEntityModel(ped) == model then
+                        entities[#entities + 1] = ped
+                    end
+                else
+                    entities[#entities + 1] = ped
+                end
+            end
+        end
+    elseif entityType == 'vehicle' then
+        for veh in EnumerateVehicles() do
+            if model then
+                if GetEntityModel(veh) == model then
+                    entities[#entities + 1] = veh
+                end
+            else
+                entities[#entities + 1] = veh
+            end
+        end
+    elseif entityType == 'pickup' then
+        for pickup in EnumeratePickups() do
+            if model then
+                if GetPickupHash(pickup) == model then
+                    entities[#entities + 1] = pickup
+                end
+            else
+                entities[#entities + 1] = pickup
+            end
+        end
+    end
+
+    local entitiesInRadius = {}
+    for _, entity in pairs(entities) do
+        local distance = #(coords - GetEntityCoords(entity))
+        if distance <= radius then
+            entitiesInRadius[#entitiesInRadius + 1] = entity
+        end
+    end
+    return entitiesInRadius
+end
+
+exports('GetEntitiesInRadius', function(entityType, coords, model, radius) return GetEntitiesInRadius(entityType, coords, model, radius) end)
+
+---@param entityType string | Type of entity to search for (object, ped, vehicle, pickup)
+---@param coords vector3 | Coordinates to search for entities around
+---@param model string or hash | Model to search for
 ---@return number, number | Entity, Distance
 local function GetClosest(entityType, coords, model)
     if model and type(model) == 'string' then
@@ -231,3 +314,65 @@ exports('GetClosest', function(entityType, coords, model) return GetClosest(enti
     local ped, dist = exports['duf']:GetClosest('ped', GetEntityCoords(PlayerPedId()))
     -- Do something with ped
 ]]
+
+---@param zone 'vector3' | Zone to search for players in
+---@return table | Players in zone
+local function ReturnPlayersInZone(zone)
+    if type(zone) == 'vector3' then
+        SetFocusPosAndVel(zone)
+        zone = GetNameOfZone(zone)
+    else
+        print('^3DUF^7: ^1Invalid Zone Argument^7')
+        return {}
+    end
+    local players = GetActivePlayers()
+    local playersInZone = {}
+    for _, player in pairs(players) do
+        local ped = GetPlayerPed(player)
+        local playerZone = GetNameOfZone(GetEntityCoords(ped))
+        if playerZone == zone then
+            playersInZone[#playersInZone + 1] = player
+        end
+    end
+    return playersInZone
+end
+
+exports('ReturnPlayersInZone', function(zone) return ReturnPlayersInZone(zone) end)
+
+---@param coords vector3 | Coordinates to search for players around
+---@param radius number | Radius to search for players in
+---@return table | Players peds in radius
+local function GetPlayersInRadius(coords, radius)
+    local players = GetActivePlayers()
+    local playersInRadius = {}
+    for _, player in pairs(players) do
+        local ped = GetPlayerPed(player)
+        local distance = #(coords - GetEntityCoords(ped))
+        if distance <= radius then
+            playersInRadius[#playersInRadius + 1] = player
+        end
+    end
+    return playersInRadius
+end
+
+exports('GetPlayersInRadius', function(coords, radius) return GetPlayersInRadius(coords, radius) end)
+
+---@param coords vector3 | Coordinates to search for players around
+---@return number, number | Player, Distance
+local function GetClosestPlayer(coords)
+    local players = GetActivePlayers()
+    local closestPlayer = nil
+    local closestDistance = nil
+    for _, player in pairs(players) do
+        local ped = GetPlayerPed(player)
+        local distance = #(coords - GetEntityCoords(ped))
+        if closestDistance == nil or closestDistance > distance then
+            closestPlayer = player
+            closestDistance = distance
+        end
+    end
+    return closestPlayer, closestDistance
+end
+
+exports('GetClosestPlayer', function(coords) return GetClosestPlayer(coords) end)
+
