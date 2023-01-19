@@ -84,7 +84,7 @@ local entities = exports['duf']:ReturnEntitiesWithModel(entityType, model)
 
 ```lua
 ---@param entityType string | Type of entity (e.g. 'object', 'ped', 'vehicle', 'pickup')
----@param zone 'vector3' | Zone of entity (e.g. 'AIRP')
+---@param zone 'vector3' | Coords of zone
 ---@return table | All entities in zone
 local entities = exports['duf']:ReturnEntitiesInZone(entityType, zone)
 ```
@@ -263,7 +263,7 @@ local heading = exports['duf']:GetHeadingBetweenCoords(coords1, coords2)
 local entities = exports['duf']:FindEntitiesInLOS(source, flags, maxDistance)
 ```
 
-Where `flags` is one of the following:
+Where `flags` is a combination of the following:
 
 ```lua
 local flags = {
@@ -335,8 +335,8 @@ local rightVector = exports['duf']:Sv_GetEntityRightVector(entity)
 
 ```lua
 ---@param entity number | Entity Handle
----@return 'vector3', 'vector3', 'vector3' | Entity Forward Vector, Entity Right Vector, Entity Up Vector
-local forwardVector, rightVector, upVector = exports['duf']:Sv_GetEntityMatrix(entity)
+---@return 'vector3', 'vector3', 'vector3', 'vector3' | Entity Forward Vector, Entity Right Vector, Entity Up Vector, position
+local forwardVector, rightVector, upVector, position = exports['duf']:Sv_GetEntityMatrix(entity)
 ```
 
 ## Credits
