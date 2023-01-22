@@ -141,6 +141,46 @@ end
 
 exports('GetHeadingBetweenCoords', function(x1, y1, z1, x2, y2, z2) return GetHeadingBetweenCoords(x1, y1, z1, x2, y2, z2) end)
 
+--------------------------------- Get Distance Between Points ---------------------------------
+
+---@param point1 'vector3' | 'vector2' | table
+---@param point2 'vector3' | 'vector2' | table
+---@return number
+local function GetDistBetweenPoints(point1, point2)
+    local x1, y1, z1, x2, y2, z2 = nil, nil, nil, nil, nil, nil
+    if type(point1) == 'table' then
+        x1 = point1.x
+        y1 = point1.y
+        z1 = point1.z
+    elseif type(point1) == 'vector2' then
+        x1 = point1.x
+        y1 = point1.y
+    elseif type(point1) == 'vector3' then
+        x1 = point1.x
+        y1 = point1.y
+        z1 = point1.z
+    end
+    if type(point2) == 'table' then
+        x2 = point2.x
+        y2 = point2.y
+        z2 = point2.z
+    elseif type(point2) == 'vector2' then
+        x2 = point2.x
+        y2 = point2.y
+    elseif type(point2) == 'vector3' then
+        x2 = point2.x
+        y2 = point2.y
+        z2 = point2.z
+    end
+    if z1 and z2 then
+        return GetDistVec3(x1, y1, z1, x2, y2, z2)
+    else
+        return GetDistVec2(x1, y1, x2, y2)
+    end
+end
+
+exports('GetDistBetweenPoints', function(point1, point2) return GetDistBetweenPoints(point1, point2) end)
+
 --------------------------------- Is Point Within Polygon ---------------------------------
 
 ---@param point 'vector3' | 'vector2' | table

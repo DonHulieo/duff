@@ -1,3 +1,19 @@
+--------------------------------- Handlers ---------------------------------
+
+RegisterNetEvent('duf:Cl_PlayerEnteredNone')
+
+for _, zone in pairs(Zones.Data) do
+    RegisterNetEvent('duf:Cl_PlayerEntered' .. zone.Name)
+    AddEventHandler('duf:Cl_PlayerEntered' .. zone.Name, function(zone)
+        print('Player entered ' .. zone)
+    end)
+end
+
+RegisterNetEvent('duf:Cl_SyncPlayerZones')
+AddEventHandler('duf:Cl_SyncPlayerZones', function(PlayerZones)
+    Zones.Players = PlayerZones
+end)
+
 --------------------------------- Utilities ---------------------------------
 
 local function GetZoneIndex(zone)

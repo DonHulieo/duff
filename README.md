@@ -15,7 +15,7 @@ Well, this is the solution for you! This is a collection of *optimised utility f
 
 ## Installation
 
-1. Download the latest release from the [releases]() page.
+1. Download the latest release from the releases page (when it's released!).
 2. Extract the contents of the zip file into your resources folder.
 3. Add `ensure duf` to your server.cfg file.
 
@@ -376,7 +376,7 @@ local zones = exports['duf']:GetZones()
 
 ```lua
 ---@param zone string | Zone Name (e.g. "AIRP")
-local polyZone = exports['duf']:Cl_CreatePolyZoneForZone(zone)
+local polyZone = exports['duf']:CreatePolyZoneForZone(zone)
 ```
 
 ##### 6.3. Server Functions

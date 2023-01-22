@@ -1,4 +1,5 @@
 Zones = {}
+Zones.Players = {}
 Zones.PolyZones = {}
 Zones.Data = {}
 
