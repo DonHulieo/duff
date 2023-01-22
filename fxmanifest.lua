@@ -17,7 +17,8 @@ client_script {
     'client/enumerators.lua', 
     'client/events.lua', 
     'client/load_assets.lua', 
-    'client/math.lua'
+    'client/math.lua',
+    'client/zones.lua'
 }
 
 shared_script {'shared/math.lua', 'shared/zones.lua'}

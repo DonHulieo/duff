@@ -84,3 +84,78 @@ exports('GetEntityMatrix', function(entity)
     local forwardVector, upVector, rightVector, position = vector3(matrix[1][2], matrix[2][2], matrix[3][2]), vector3(matrix[1][3], matrix[2][3], matrix[3][3]), vector3(matrix[1][1], matrix[2][1], matrix[3][1]), vector3(matrix[4][1], matrix[4][2], matrix[4][3])
     return forwardVector, upVector, rightVector, position
 end)
+
+--------------------------------- Zone Utility Functions --------------------------------- [Credits goes to: DurtyFree | https://github.com/DurtyFree/gta-v-data-dumps/blob/master/zones.json]
+
+--------------------------------- GetZoneFromIndex ---------------------------------
+-- This is useful as most function on the client side require the zone index instead of the name, or give you the index instead of the name
+---@param index number | The index of the zone
+---@return string | The name of the zone
+local function GetZoneFromIndex(index)
+    for i, zone in pairs(Zones.Data) do
+        if zone.Index == index then
+            return zone.Name
+        end
+    end
+end
+
+exports('Sv_GetZoneFromIndex', function(index) return GetZoneFromIndex(index) end)
+
+--------------------------------- GetZoneAtCoords ---------------------------------
+
+---@param coords 'vector3' | The coordinates to get the zone of
+---@param returnIndex boolean | If true, will return the index of the zone instead of the name
+---@return string or number | The name of the zone or the index of the zone
+local function GetZoneAtCoords(coords, returnIndex)
+    if type(coords) == 'table' then
+        coords = exports['duf']:ConvertToVec3(coords)
+    elseif type(coords) ~= 'vector3' then
+        return
+    end
+    for i, zone in pairs(Zones.Data) do
+        local zonePoints = {}
+        for _, bounds in pairs(zone.Bounds) do 
+            for index, bound in pairs(bounds) do
+                zonePoints[#zonePoints + 1] = {x = bound.X, y = bound.Y, z = bound.Z}
+            end
+        end
+        if exports['duf']:IsPointInPolygon(coords, zonePoints) then
+            if returnIndex then
+                return i
+            else
+                return zone.Name
+            end
+        end
+    end
+end
+
+exports('Sv_GetZoneAtCoords', function(coords) return GetZoneAtCoords(coords) end)
+
+--------------------------------- GetEntityZone ---------------------------------
+
+---@param entity number | Entity to get the zone of
+---@param returnIndex boolean | If true, will return the index of the zone instead of the name
+---@return string or number
+local function GetEntityZone(entity, returnIndex)
+    local coords = GetEntityCoords(entity)
+    return GetZoneAtCoords(coords, returnIndex)
+end
+
+exports('Sv_GetEntityZone', function(entity) return GetEntityZone(entity) end)
+
+--------------------------------- IsEntityInZone ---------------------------------
+
+---@param entity number | Entity to check if the zone of 
+---@param zone string | The zone to check if the entity is in
+---@return boolean
+local function IsEntityInZone(entity, zone)
+    local zoneIndex = GetZoneAtCoords(GetEntityCoords(entity), true)
+    if zoneIndex then
+        return Zones.Data[zoneIndex].Name == zone
+    end
+    return false
+end
+
+exports('Sv_IsEntityInZone', function(entity, zone) return IsEntityInZone(entity, zone) end)
+
+

@@ -140,3 +140,33 @@ local function GetHeadingBetweenCoords(x1, y1, z1, x2, y2, z2)
 end
 
 exports('GetHeadingBetweenCoords', function(x1, y1, z1, x2, y2, z2) return GetHeadingBetweenCoords(x1, y1, z1, x2, y2, z2) end)
+
+--------------------------------- Is Point Within Polygon ---------------------------------
+
+---@param point 'vector3' | 'vector2' | table
+---@param polygon table
+---@return boolean
+local function IsPointInPolygon(point, polygon)
+    local x, y = nil, nil
+    if type(point) == 'table' then
+        x = point.x
+        y = point.y
+    elseif type(point) == 'vector2' then
+        x = point.x
+        y = point.y
+    elseif type(point) == 'vector3' then
+        x = point.x
+        y = point.y
+    end
+    local inside = false
+    local j = #polygon
+    for i = 1, #polygon do
+        if ((polygon[i].y > y) ~= (polygon[j].y > y)) and (x < (polygon[j].x - polygon[i].x) * (y - polygon[i].y) / (polygon[j].y - polygon[i].y) + polygon[i].x) then
+            inside = not inside
+        end
+        j = i
+    end
+    return inside
+end
+
+exports('IsPointInPolygon', function(point, polygon) return IsPointInPolygon(point, polygon) end)
