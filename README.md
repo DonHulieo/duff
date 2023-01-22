@@ -379,7 +379,7 @@ local zones = exports['duf']:GetZones()
 local polyZone = exports['duf']:CreatePolyZoneForZone(zone)
 ```
 
-##### 6.3. Server Functions
+#### 6.3. Server Functions
 
 ##### 6.3.1. Get Zone Name
 
