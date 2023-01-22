@@ -146,9 +146,14 @@ exports('Sv_GetEntityZone', function(entity) return GetEntityZone(entity) end)
 --------------------------------- IsEntityInZone ---------------------------------
 
 ---@param entity number | Entity to check if the zone of 
----@param zone string | The zone to check if the entity is in
+---@param zone string or number | The zone to check if the entity is in
 ---@return boolean
 local function IsEntityInZone(entity, zone)
+    if type(zone) == 'number' then
+        zone = GetZoneFromIndex(zone)
+    elseif type(zone) ~= 'string' then
+        return
+    end
     local zoneIndex = GetZoneAtCoords(GetEntityCoords(entity), true)
     if zoneIndex then
         return Zones.Data[zoneIndex].Name == zone

@@ -1,17 +1,17 @@
 # duf - WIP
 
-Don's Utility Functions for FiveM 
+Don's Utility Functions for FiveM
 
 ## Description
 
-Has you're script gone up the *[duff](https://www.urbandictionary.com/define.php?term=Up%20The%20Duff)*? 
+Has you're script gone up the *[duff](https://www.urbandictionary.com/define.php?term=Up%20The%20Duff)*?
 Well, this is the solution for you! This is a collection of *optimised utility functions* that are exports for you to use in your scripts.
 
 - *This is a work in progress, and I'll be adding more functions as I go along.*
 
 ## Dependencies
 
-* **None!**
+- **None!**
 
 ## Installation
 
@@ -101,7 +101,7 @@ local entity, distance = exports['duf']:GetClosest(entityType, coords, model)
 
 ### 3. Events
 
-* NOTE: This started as a project of creating my own events, but I decided to used this to document the Base Game Events, found [here](https://docs.fivem.net/docs/game-references/game-events/). The events are prepackaged with the game, and I've been unable to find the parameters for each event documented anywhere. So I've set about finding them myself, due to the nature of this (and the over 1000 lines of Events and Comments), I can't provide documentation for each event, but by looking at client/events.lua, you can see the parameters for each event. I'll try to keep this up to date with the latest events, but if you find any missing, please let me know.
+- NOTE: This started as a project of creating my own events, but I decided to used this to document the Base Game Events, found [here](https://docs.fivem.net/docs/game-references/game-events/). The events are prepackaged with the game, and I've been unable to find the parameters for each event documented anywhere. So I've set about finding them myself, due to the nature of this (and the over 1000 lines of Events and Comments), I can't provide documentation for each event, but by looking at client/events.lua, you can see the parameters for each event. I'll try to keep this up to date with the latest events, but if you find any missing, please let me know.
 
 ### 4. Loading Assets
 
@@ -212,7 +212,7 @@ local roundedNum = exports['duf']:RoundNumber(num, idp)
 local randomNum = exports['duf']:GetRandomNumber(min, max)
 ```
 
-##### 5.1.4. Convert Table to Vector 
+##### 5.1.4. Convert Table to Vector
 
 ```lua
 ---@param table table | Table to convert
@@ -339,6 +339,83 @@ local rightVector = exports['duf']:Sv_GetEntityRightVector(entity)
 local forwardVector, rightVector, upVector, position = exports['duf']:Sv_GetEntityMatrix(entity)
 ```
 
+### 6. Zones
+
+#### 6.1. Shared Library
+
+Foreword: The zones.lua file in the shared library is a json string table of all the zones in the game. It is used to convert the zone index to the zone name, vice versa, find the bounds of the zone and many other utilities. This is compiled at startup and is not meant to be edited. The table follows this format:
+
+```lua
+local zones = {
+    [1] = {
+        Name = "AIRP",
+        DisplayName = "Los Santos International Airport",
+        Bounds = {
+            Minimum = {X = -756.41, Y = -2754.95, Z = 0.0},
+            Maximum = {X = -460.886, Y = -2135.08, Z = 1250.0}
+        },{
+            Minimum = {X = -1972.45, Y = -3556.38, Z = -100.0},
+            Maximum = {X = -756.41, Y = -1968.6, Z = 1150.0}
+        }
+    },
+    ...
+}
+```
+
+Add to access the table:
+
+```lua
+local zones = exports['duf']:GetZones()
+```
+
+#### 6.2. Client Functions
+
+**Note:** This function should not be used in a live enviroment, unless you want client to cook eggs on their CPU. PolyZones evidently can't handle areas so large, so this function is only meant to be used in a development enviroment.
+
+##### 6.2.1. Create PolyZone for Zone
+
+```lua
+---@param zone string | Zone Name (e.g. "AIRP")
+local polyZone = exports['duf']:Cl_CreatePolyZoneForZone(zone)
+```
+
+##### 6.3. Server Functions
+
+##### 6.3.1. Get Zone Name
+
+```lua
+---@param index number | Zone Index
+---@return string | Zone Name
+local zoneName = exports['duf']:Sv_GetZoneName(index)
+```
+
+##### 6.3.2. Get Zone at Coords
+
+```lua
+---@param coords 'vector3' | Coords to return the zone of
+---@param returnIndex boolean | If true, returns the zone index instead of the zone name
+---@return string or number | Zone Name or Index
+local zone = exports['duf']:Sv_GetZoneAtCoords(coords, returnIndex)
+```
+
+##### 6.3.3. Get Entity Zone
+
+```lua
+---@param entity number | Entity Handle
+---@param returnIndex boolean | If true, returns the zone index instead of the zone name
+---@return string or number | Zone Name or Index
+local zone = exports['duf']:Sv_GetEntityZone(entity, returnIndex)
+```
+
+##### 6.3.4. Is Entity in Zone
+
+```lua
+---@param entity number | Entity Handle
+---@param zone string or number | Zone Name or Index
+---@return boolean | Returns true if the entity is in the zone
+local inZone = exports['duf']:Sv_IsEntityInZone(entity, zone)
+```
+
 ## Credits
 
 - [negbook](https://github.com/negbook/nbk_blips)
@@ -346,3 +423,4 @@ local forwardVector, rightVector, upVector, position = exports['duf']:Sv_GetEnti
 - [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
 - [Swkeep](https://github.com/swkeep)
 - [draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297)
+- [DurtyFree](https://github.com/DurtyFree/gta-v-data-dumps)

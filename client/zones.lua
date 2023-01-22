@@ -109,7 +109,7 @@ end
 --------------------------------- PolyZone ---------------------------------
 
 ---@param zone string | Zone name to create a PolyZone for
-local function createPolyZoneforZone(zone)
+local function CreatePolyZoneforZone(zone)
     local data = Zones.Data[GetZoneIndex(zone)]
     local bounds = data.Bounds
     local points, heights = {}, {}
@@ -145,7 +145,7 @@ local function createPolyZoneforZone(zone)
     Zones.PolyZones[data.Name] = zone
 end
 
-exports('createPolyZoneforZone', function(zone) createPolyZoneforZone(zone) end)
+exports('CreatePolyZoneforZone', function(zone) CreatePolyZoneforZone(zone) end)
 
 -- createPolyZoneforZone('ALTA')
 

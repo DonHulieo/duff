@@ -16442,3 +16442,9 @@ local ZonesJson = [[
 ]]
 
 Zones.Data = json.decode(ZonesJson)
+
+local function GetZones()
+  return Zones.Data
+end
+
+exports('GetZones', function() return GetZones() end)
