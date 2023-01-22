@@ -326,11 +326,11 @@ AddEventHandler('CEventCommunicateEvent', function(entities, entity)
 	-- print(_text)
 end)
 
----@param victims table | Array of entities that were damaged
+---@param witnesses table | Array of entities that witnessed the event, where witness[1] is the victim
 ---@param attacker number | Entity that caused the damage
 AddEventHandler('CEventDamage', function(victims, attacker)
-	local _text = 'CEventDamage \npid: '..PlayerPedId()..'\nAttacker: '..attacker..'\nVictims: '..json.encode(victims)
-	print(_text)
+	-- local _text = 'CEventDamage \npid: '..PlayerPedId()..'\nAttacker: '..attacker..'\nVictims: '..json.encode(victims)
+	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
@@ -356,6 +356,13 @@ end)
 ---@param entities table | Array of entity handles that are involved in the event (usually the ped which collided with the object)
 AddEventHandler('CEventObjectCollision', function(entities)
 	-- local _text = 'CEventObjectCollision \npid: '..PlayerPedId()..'\nEntities: '..json.encode(entities)
+	-- print(_text)
+end)
+
+---@param witnesses table | Array of peds that witnessed the event, where witness[1] is the victim
+---@param attacker number | The ped that attacked the victim
+AddEventHandler('CEventMeleeAction', function(witnesses, attacker)
+	-- local _text = 'CEventMeleeAction \npid: '..PlayerPedId()..'\nAttacker: '..attacker..'\nWitnesses: '..json.encode(witnesses)
 	-- print(_text)
 end)
 
@@ -958,11 +965,6 @@ AddEventHandler('CEventMustLeaveBoat', function(entities, eventEntity, args)
 	print(_text)
 end)
 
-AddEventHandler('CEventMeleeAction', function(entities, eventEntity, args)
-	local _text = 'CEventMeleeAction \npid: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
-	print(_text)
-end)
-
 AddEventHandler('CEventLeaderUnholsteredWeapon', function(entities, eventEntity, args)
 	local _text = 'CEventLeaderUnholsteredWeapon \npid: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
 	print(_text)
@@ -1086,4 +1088,24 @@ end)
 AddEventHandler('CEventShovePed', function(entities, eventEntity, args)
 	local _text = 'CEventShovePed \npid: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
 	print(_text)
+end)
+
+AddEventHandler('CEvent0xC92B98C8', function(entities, eventEntity, args)
+	local _text = 'CEvent0xC92B98C8 \npid: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
+	print(_text)
+end)
+
+AddEventHandler('CEventNone', function(entities, eventEntity, args)
+	local _text = 'CEventNone \npid: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
+	print(_text)
+end)
+
+AddEventHandler('CEventInWater', function(entities, eventEntity, args)
+	local _text = 'CEventInWater \npid: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
+	print(_text)
+end)
+
+AddEventHandler('CEventShockingDrivingOnPavement', function(entities, eventEntity, args)
+	--local _text = 'CEventShockingCarCrash \npid: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
+	--print(_text)
 end)

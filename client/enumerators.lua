@@ -127,13 +127,13 @@ exports('ReturnEntitiesWithModel', function(entityType, model) return ReturnEnti
 ]]
 
 ---@param entityType string | Type of entity to search for (object, ped, vehicle, pickup)
----@param zone vector3 | Zone to search for entities in
+---@param zone vector3 or string | Zone to search for entities in
 ---@return table | Entities in zone
 local function ReturnEntitiesInZone(entityType, zone)
     if type(zone) == 'vector3' then
-        SetFocusPosAndVel(zone)
+        SetFocusPosAndVel(zone.x, zone.y, zone.z, 0.0, 0.0, 0.0)
         zone = GetNameOfZone(zone)
-    else
+    elseif type(zone) ~= 'string' then
         print('^3DUF^7: ^1Invalid Zone Argument^7')
         return {}
     end

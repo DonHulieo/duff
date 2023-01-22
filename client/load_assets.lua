@@ -13,7 +13,7 @@ local function ReqModel(model)
     if not loaded then
         RequestModel(model)
         while not loaded do
-            Wait(100)
+            Wait(0)
         end
     end
     return loaded
@@ -32,7 +32,7 @@ local function ReqCollision(model)
     if not loaded then
         RequestCollisionForModel(model)
         while not loaded do
-            Wait(100)
+            Wait(0)
         end
     end
     return loaded
@@ -46,7 +46,7 @@ local function ReqAnimDict(dict)
     if not loaded then
         RequestAnimDict(dict)
         while not loaded do
-            Wait(100)
+            Wait(0)
         end
     end
     return loaded
@@ -60,7 +60,7 @@ local function ReqAnimSet(animSet)
     if not loaded then
         RequestAnimSet(animSet)
         while not loaded do
-            Wait(100)
+            Wait(0)
         end
     end
     return loaded
@@ -74,7 +74,7 @@ local function ReqClipSet(clipSet)
     if not loaded then
         RequestClipSet(clipSet)
         while not loaded do
-            Wait(100)
+            Wait(0)
         end
     end
     return loaded
@@ -88,7 +88,7 @@ local function ReqIpl(ipl)
     if not loaded then
         RequestIpl(ipl)
         while not loaded do
-            Wait(100)
+            Wait(0)
         end
     end
     return loaded
@@ -102,7 +102,7 @@ local function ReqNamedPtfxAsset(asset)
     if not loaded then
         RequestNamedPtfxAsset(asset)
         while not loaded do
-            Wait(100)
+            Wait(0)
         end
     end
     if loaded then UseParticleFxAsset(asset) end
@@ -117,7 +117,7 @@ local function ReqScaleformMovie(scaleform)
     if not loaded then
         RequestScaleformMovie(scaleform)
         while not loaded do
-            Wait(100)
+            Wait(0)
         end
     end
     return loaded
@@ -131,7 +131,7 @@ local function ReqStreamedTextureDict(dict)
     if not loaded then
         RequestStreamedTextureDict(dict, true)
         while not loaded do
-            Wait(100)
+            Wait(0)
         end
     end
     return loaded
@@ -149,7 +149,7 @@ local function ReqWeaponAsset(asset)
     if not loaded then
         RequestWeaponAsset(asset, 31, 0)
         while not loaded do
-            Wait(100)
+            Wait(0)
         end
     end
     return loaded
