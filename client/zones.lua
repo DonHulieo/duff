@@ -3,8 +3,8 @@
 RegisterNetEvent('duf:Cl_PlayerEnteredNone')
 
 for _, zone in pairs(Zones.Data) do
-    RegisterNetEvent('duf:Cl_PlayerEntered' .. zone.Name)
-    AddEventHandler('duf:Cl_PlayerEntered' .. zone.Name, function(zone)
+    RegisterNetEvent('duf:PlayerEnteredZone' .. zone.Name)
+    AddEventHandler('duf:PlayerEnteredZone' .. zone.Name, function(zone)
         print('Player entered ' .. zone)
     end)
 end
@@ -84,8 +84,8 @@ local function removeAngledPoints(points)
         if not a or not b or not c then
             break
         end
-        local angle1 = getAngleBetweenPoints(a, b)
-        local angle2 = getAngleBetweenPoints(a, c)
+        local angle1 = exports['duf']GetAngleBetweenPoints(a, b)
+        local angle2 = exports['duf']GetAngleBetweenPoints(a, c)
         if angle1 > angle2 then
             table.remove(points, i + 1)
         else
@@ -141,7 +141,6 @@ local function CreatePolyZoneforZone(zone)
         end
     end
     local lowest, highest = findHeights(heights)
-    local orderedPoints = {}
     local center = vector2(0, 0)
     for k, v in pairs(points) do
         center = center + v

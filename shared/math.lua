@@ -13,6 +13,24 @@ end
 
 exports('CompareTables', function(t1, t2) return CompareTables(t1, t2) end)
 
+--------------------------------- Sort Table ---------------------------------
+
+---@param t table
+---@param sortFunc function
+---@return table
+local function SortTable(t, sortFunc)
+    for i = 1, #t do
+        for j = 1, #t do
+            if sortFunc(t[i], t[j]) then
+                t[i], t[j] = t[j], t[i]
+            end
+        end
+    end
+    return t
+end
+
+exports('SortTable', function(t, sortFunc) return SortTable(t, sortFunc) end)
+
 --------------------------------- Round Number ---------------------------------
 
 ---@param num number
@@ -181,12 +199,89 @@ end
 
 exports('GetDistBetweenPoints', function(point1, point2) return GetDistBetweenPoints(point1, point2) end)
 
+--------------------------------- Get Angle ---------------------------------
+
+local function GetAngle(p)
+    local angle = math.atan2(p.y - center.y, p.x - center.x)
+    if angle < 0 then
+        angle = angle + math.pi * 2
+    end
+    return angle
+end
+
+exports('GetAngle', function(p) return GetAngle(p) end)
+
+--------------------------------- Get Angle Between Points ---------------------------------
+
+---@param point1 'vector3' | 'vector2' | table
+---@param point2 'vector3' | 'vector2' | table
+---@return number
+local function GetAngleBetweenPoints(point1, point2)
+    local x1, y1, z1, x2, y2, z2 = nil, nil, nil, nil, nil, nil
+    if type(point1) == 'table' then
+        x1 = point1.x
+        y1 = point1.y
+        z1 = point1.z
+    elseif type(point1) == 'vector2' then
+        x1 = point1.x
+        y1 = point1.y
+    elseif type(point1) == 'vector3' then
+        x1 = point1.x
+        y1 = point1.y
+        z1 = point1.z
+    end
+    if type(point2) == 'table' then
+        x2 = point2.x
+        y2 = point2.y
+        z2 = point2.z
+    elseif type(point2) == 'vector2' then
+        x2 = point2.x
+        y2 = point2.y
+    elseif type(point2) == 'vector3' then
+        x2 = point2.x
+        y2 = point2.y
+        z2 = point2.z
+    end
+    if z1 and z2 then
+        return GetAngle(vector3(x1, y1, z1), vector3(x2, y2, z2))
+    else
+        return GetAngle(vector2(x1, y1), vector2(x2, y2))
+    end
+end
+
+exports('GetAngleBetweenPoints', function(point1, point2) return GetAngleBetweenPoints(point1, point2) end)
+
+--------------------------------- Order Vectors By ---------------------------------
+
+---@param table table | An Array of Vectors to Order
+---@param key string | The Key to Order By, (x, y, z)
+---@param order string | The Order to Order By, (asc, desc, clkws, cnt-clkws)
+---@return table
+local function OrderVectorsBy(table, key, order)
+    local function asc(a, b) return a[key] < b[key] end
+    local function desc(a, b) return a[key] > b[key] end
+    local function clkws(a, b) return math.atan2(a.y, a.x) < math.atan2(b.y, b.x) end
+    local function cnt_clkws(a, b) return math.atan2(a.y, a.x) > math.atan2(b.y, b.x) end
+    if order == 'asc' then
+        SortTable(table, asc)
+    elseif order == 'desc' then
+        SortTable(table, desc)
+    elseif order == 'clkws' then
+        SortTable(table, clkws)
+    elseif order == 'cnt-clkws' then
+        SortTable(table, cnt_clkws)
+    end
+    return table
+end
+
+exports('OrderVectorsBy', function(table, key, order) return OrderVectorsBy(table, key, order) end)
+
 --------------------------------- Is Point Within Polygon ---------------------------------
 
 ---@param point 'vector3' | 'vector2' | table
 ---@param polygon table
 ---@return boolean
-local function IsPointInPolygon(point, polygon)
+local function IsPointInPoly(point, polygon)
     local x, y = nil, nil
     if type(point) == 'table' then
         x = point.x
@@ -209,4 +304,4 @@ local function IsPointInPolygon(point, polygon)
     return inside
 end
 
-exports('IsPointInPolygon', function(point, polygon) return IsPointInPolygon(point, polygon) end)
+exports('IsPointInPoly', function(point, polygon) return IsPointInPoly(point, polygon) end)

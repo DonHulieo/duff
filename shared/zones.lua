@@ -1,7 +1,10 @@
 Zones = {}
-Zones.Players = {}
-Zones.PolyZones = {}
+Zones.CallBacks = {}
+Zones.CallBacks.Client = {}
+Zones.CallBacks.Server = {}
 Zones.Data = {}
+Zones.PolyZones = {}
+Zones.Players = {}
 
 local ZonesJson = [[
   [
