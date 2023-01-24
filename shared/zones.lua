@@ -1,10 +1,10 @@
 Zones = {}
-Zones.CallBacks = {}
-Zones.CallBacks.Client = {}
-Zones.CallBacks.Server = {}
+
+Zones.Config = {}
 Zones.Data = {}
 Zones.PolyZones = {}
-Zones.Players = {}
+
+99CA66B0363E1F7E
 
 local ZonesJson = [[
   [
@@ -16447,8 +16447,86 @@ local ZonesJson = [[
 
 Zones.Data = json.decode(ZonesJson)
 
-local function GetZones()
-  return Zones.Data
-end
+exports('GetZones', function() return Zones.Data end)
 
-exports('GetZones', function() return GetZones() end)
+local OceanJson = [[
+[
+  "Alamo",
+  "Alta",
+  "ArmyB",
+  "BanhamCa",
+  "Beach",
+  "BhamCa",
+  "BradP",
+  "BradT",
+  "Burton",
+  "CalafB",
+  "CANNY",
+  "CCreak",
+  "ChamH",
+  "CHIL",
+  "CHU",
+  "CMSW",
+  "Cypre",
+  "Delbe",
+  "DeLBe",
+  "DelPe",
+  "DelSol",
+  "Desrt",
+  "Downt",
+  "DTVine",
+  "East_V",
+  "EBuro",
+  "ELGorL",
+  "Elysian",
+  "Galfish",
+  "Galli",
+  "Golf",
+  "GrapeS",
+  "Greatc",
+  "Hors",
+  "HumLab",
+  "Jail",
+  "Koreat",
+  "Lago",
+  "LAGO",
+  "LegSqu",
+  "LMesa",
+  "LosPuer",
+  "Mirr",
+  "Morn",
+  "MTChil",
+  "MTGordo",
+  "MTJose",
+  "Murri",
+  "NCHU",
+  "Noose",
+  "Observ",
+  "PalCov",
+  "Paleto",
+  "PalFor",
+  "PalHigh",
+  "Palmpow",
+  "PBluff",
+  "PBOX",
+  "RGLEN",
+  "Richm",
+  "Rockf",
+  "RTRAK",
+  "SanChia",
+  "Sandy",
+  "SKID",
+  "Stad",
+  "STRAW",
+  "Tatamo",
+  "TEXTI",
+  "TongVaH",
+  "TongvaV",
+  "VCana",
+  "Vesp",
+  "Vine",
+  "WindF",
+  "WVine",
+  "Zancudo"
+]
+]]

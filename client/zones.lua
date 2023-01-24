@@ -18,7 +18,7 @@ end)
 
 local function GetZoneIndex(zone)
     for i = 1, #Zones.Data do
-        if string.upper(Zones.Data[i].Name) == zone then
+        if Zones.Data[i].Name == zone then
             return i
         end
     end
@@ -84,8 +84,8 @@ local function removeAngledPoints(points)
         if not a or not b or not c then
             break
         end
-        local angle1 = exports['duf']GetAngleBetweenPoints(a, b)
-        local angle2 = exports['duf']GetAngleBetweenPoints(a, c)
+        local angle1 = getAngleBetweenPoints(a, b)
+        local angle2 = getAngleBetweenPoints(a, c)
         if angle1 > angle2 then
             table.remove(points, i + 1)
         else
@@ -154,7 +154,7 @@ local function CreatePolyZoneforZone(zone)
         name = data.Name,
         minZ = lowest,
         maxZ = highest,
-        debugGrid = true,
+        debugGrid = false,
         gridDivisions = 25
     })
     Zones.PolyZones[data.Name] = zone
@@ -162,16 +162,25 @@ end
 
 exports('CreatePolyZoneforZone', function(zone) CreatePolyZoneforZone(zone) end)
 
--- createPolyZoneforZone('ALTA')
+local function Notify(text)
+    SetNotificationTextEntry('STRING')
+    AddTextComponentString(text)
+    DrawNotification(false, false)
+end
+
+for k, v in pairs(Zones.Data) do
+    CreatePolyZoneforZone(v.Name)
+    print('Created PolyZone for ' .. v.Name)
+end
 
 if Zones.PolyZones then
     for k, v in pairs(Zones.PolyZones) do
         local msBetweenPointCheck = 100
         v:onPointInOut(PolyZone.getPlayerPosition, function(isPointInside, point)
             if isPointInside then
-                print('Entered ' .. v.name)
+                Notify('Entered ' .. v.name)
             else
-                print('Exited ' .. v.name)
+                Notify('Exited ' .. v.name)
             end
         end, msBetweenPointCheck)
     end

@@ -31,13 +31,27 @@ end
 ---@return string | The name of the zone
 local function GetZoneFromIndex(index)
     for i, zone in pairs(Zones.Data) do
-        if zone.Index == index then
+        if i == index then
             return zone.Name
         end
     end
 end
 
 exports('Sv_GetZoneFromIndex', function(index) return GetZoneFromIndex(index) end)
+
+--------------------------------- GetIndexFromZone ---------------------------------
+
+---@param zone string | The name of the zone
+---@return number | The index of the zone
+local function GetIndexFromZone(zone)
+    for index, z in pairs(Zones.Data) do
+        if z.Name == zone then
+            return index
+        end
+    end
+end
+
+exports('Sv_GetIndexFromZone', function(zone) return GetIndexFromZone(zone) end)
 
 --------------------------------- GetZoneAtCoords ---------------------------------
 
@@ -97,7 +111,7 @@ local function GetZoneAtCoords(coords, returnIndex, excludeZone)
     end
 end
 
-exports('Sv_GetZoneAtCoords', function(coords) return GetZoneAtCoords(coords) end)
+exports('Sv_GetZoneAtCoords', function(coords, returnIndex, excludeZone) return GetZoneAtCoords(coords, returnIndex, excludeZone) end)
 
 --------------------------------- GetEntityZone ---------------------------------
 
@@ -156,13 +170,20 @@ local function GetClosestZone(coords, returnIndex, excludeZone)
                 goto continue
             end
         end
-        local zonePoints = {}
+        local distance = 0
         for _, bounds in pairs(zone.Bounds) do 
             for index, bound in pairs(bounds) do
-                zonePoints[#zonePoints + 1] = {x = bound.X, y = bound.Y, z = bound.Z}
+                distance = exports['duf']:GetDistBetweenPoints(coords, vector3(bound.X, bound.Y, bound.Z))
+                if not closestZoneDistance or distance < closestZoneDistance then
+                    closestZoneDistance = distance
+                    if returnIndex then
+                        closestZone = i
+                    else
+                        closestZone = zone.Name
+                    end
+                end
             end
         end
-        local distance = exports['duf']:GetDistBetweenPoints(coords, zonePoints[1])
         if not closestZoneDistance or distance < closestZoneDistance then
             closestZoneDistance = distance
             if returnIndex then
@@ -178,66 +199,27 @@ end
 
 exports('Sv_GetClosestZone', function(coords, returnIndex, excludeZone) return GetClosestZone(coords, returnIndex, excludeZone) end)
 
---------------------------------- Handlers ---------------------------------
+--------------------------------- Does Zone Include ---------------------------------
 
-local function isPlayerConnected(ID)
-    for _, player in pairs(GetPlayers()) do
-        if player == ID then
-            return true
-        end
+---@param zone string or number | The zone to check if it includes another zone
+---@return boolean, string | If the zone includes another zone, return true and the name of the zone it includes
+local function DoesZoneInclude(zone)
+    if type(zone) == 'number' then
+        zone = GetZoneFromIndex(zone)
+    elseif type(zone) ~= 'string' then
+        return
     end
-    return false
-end
-
-local function isVehicleBlacklisted(vehicle)
-    local blacklistedVehicleTypes = {'boat', 'heli', 'plane', 'submarine'}
-    for i = 1, #blacklistedVehicleTypes do
-        if GetVehicleType(vehicle) == blacklistedVehicleTypes[i] then
-            return true
-        end
-    end
-    return false
-end
-
---------------------------------- Zone Threads ---------------------------------
-
-CreateThread(function()
-    local sleep = 1000
-    while true do
-        Wait(sleep)
-        for _, ID in pairs(GetPlayers()) do
-            local src = ID
-            local ped = GetPlayerPed(src)
-            local coords = GetEntityCoords(ped)
-            local zone = GetZoneAtCoords(coords)
-            if zone and Zones.Players[src] ~= zone then
-                print(zone)
-                local vehicle = GetVehiclePedIsIn(ped, false)
-                print(isVehicleBlacklisted(vehicle))
-                if vehicle ~= 0 and not isVehicleBlacklisted(vehicle) then
-                    if string.upper(zone) ~= 'OCEANA' then
-                        local event = 'duf:PlayerEnteredZone' .. zone
-                        TriggerClientEvent(event, src, zone)
-                        Zones.Players[src] = zone
-                    else
-                        local closest, distance = GetClosestZone(coords, false, zone)
-                        local event = 'duf:PlayerEnteredZone' .. closest
-                        TriggerClientEvent(event, src, closest)
-                        Zones.Players[src] = closest
-                    end
-                else
-                    local event = 'duf:PlayerEnteredZone' .. zone
-                    TriggerClientEvent(event, src, zone)
-                    Zones.Players[src] = zone
-                end
-            else
-                local closest, distance = GetClosestZone(coords, false, zone)
-                if closest and distance < 100 then
-                    sleep = 100 * distance
-                else
-                    sleep = 10000
-                end
+    local bounds = Zones.Data[GetIndexFromZone(zone)].Bounds
+    for _, bound in pairs(bounds) do
+        for k, v in pairs(bound) do
+            local zoneName = GetZoneAtCoords(vector3(v.X, v.Y, v.Z))
+            if not zoneName then return false end
+            if string.upper(zoneName) ~= string.upper(zone) then
+                return true, zoneName
             end
         end
     end
-end)
+    return false
+end
+
+exports('Sv_DoesZoneInclude', function(zone) return DoesZoneInclude(zone) end)
