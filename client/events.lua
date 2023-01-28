@@ -448,240 +448,240 @@ end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param ped number | Entity handle of the ped who triggered the event
----@param x number | X coord of ped
----@param y number | Y coord of ped
----@param z number | Z coord of ped
-AddEventHandler('CEventShockingBicycleCrash', function(witnesses, ped, x, y, z)
+---@param coords table | Table of coords of the ped
+AddEventHandler('CEventShockingBicycleCrash', function(witnesses, ped, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingBicycleCrash \nPlyPId: '..PlayerPedId()..'\nPed: '..ped..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param vehicle number | Entity handle of the vehicle who triggered the event
----@param x number | X coord of vehicle
----@param y number | Y coord of vehicle
----@param z number | Z coord of vehicle
-AddEventHandler('CEventShockingBicycleOnPavement', function(witnesses, vehicle, x, y, z)
+---@param coords table | Table of coords of the vehicle
+AddEventHandler('CEventShockingBicycleOnPavement', function(witnesses, vehicle, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingBicycleOnPavement \nPlyPId: '..PlayerPedId()..'\nVehicle: '..vehicle..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param vehicle number | Entity handle of the vehicle who triggered the event
----@param x number | X coord of vehicle
----@param y number | Y coord of vehicle
----@param z number | Z coord of vehicle
-AddEventHandler('CEventShockingCarAlarm', function(witnesses, vehicle, x, y, z)
+---@param coords table | Table of coords of the vehicle
+AddEventHandler('CEventShockingCarAlarm', function(witnesses, vehicle, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingCarAlarm \nVehicle: '..vehicle..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param driver number | Entity handle of the ped who triggered the event
----@param x number | X coord of driver
----@param y number | Y coord of driver
----@param z number | Z coord of driver
-AddEventHandler('CEventShockingCarCrash', function(witnesses, driver, x, y, z)
+---@param coords table | Table of coords of the driver
+AddEventHandler('CEventShockingCarCrash', function(witnesses, driver, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingCarCrash \nPlyPId: '..PlayerPedId()..'\nDriver: '..driver..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param driver number | Entity handle of the driver who triggered the event
----@param x number | X coord of driver
----@param y number | Y coord of driver
----@param z number | Z coord of driver
-AddEventHandler('CEventShockingCarOnCar', function(witnesses, driver, x, y, z)
+---@param coords table | Table of coords of the driver
+AddEventHandler('CEventShockingCarOnCar', function(witnesses, driver, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingCarOnCar \nPlyPId: '..PlayerPedId()..'\nDriver: '..driver..'\nWitnesses: '..json.encode(witnesses)..'\nargs: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param driver number | Entity handle of the driver who triggered the event
----@param x number | X coord of driver
----@param y number | Y coord of driver
----@param z number | Z coord of driver
-AddEventHandler('CEventShockingCarPileUp', function(witnesses, driver, x, y, z)
+---@param coords table | Table of coords of the driver
+AddEventHandler('CEventShockingCarPileUp', function(witnesses, driver, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingCarPileUp \npid: '..PlayerPedId()..'\nDriver: '..driver..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param animal number | Entity handle of the animal who triggered the event
----@param x number | X coord of animal
----@param y number | Y coord of animal
----@param z number | Z coord of animal
-AddEventHandler('CEventShockingDangerousAnimal', function(witnesses, animal, x, y, z)
+---@param coords table | Table of coords of the animal
+AddEventHandler('CEventShockingDangerousAnimal', function(witnesses, animal, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingDangerousAnimal \nAnimal: '..animal..'\nWitnesses: '..json.encode(witnesses)..'\nargs: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param ped number | Entity handle of the ped who triggered the event
----@param x number | X coord of ped
----@param y number | Y coord of ped
----@param z number | Z coord of ped
-AddEventHandler('CEventShockingDeadBody', function(witnesses, ped, x, y, z)
+---@param coords table | Table of coords of the ped
+AddEventHandler('CEventShockingDeadBody', function(witnesses, ped, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingDeadBody \nPlyPId: '..PlayerPedId()..'\nPed: '..ped..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param vehicle number | Entity handle of the vehicle which triggered the event
----@param x number | X coord of vehicle
----@param y number | Y coord of vehicle
----@param z number | Z coord of vehicle
-AddEventHandler('CEventShockingDrivingOnPavement', function(witnesses, vehicle, x, y, z)
+---@param coords table | Table of coords of the vehicle
+AddEventHandler('CEventShockingDrivingOnPavement', function(witnesses, vehicle, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingDrivingOnPavement \nVehicle: '..vehicle..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param vehicle number | Entity handle of the vehicle which triggered the event
----@param x number | X coord of vehicle
----@param y number | Y coord of vehicle
----@param z number | Z coord of vehicle
-AddEventHandler('CEventShockingEngineRevved', function(witnesses, vehicle, x, y, z)
+---@param coords table | Table of coords of the vehicle
+AddEventHandler('CEventShockingEngineRevved', function(witnesses, vehicle, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingEngineRevved \nVehicle: '..vehicle..'\nWitnesses: '..json.encode(witnesses)..'\nargs: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the explosion
 ---@param entity number | Handle of the entity which triggered the explosion
----@param x number | X coordinate of the explosion
----@param y number | Y coordinate of the explosion
----@param z number | Z coordinate of the explosion
-AddEventHandler('CEventShockingExplosion', function(witnesses, entity, x, y, z)
+---@param coords table | Table of coords of the explosion
+AddEventHandler('CEventShockingExplosion', function(witnesses, entity, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingExplosion \nPlyPId: '..PlayerPedId()..'\nSource: '..entity..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the fire
 ---@param entity number | Handle of the entity which thats on fire
----@param x number | X coordinate of the fire
----@param y number | Y coordinate of the fire
----@param z number | Z coordinate of the fire
-AddEventHandler('CEventShockingFire', function(witnesses, entity, x, y, z)
+---@param coords table | Table of coords of the fire
+AddEventHandler('CEventShockingFire', function(witnesses, entity, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingFire \npid: '..PlayerPedId()..'\nSource: '..entity..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param attacker number | Handle of the entity that triggered the event
----@param x number | X coord of attacker
----@param y number | Y coord of attacker
----@param z number | Z coord of attacker
-AddEventHandler('CEventShockingGunFight', function(witnesses, attacker, x, y, z)
+---@param coords table | Table of coords of the attacker
+AddEventHandler('CEventShockingGunFight', function(witnesses, attacker, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingGunFight \nAttacker: '..attacker..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param ped number | Entity handle of the ped who triggered the event
----@param x number | X coord of ped
----@param y number | Y coord of ped
----@param z number | Z coord of ped
-AddEventHandler('CEventShockingGunshotFired', function(witnesses, ped, x, y, z)
+---@param coords table | Table of coords of the ped
+AddEventHandler('CEventShockingGunshotFired', function(witnesses, ped, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingGunshotFired \nPlyPId: '..PlayerPedId()..'\nShooter: '..ped..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param vehicle number | Entity handle of the helicopter
----@param x number | X coordinate of the helicopter
----@param y number | Y coordinate of the helicopter
----@param z number | Z coordinate of the helicopter
-AddEventHandler('CEventShockingHelicopterOverhead', function(witnesses, vehicle, x, y, z)
+---@param coords table | Table of coords of the helicopter
+AddEventHandler('CEventShockingHelicopterOverhead', function(witnesses, vehicle, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingHelicopterOverhead \npid: '..PlayerPedId()..'\nVehicle: '..vehicle..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param vehicle number | Entity handle of the vehicle which sounded their horn
----@param x number | X coordinate of the vehicle
----@param y number | Y coordinate of the vehicle
----@param z number | Z coordinate of the vehicle
-AddEventHandler('CEventShockingHornSounded', function(witnesses, vehicle, x, y, z)
+---@param coords table | Table of coords of the vehicle
+AddEventHandler('CEventShockingHornSounded', function(witnesses, vehicle, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingHornSounded \nPlyPId: '..PlayerPedId()..'\nVehicle: '..vehicle..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param attacker number | Entity handle of the ped who injured the other ped
----@param x number | X coordinate of the injured ped
----@param y number | Y coordinate of the injured ped
----@param z number | Z coordinate of the injured ped
-AddEventHandler('CEventShockingInjuredPed', function(witnesses, attacker, x, y, z)
+---@param coords table | Table of coords of the injured ped
+AddEventHandler('CEventShockingInjuredPed', function(witnesses, attacker, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingInjuredPed \nPlyPId: '..PlayerPedId()..'\nAttacker: '..attacker..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param ped number | Entity handle of the ped who triggered the event
----@param x number | X coord of ped
----@param y number | Y coord of ped
----@param z number | Z coord of ped
-AddEventHandler('CEventShockingMadDriver', function(witnesses, ped, x, y, z)
+---@param coords table | Table of coords of the ped
+AddEventHandler('CEventShockingMadDriver', function(witnesses, ped, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingMadDriver \nPlyPId: '..PlayerPedId()..'\nPed: '..ped..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param ped number | Entity handle of the ped who triggered the event
----@param x number | X coord of ped
----@param y number | Y coord of ped
----@param z number | Z coord of ped
-AddEventHandler('CEventShockingMadDriverBicycle', function(witnesses, ped, x, y, z)
+---@param coords table | Table of coords of the ped
+AddEventHandler('CEventShockingMadDriverBicycle', function(witnesses, ped, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingMadDriverBicycle \nPlyPId: '..PlayerPedId()..'\nPed: '..ped..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param ped number | Entity handle of the ped who triggered the event
----@param x number | X coord of ped
----@param y number | Y coord of ped
----@param z number | Z coord of ped
-AddEventHandler('CEventShockingMadDriverExtreme', function(ped, witnesses, x, y, z)
+---@param coords table | Table of coords of the ped
+AddEventHandler('CEventShockingMadDriverExtreme', function(witnesses, ped, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingMadDriverExtreme \nPlyPId: '..PlayerPedId()..'\nPed: '..ped..'\nWitnesses: '..json.encode(witnesses)..'\naCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param ped number | Entity handle of the ped that is parachuting
----@param x number | X coordinate of the parachuter
----@param y number | Y coordinate of the parachuter
----@param z number | Z coordinate of the parachuter
-AddEventHandler('CEventShockingParachuterOverhead', function(witnesses, ped, x, y, z)
+---@param coords table | Table of coords of the ped
+AddEventHandler('CEventShockingParachuterOverhead', function(witnesses, ped, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingParachuterOverhead \npid: '..PlayerPedId()..'\nWitnesses: '..json.encode(witnesses)..'\nPed: '..ped..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of peds that witnessed the event
 ---@param player number | Player ped that knocked into the ped
----@param x number | X coordinate of the event
----@param y number | Y coordinate of the event
----@param z number | Z coordinate of the event
-AddEventHandler('CEventShockingPedKnockedIntoByPlayer', function(witnesses, player, x, y, z)
+---@param coords table | Table of coords of the event
+AddEventHandler('CEventShockingPedKnockedIntoByPlayer', function(witnesses, player, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingPedKnockedIntoByPlayer \npid: '..PlayerPedId()..'\nWitnesses: '..json.encode(witnesses)..'\nPlayer: '..player..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param driver number | Entity handle of the ped who injured the other ped
----@param x number | X coordinate of the injured ped
----@param y number | Y coordinate of the injured ped
----@param z number | Z coordinate of the injured ped
-AddEventHandler('CEventShockingPedRunOver', function(witnesses, driver, x, y, z)
+---@param coords table | Table of coords of the injured ped
+AddEventHandler('CEventShockingPedRunOver', function(witnesses, driver, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingPedRunOver \nPlyPId: '..PlayerPedId()..'\nDriver: '..driver..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of peds that witnessed the event
 ---@param attacker number | The ped that attacked
----@param x number | The x position of the event
----@param y number | The y position of the event
----@param z number | The z position of the event
-AddEventHandler('CEventShockingPedShot', function(witnesses, attacker, x, y, z)
+---@param coords table | Table of coords of the event
+AddEventHandler('CEventShockingPedShot', function(witnesses, attacker, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingPedShot \nPlyPId: '..PlayerPedId()..'\nWitnesses: '..json.encode(witnesses)..'\nAttacker: '..attacker..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
@@ -689,129 +689,129 @@ end)
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param vehicle number | Entity handle of the plane that triggered the event
 ---@param x number | X coordinate of the plane
----@param y number | Y coordinate of the plane
----@param z number | Z coordinate of the plane
-AddEventHandler('CEventShockingPlaneFlyby', function(witnesses, vehicle, x, y, z)
+AddEventHandler('CEventShockingPlaneFlyby', function(witnesses, vehicle, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingPlaneFlyby \nWitnesses: '..json.encode(witnesses)..'\nVehicle: '..vehicle..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param entity number | Handle of the entity scared? by the event
----@param x number | X coordinate of the event
----@param y number | Y coordinate of the event
----@param z number | Z coordinate of the event
-AddEventHandler('CEventShockingPotentialBlast', function(witnesses, entity, x, y, z)
+---@param coords table | Table of coords of the entity
+AddEventHandler('CEventShockingPotentialBlast', function(witnesses, entity, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingPotentialBlast \npid: '..PlayerPedId()..'\nWitnesses: '..json.encode(witnesses)..'\nEntity: '..entity..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param attacker number | Handle of the entity who triggered the event
----@param x number | X coord of entity
----@param y number | Y coord of entity
----@param z number | Z coord of entity
-AddEventHandler('CEventShockingPropertyDamage', function(witnesses, attacker, x, y, z)
+---@param coords table | Table of coords of the event
+AddEventHandler('CEventShockingPropertyDamage', function(witnesses, attacker, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingPropertyDamage \nPlyPId: '..PlayerPedId()..'\nAttacker: '..attacker..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles that witnessed the event
 ---@param ped number | Entity handle of the ped is running
----@param x number | X coordinate of the ped
----@param y number | Y coordinate of the ped
----@param z number | Z coordinate of the ped
-AddEventHandler('CEventShockingRunningPed', function(witnesses, ped, x, y, z)
+---@param coords table | Table of coords of the ped
+AddEventHandler('CEventShockingRunningPed', function(witnesses, ped, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingRunningPed \nPlyPId: '..PlayerPedId()..'\nPed: '..ped..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of peds that witnessed the event
 ---@param ped number | Handle of the ped that is running (ie triggered the stampede)
----@param x number | X coord of the event
----@param y number | Y coord of the event
----@param z number | Z coord of the event
-AddEventHandler('CEventShockingRunningStampede', function(witnesses, ped, x, y, z)
+---@param coords table | Table of coords of the ped/event
+AddEventHandler('CEventShockingRunningStampede', function(witnesses, ped, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingRunningStampede \nPlyPId: '..PlayerPedId()..'\nWitnesses: '..json.encode(witnesses)..'\nPed: '..ped..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entities that witnessed the event
 ---@param jacker number | The ped that jacked the vehicle
----@param x number | The x coordinate of the vehicle
----@param y number | The y coordinate of the vehicle
----@param z number | The z coordinate of the vehicle
-AddEventHandler('CEventShockingSeenCarStolen', function(witnesses, jacker, x, y, z)
+---@param coords table | Table of coords of the vehicle
+AddEventHandler('CEventShockingSeenCarStolen', function(witnesses, jacker, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingSeenCarStolen \npid: '..PlayerPedId()..'\nWitnesses: '..json.encode(witnesses)..'\nJacker: '..jacker..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of peds that witnessed the event
 ---@param attacker number | The ped that used the melee weapon
----@param x number | The x coordinate of the event
----@param y number | The y coordinate of the event
----@param z number | The z coordinate of the event
-AddEventHandler('CEventShockingSeenMeleeAction', function(witnesses, attacker, x, y, z)
+---@param coords table | Table of coords of the attacker
+AddEventHandler('CEventShockingSeenMeleeAction', function(witnesses, attacker, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingSeenMeleeAction \nPlyPId: '..PlayerPedId()..'\nAttacker: '..attacker..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param vehicle number | Entity handle of the vehicle who triggered the event
----@param x number | X coord of vehicle
----@param y number | Y coord of vehicle
----@param z number | Z coord of vehicle
-AddEventHandler('CEventShockingSeenNiceCar', function(witnesses, vehicle, x, y, z)
+---@param coords table | Table of coords of the vehicle
+AddEventHandler('CEventShockingSeenNiceCar', function(witnesses, vehicle, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingSeenNiceCar \nPlyPId: '..PlayerPedId()..'\nVehicle: '..vehicle..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Table of entities that witnessed the event
 ---@param attacker number | Ped handle of the attacker
----@param x number | X coord of the attacker
----@param y number | Y coord of the attacker
----@param z number | Z coord of the attacker
-AddEventHandler('CEventShockingSeenPedKilled', function(witnesses, attacker, x, y, z)
+---@param coords table | Table of coords of the attacker
+AddEventHandler('CEventShockingSeenPedKilled', function(witnesses, attacker, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingSeenPedKilled \nPlyPId: '..PlayerPedId()..'\nAttacker: '..attacker..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Table of entities that witnessed the event
 ---@param vehicle number | Entity of the vehicle that triggered the event
----@param x number | X coord of the vehicle
----@param y number | Y coord of the vehicle
----@param z number | Z coord of the vehicle
-AddEventHandler('CEventShockingSiren', function(witnesses, vehicle, x, y, z)
+---@param coords table | Table of coords of the vehicle
+AddEventHandler('CEventShockingSiren', function(witnesses, vehicle, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingSiren \nvehicle: '..vehicle..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entities that witnessed the event
 ---@param vehicle number | Entity handle of the vehicle towing
----@param x number | X coordinate of the vehicle towing
----@param y number | Y coordinate of the vehicle towing
----@param z number | Z coordinate of the vehicle towing
-AddEventHandler('CEventShockingVehicleTowed', function(witnesses, vehicle, x, y, z)
+---@param coords table | Table of coords of the vehicle
+AddEventHandler('CEventShockingVehicleTowed', function(witnesses, vehicle, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingVehicleTowed \nTow Vehicle: '..vehicle..'\nWitnesses: '..json.encode(witnesses)..'\nCoords: '..json.encode(x, y, z)"
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param ped number | Entity handle of the ped who triggered the event
----@param x number | X coord of ped
----@param y number | Y coord of ped
----@param z number | Z coord of ped
-AddEventHandler('CEventShockingVisibleWeapon', function(witnesses, ped, x, y, z)
+---@param coords table | Table of coords of the ped
+AddEventHandler('CEventShockingVisibleWeapon', function(witnesses, ped, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingVisibleWeapon \nPlyPId: '..PlayerPedId()..'\nPed: '..ped..'\nWitnesses: '..json.encode(witnesses)..'\nargs: '..json.encode(x, y, z)
 	-- print(_text)
 end)
 
 ---@param witnesses table | Array of entity handles who witnessed the event
 ---@param ped number | Entity handle of the ped who triggered the event
----@param x number | X coord of ped
----@param y number | Y coord of ped
----@param z number | Z coord of ped
-AddEventHandler('CEventShockingWeaponThreat', function(witnesses, ped, x, y, z)
+---@param coords table | Table of coords of the ped
+AddEventHandler('CEventShockingWeaponThreat', function(witnesses, ped, coords)
+	local x, y, z = coords[1][1], coords[1][2], coords[1][3]
+	coords = vector3(x, y, z)
 	-- local _text = 'CEventShockingWeaponThreat \nPlyPId: '..PlayerPedId()..'\nPed: '..ped..'\nWitnesses: '..json.encode(witnesses)..'\nargs: '..json.encode(x, y, z)
 	-- print(_text)
 end)
