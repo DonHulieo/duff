@@ -158,10 +158,21 @@ local function CreatePolyZoneforZone(zone)
         gridDivisions = 25
     })
     Zones.PolyZones[data.Name] = zone
+    collectgarbage("collect")
+    return zone
 end
 
-exports('CreatePolyZoneforZone', function(zone) CreatePolyZoneforZone(zone) end)
+exports('CreatePolyZoneforZone', function(zone) return CreatePolyZoneforZone(zone) end)
 
+local function CreatePolyZoneforAllZones()
+    for i = 1, #Zones.Data do
+        CreatePolyZoneforZone(Zones.Data[i].Name)
+    end
+    TriggerServerEvent('duf:server:UpdateZones', Zones.PolyZones)
+end
+
+exports('CreatePolyZoneforAllZones', function() return CreatePolyZoneforAllZones() end)
+--[[
 local function Notify(text)
     SetNotificationTextEntry('STRING')
     AddTextComponentString(text)
@@ -185,3 +196,4 @@ if Zones.PolyZones then
         end, msBetweenPointCheck)
     end
 end
+]]

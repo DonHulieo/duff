@@ -223,3 +223,10 @@ local function DoesZoneInclude(zone)
 end
 
 exports('Sv_DoesZoneInclude', function(zone) return DoesZoneInclude(zone) end)
+
+--------------------------------- Handlers ---------------------------------
+
+RegisterNetEvent('duf:server:UpdateZones')
+AddEventHandler('duf:server:UpdateZones', function(zones)
+    Zones.PolyZones = zones
+end)
