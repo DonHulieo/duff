@@ -5,7 +5,7 @@ author 'DonHulieo'
 description 'Don\'s Utility Functions for FiveM'
 version '0.5.6'
 
-server_script {'server/commands.lua', 'server/events.lua', 'server/math.lua', 'server/zones.lua'}
+server_script {'server/events.lua', 'server/math.lua', 'server/scopes.lua', 'server/zones.lua'}
 
 client_script {
     '@PolyZone/client.lua',
@@ -13,7 +13,8 @@ client_script {
     '@PolyZone/EntityZone.lua',
     '@PolyZone/CircleZone.lua',
     '@PolyZone/ComboZone.lua',
-    'client/blips.lua', 
+    'client/blips.lua',
+    'client/draw.lua',
     'client/enumerators.lua', 
     'client/events.lua', 
     'client/load_assets.lua', 
