@@ -1,5 +1,7 @@
 local scopes = {}
 
+--------------------------------- ScopeEvents --------------------------------- [Credits go to: PichotM | https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21]
+
 ---@param intSource number | Player Server ID
 ---@return table | Table of players in scope
 local function GetPlayerScope(intSource)
