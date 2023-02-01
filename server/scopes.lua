@@ -21,7 +21,9 @@ local function TriggerScopeEvent(eventName, scopeOwner, ...)
     TriggerClientEvent(eventName, scopeOwner, ...)
 end
 
-exports('TriggerScopeEvent', function(eventName, scopeOwner, ...) return TriggerScopeEvent(eventName, scopeOwner, ...) end)
+RegisterNetEvent('TriggerScopeEvent', function(eventName, scopeOwner, ...)
+    TriggerScopeEvent(eventName, scopeOwner, ...)
+end)
 
 -------------------------------- HANDLERS --------------------------------
 
@@ -60,9 +62,4 @@ AddEventHandler('playerDropped', function()
             tbl[intSource] = nil
         end
     end
-end)
-
-RegisterNetEvent('TriggerScopeEvent')
-AddEventHandler('TriggerScopeEvent', function(eventName, scopeOwner, ...)
-    TriggerScopeEvent(eventName, scopeOwner, ...)
 end)

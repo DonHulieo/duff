@@ -23,8 +23,8 @@
 ---@param textureName string
 ---@param drawOnEnts boolean
 ---@param dist number | Distance player has to be to see the marker, default 100
----@param owner boolean | If this function was called from the server, this will be true
-local function DrawSyncedMarker(type, x, y, z, dirX, dirY, dirZ, rotX, rotY, rotZ, scaleX, scaleY, scaleZ, r, g, b, a, bobUpAndDown, faceCamera, p19, rotate, textureDict, textureName, drawOnEnts, dist, owner)
+---@param server boolean | If this function was called from the server, this will be true
+local function DrawSyncedMarker(type, x, y, z, dirX, dirY, dirZ, rotX, rotY, rotZ, scaleX, scaleY, scaleZ, r, g, b, a, bobUpAndDown, faceCamera, p19, rotate, textureDict, textureName, drawOnEnts, dist, server)
     -- local coords = GetEntityCoords(PlayerPedId())
     local distance = function(x, y, z) return #(vector3(x, y, z) - GetEntityCoords(PlayerPedId())) end
     local drawing = false
@@ -34,7 +34,7 @@ local function DrawSyncedMarker(type, x, y, z, dirX, dirY, dirZ, rotX, rotY, rot
         repeat Wait(0) until loaded
     end
     if distance(x, y, z) < dist then
-        if not owner then
+        if not server then
             TriggerServerEvent('TriggerScopeEvent', 'duf:DrawSyncedMarker', GetPlayerServerId(PlayerId()), type, x, y, z, dirX, dirY, dirZ, rotX, rotY, rotZ, scaleX, scaleY, scaleZ, r, g, b, a, bobUpAndDown, faceCamera, p19, rotate, textureDict, textureName, drawOnEnts, dist, true)
         end
         drawing = true
@@ -57,10 +57,9 @@ end
 
 exports('DrawSyncedMarker', function(...) return DrawSyncedMarker(...) end)
 
-RegisterNetEvent('duf:DrawSyncedMarker')
-AddEventHandler('duf:DrawSyncedMarker', function(...) return DrawSyncedMarker(...) end)
+RegisterNetEvent('duf:DrawSyncedMarker', function(...) return DrawSyncedMarker(...) end)
 
---------------------------------- DrawText --------------------------------- 
+--------------------------------- DrawText3D --------------------------------- 
 
 ---@param x number | X coordinate
 ---@param y number | Y coordinate
@@ -92,13 +91,18 @@ local function DrawText3D(x, y, z, text, scale)
         SetTextEntry('STRING')
         SetTextCentre(1)
         AddTextComponentString(text)
-        DrawText(_x, _y)
+        EndTextCommandDisplayText(_x, _y)
     end
 end
 
 exports('DrawText3D', function(x, y, z, text, scale) return DrawText3D(x, y, z, text, scale) end)
 --[[ 
     Example usage:
-    local coords = GetEntityCoords(PlayerPedId())
-    exports['duf']:DrawText3D(coords, 'Hello World!', 0.35)
-]]
+    CreateThread(function()
+        while true do
+            Wait(0)
+            local coords = GetEntityCoords(PlayerPedId())
+            exports['duf']:DrawText3D(coords, 'Hello World!', 0.35)
+        end
+    end)
+]]--

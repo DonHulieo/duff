@@ -294,9 +294,9 @@ AddEventHandler('gameEventTriggered', function(name, args)
 			end
 		end
 	elseif name == 'CEventNetworkPlayerEnteredVehicle' then
-		local _ = args[1]
+		local netId = args[1] -- Network ID of the client? always returns 128 on a locally hosted server
 		local vehicle = args[2]
-		-- local _text = 'CEventNetworkPlayerEnteredVehicle \npid: '..PlayerPedId()..'\nVehicle: '..vehicle..'\nUnknown: '.._
+		-- local _text = 'CEventNetworkPlayerEnteredVehicle \npid: '..PlayerPedId()..'\nVehicle: '..vehicle..'\NetId: '.._
 		-- print(_text)
 	else
 		local _text = 'gameEventTriggered \npid: '..PlayerPedId()..'\nname: '..name..'\nargs: '..json.encode(args)
