@@ -75,11 +75,11 @@ exports('Cl_GetEntityRightVector', function(entity) return GetEntityRightVector(
 local function CalculateIncline(entity, ms)
     local entity = entity or PlayerPedId()
     local ms = ms or 1000
-    local startCoords = GetEntityCoords(entity)
+    local startZ = GetEntityCoords(entity).z
     Wait(ms)
-    local endCoords = GetEntityCoords(entity)
-    local dist = GetDistVec3(startCoords, endCoords)
-    local incline = math.deg(math.atan2(dist, ms))
+    local endZ = GetEntityCoords(entity).z
+    local dist = endZ - startZ
+    local incline = math.deg(math.atan2(dist, ms / 1000))
     return incline
 end
 
@@ -87,16 +87,50 @@ exports('CalculateIncline', function(entity, ms) return CalculateIncline(entity,
 
 --------------------------------- Calculate Fuel Consumption ---------------------------------
 
----@param vehicle Entity
----@param speed number | Speed in MPH
----@param incline number | Incline in degrees
+---@param vehicle number | Vehicle Handle
+---@param speed number | Speed in m/s
 ---@return number | Fuel consumption in L/100km
-local function CalculateFuelConsumption(vehicle, speed, incline)
+local function CalculateFuelConsumption(vehicle, speed)
     local vehicle = vehicle or GetVehiclePedIsIn(PlayerPedId(), false)  
-    local speed = speed or GetEntitySpeed(vehicle) * 2.236936
-    local incline = incline or CalculateIncline(vehicle, 1000)
-    local fuelConsumption = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fPetrolTankVolume') * GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fPetrolTankVolume') * (speed / 100) * (incline / 100)
+    local speed = speed or GetEntitySpeed(vehicle)
+    local tankVolume = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fPetrolTankVolume')
+    local mass = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fMass')
+    local dragCo = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff')
+    local windSpeed = GetWindSpeed()
+    local incline = CalculateIncline(vehicle, 100)
+    local minDim, maxDim = GetModelDimensions(GetEntityModel(vehicle))
+    local vehicleCSA = (maxDim.y - minDim.y) * (maxDim.z - minDim.z) -- in m^2
+    local dragForce = 0.5 * dragCo * vehicleCSA * 1.202 * ((speed - windSpeed)^2) -- in N
+    local gradForce = mass * 9.81 * (math.sin(math.rad(incline)) + 1 * math.cos(math.rad(incline))) -- in N
+    local rollFrCo = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fRollCentreHeightFront') 
+    local rollRrCo = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fRollCentreHeightRear')
+    local rollCo = (rollFrCo + rollRrCo) / 2
+    local rollForce = rollCo * mass * 9.81 -- in N
+    local efficiency = 0.87
+    if GetVehicleCurrentGear(vehicle) < (GetVehicleHighGear(vehicle) / 2) then efficiency = 0.85 end 
+    if GetVehicleCurrentGear(vehicle) == GetVehicleHighGear(vehicle) then efficiency = 0.9 end
+    if dragForce < 0 then dragForce = 0 end 
+    if gradForce < 0 then gradForce = 0 end
+    if rollForce < 0 then rollForce = 0 end
+    local power = (dragForce + gradForce + rollForce) * speed / efficiency -- in W
+    local BSFC = 1 - ((0.5 * 1.202 * dragCo * vehicleCSA * speed ^ 3) / power) -- in kg/kWh
+    local fuelConsumption = (power * BSFC) / (3600 * 4184) * 100 / tankVolume -- in L/100km
+    if fuelConsumption ~= fuelConsumption or fuelConsumption < 0 then fuelConsumption = exports['duf']:RoundNumber(GetVehicleCurrentRpm(vehicle), 1) end
+    -- print('Speed: ' .. speed * 3.6 .. '\nMass: ' .. mass .. ' kg\nDrag Co: ' .. dragCo .. '\nWind Speed: ' .. windSpeed .. ' m/s\nIncline: ' .. incline .. ' deg\nVehicle CSA: ' .. vehicleCSA .. ' m^2\nDrag Force: ' .. dragForce .. ' N\nGrad Force: ' .. gradForce .. ' N\nRoll Force: ' .. rollForce .. ' N\nEfficiency: ' .. efficiency .. '\nPower: ' .. power .. ' W\nBSFC : ' .. BSFC .. '\nFuel Consumption: ' .. fuelConsumption .. ' L/100km')
     return fuelConsumption
 end
 
 exports('CalculateFuelConsumption', function(vehicle, speed, incline) return CalculateFuelConsumption(vehicle, speed, incline) end)
+
+--[[
+CreateThread(function()
+    while true do
+        local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
+        if vehicle ~= 0 then
+            local fuelConsumption = CalculateFuelConsumption(vehicle)
+            print('Fuel Consumption: ' .. fuelConsumption .. ' L/100km')
+        end
+        Wait(1000)
+    end
+end)
+]]--
