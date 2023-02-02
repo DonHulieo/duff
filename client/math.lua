@@ -107,15 +107,15 @@ local function CalculateFuelConsumption(vehicle, speed)
     local rollCo = (rollFrCo + rollRrCo) / 2
     local rollForce = rollCo * mass * 9.81 -- in N
     local efficiency = 0.87
-    if GetVehicleCurrentGear(vehicle) < (GetVehicleHighGear(vehicle) / 2) then efficiency = 0.85 end 
-    if GetVehicleCurrentGear(vehicle) == GetVehicleHighGear(vehicle) then efficiency = 0.9 end
+    if GetVehicleCurrentGear(vehicle) < (GetVehicleHighGear(vehicle) / 2) then efficiency = 0.85
+    elseif GetVehicleCurrentGear(vehicle) == GetVehicleHighGear(vehicle) then efficiency = 0.9 end
     if dragForce < 0 then dragForce = 0 end 
     if gradForce < 0 then gradForce = 0 end
     if rollForce < 0 then rollForce = 0 end
     local power = (dragForce + gradForce + rollForce) * speed / efficiency -- in W
     local BSFC = 1 - ((0.5 * 1.202 * dragCo * vehicleCSA * speed ^ 3) / power) -- in kg/kWh
     local fuelConsumption = (power * BSFC) / (3600 * 4184) * 100 / tankVolume -- in L/100km
-    if fuelConsumption ~= fuelConsumption or fuelConsumption < 0 then fuelConsumption = exports['duf']:RoundNumber(GetVehicleCurrentRpm(vehicle), 1) end
+    if fuelConsumption ~= fuelConsumption or fuelConsumption < 0 then fuelConsumption = exports['duf']:RoundNumber(GetVehicleCurrentRpm(vehicle), 2) end
     -- print('Speed: ' .. speed * 3.6 .. '\nMass: ' .. mass .. ' kg\nDrag Co: ' .. dragCo .. '\nWind Speed: ' .. windSpeed .. ' m/s\nIncline: ' .. incline .. ' deg\nVehicle CSA: ' .. vehicleCSA .. ' m^2\nDrag Force: ' .. dragForce .. ' N\nGrad Force: ' .. gradForce .. ' N\nRoll Force: ' .. rollForce .. ' N\nEfficiency: ' .. efficiency .. '\nPower: ' .. power .. ' W\nBSFC : ' .. BSFC .. '\nFuel Consumption: ' .. fuelConsumption .. ' L/100km')
     return fuelConsumption
 end

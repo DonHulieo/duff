@@ -125,6 +125,18 @@ local function ReqWeaponAsset(asset)
     return loaded()
 end
 
+---@return boolean | Returns true if rope textures are loaded
+local function ReqRopeTextures()
+    local loaded = function() return RopeAreTexturesLoaded() end
+    if not loaded() then
+        RopeLoadTextures()
+        repeat Wait(0) until loaded()
+    end
+    return loaded()
+end
+
+--------------------------------- Exports --------------------------------- 
+
 exports('ReqModel', function(model) return ReqModel(model) end)
 exports('ReqCollision', function(model) return ReqCollision(model) end)
 exports('ReqAnimDict', function(dict) return ReqAnimDict(dict) end)
@@ -135,6 +147,8 @@ exports('ReqNamedPtfxAsset', function(asset) return ReqNamedPtfxAsset(asset) end
 exports('ReqScaleformMovie', function(scaleform) return ReqScaleformMovie(scaleform) end)
 exports('ReqStreamedTextureDict', function(dict) return ReqStreamedTextureDict(dict) end)
 exports('ReqWeaponAsset', function(asset) return ReqWeaponAsset(asset) end)
+exports('ReqRopeTextures', function() return ReqRopeTextures() end)
+
 --[[
     Example usage:
     exports['duf']:ReqModel('prop_cs_cardbox_01') | exports['duf']:ReqModel(1302435108)
