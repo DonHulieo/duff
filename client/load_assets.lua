@@ -3,7 +3,7 @@
 ---@param model string or hash | Model to load
 ---@return boolean | Returns true if model is loaded
 local function ReqModel(model)
-    if not IsModelInCdimage(model) or not IsModelAVehicle(model) then print('^3DUF^7: ^1Invalid model requested^7: ' .. model) return false end
+    -- if not IsModelInCdimage(model) or not IsModelAVehicle(model) then print('^3DUF^7: ^1Invalid model requested^7: ' .. model) return false end
     if type(model) == 'string' then
         model = joaat(model)
     end
@@ -19,7 +19,7 @@ end
 ---@param model string or hash | Model to load collision for
 ---@return boolean | Returns true if collision is loaded
 local function ReqCollision(model)
-    if not IsModelInCdimage(model) or not IsModelAVehicle(model) then print('^3DUF^7: ^1Invalid model requested^7: ' .. model) return false end
+    -- if not IsModelInCdimage(model) or not IsModelAVehicle(model) then print('^3DUF^7: ^1Invalid model requested^7: ' .. model) return false end
     if type(model) == 'string' then
         model = joaat(model)
     end

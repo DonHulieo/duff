@@ -251,6 +251,24 @@ end
 
 exports('GetAngleBetweenPoints', function(point1, point2) return GetAngleBetweenPoints(point1, point2) end)
 
+--------------------------------- Calculate Incline ---------------------------------
+
+---@param entity number | Entity Handle 
+---@param ms number | Milliseconds to calculate incline over
+---@return number | Incline in degrees
+local function CalculateIncline(entity, ms)
+    local entity = entity
+    local ms = ms or 1000
+    local startZ = GetEntityCoords(entity).z
+    Wait(ms)
+    local endZ = GetEntityCoords(entity).z
+    local dist = endZ - startZ
+    local incline = math.deg(math.atan2(dist, ms / 1000))
+    return incline
+end
+
+exports('CalculateIncline', function(entity, ms) return CalculateIncline(entity, ms) end)
+
 --------------------------------- Order Vectors By ---------------------------------
 
 ---@param table table | An Array of Vectors to Order
