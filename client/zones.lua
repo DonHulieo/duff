@@ -1,18 +1,25 @@
---------------------------------- Handlers ---------------------------------
+--------------------------------- Events ---------------------------------
 
 RegisterNetEvent('duf:Cl_PlayerEnteredNone')
 
 for _, zone in pairs(Zones.Data) do
-    RegisterNetEvent('duf:PlayerEnteredZone' .. zone.Name)
-    AddEventHandler('duf:PlayerEnteredZone' .. zone.Name, function(zone)
+    RegisterNetEvent('duf:PlayerEntered' .. zone.Name, function(zone)
         print('Player entered ' .. zone)
     end)
 end
 
-RegisterNetEvent('duf:Cl_SyncPlayerZones')
-AddEventHandler('duf:Cl_SyncPlayerZones', function(PlayerZones)
+RegisterNetEvent('duf:Cl_SyncPlayerZones', function(PlayerZones)
     Zones.Players = PlayerZones
 end)
+
+Zones.PolyZones = {}
+
+RegisterNetEvent('duf:client:UpdateZones', function(data)
+    Zones.PolyZones = data
+end)
+
+exports('GetPolyZone', function(zone) return Zones.PolyZones[zone] end)
+exports('GetPolyZones', function() return Zones.PolyZones end)
 
 --------------------------------- Utilities ---------------------------------
 
@@ -172,28 +179,27 @@ local function CreatePolyZoneforAllZones()
 end
 
 exports('CreatePolyZoneforAllZones', function() return CreatePolyZoneforAllZones() end)
---[[
-local function Notify(text)
-    SetNotificationTextEntry('STRING')
-    AddTextComponentString(text)
-    DrawNotification(false, false)
-end
 
-for k, v in pairs(Zones.Data) do
-    CreatePolyZoneforZone(v.Name)
-    print('Created PolyZone for ' .. v.Name)
-end
+-- local function Notify(text)
+--     SetNotificationTextEntry('STRING')
+--     AddTextComponentString(text)
+--     DrawNotification(false, false)
+-- end
 
-if Zones.PolyZones then
-    for k, v in pairs(Zones.PolyZones) do
-        local msBetweenPointCheck = 100
-        v:onPointInOut(PolyZone.getPlayerPosition, function(isPointInside, point)
-            if isPointInside then
-                Notify('Entered ' .. v.name)
-            else
-                Notify('Exited ' .. v.name)
-            end
-        end, msBetweenPointCheck)
-    end
-end
-]]
+-- for k, v in pairs(Zones.Data) do
+--     CreatePolyZoneforZone(v.Name)
+--     print('Created PolyZone for ' .. v.Name)
+-- end
+
+-- if Zones.PolyZones then
+--     for k, v in pairs(Zones.PolyZones) do
+--         local msBetweenPointCheck = 100
+--         v:onPointInOut(PolyZone.getPlayerPosition, function(isPointInside, point)
+--             if isPointInside then
+--                 Notify('Entered ' .. v.name)
+--             else
+--                 Notify('Exited ' .. v.name)
+--             end
+--         end, msBetweenPointCheck)
+--     end
+-- end

@@ -2,7 +2,6 @@ Zones = {}
 
 Zones.Config = {}
 Zones.Data = {}
-Zones.PolyZones = {}
 
 local ZonesJson = [[
   [
