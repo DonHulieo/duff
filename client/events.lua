@@ -366,6 +366,13 @@ AddEventHandler('CEventMeleeAction', function(witnesses, attacker)
 	-- print(_text)
 end)
 
+---@param doorId number | The door ID that was opened, see https://runtime.fivem.net/doc/natives/?_0x9C6A6C19B6C0C496
+---@param entity number | The entity that opened the door
+AddEventHandler('CEventOpenDoor', function(doorId, entity)
+	-- local _text = 'CEventOpenDoor \npid: '..PlayerPedId()..'\nEntity: '..entity..'\nDoor: '..json.encode(doorId)
+	-- print(_text)
+end)
+
 ---@param victims table | Array of entities that could be run over by the vehicle
 ---@param driver number | The ped handle of the driver
 AddEventHandler('CEventPotentialGetRunOver', function(victims, driver)
@@ -1037,11 +1044,6 @@ end)
 
 AddEventHandler('CEventNewTask', function(entities, eventEntity, args)
 	local _text = 'CEventNewTask \npid: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
-	print(_text)
-end)
-
-AddEventHandler('CEventOpenDoor', function(entities, eventEntity, args)
-	local _text = 'CEventOpenDoor \npid: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
 	print(_text)
 end)
 
