@@ -826,6 +826,7 @@ end)
 --------------------------------- Unknown Parameters ---------------------------------
 
 -- Shocking Events
+
 AddEventHandler('CEventShocking', function(entities, eventEntity, args)
 	local _text = 'CEventShocking \nPlyPId: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
 	print(_text)
@@ -1107,7 +1108,7 @@ AddEventHandler('CEventInWater', function(entities, eventEntity, args)
 	print(_text)
 end)
 
-AddEventHandler('CEventShockingDrivingOnPavement', function(entities, eventEntity, args)
-	--local _text = 'CEventShockingCarCrash \npid: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
-	--print(_text)
+AddEventHandler('CEventStatChangedValue', function(entities, eventEntity, args)
+	local _text = 'CEventStatChangedValue \npid: '..PlayerPedId()..'\neventEnt: '..eventEntity..'\nentities: '..json.encode(entities)..'\nargs: '..json.encode(args)
+	print(_text)
 end)
