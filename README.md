@@ -1,4 +1,4 @@
-# duf - WIP
+# duff - WIP
 
 Don's Utility Functions for FiveM
 
