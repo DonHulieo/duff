@@ -51,9 +51,9 @@ function require(path)
 end
 
 exports('require', require)
-exports('ImportObject', function()
-  return require 'duf.shared.import'
-end)
+-- exports('ImportObject', function()
+--   return require 'duf.shared.import'
+-- end)
 
 ---@param resource string
 local function clearModules(resource)
