@@ -6,13 +6,10 @@
 ---@field GetEntityUpVector fun(entity: integer): vector3? @shared
 ---@field GetOffsetFromEntityInWorldCoords fun(entity: integer, offset_x: number, offset_y: number, offset_z: number): vector3? @server
 local CVector do
-  local type = type
-  local error = error
-  local does_entity_exist = DoesEntityExist
-  local get_coords = GetEntityCoords
-  local vector3 = vector3
-  local check_type = CheckType
-  local require = require
+  local type, error = type, error
+  local does_entity_exist, get_coords = DoesEntityExist, GetEntityCoords
+  local check_type, require = CheckType, require
+  local math, vector3 = math, vector3
   ---@module 'duf.shared.array'
   local array = require 'duf.shared.array'
   local is_server = IsDuplicityVersion() == 1
@@ -20,9 +17,8 @@ local CVector do
   ---@param tbl table
   ---@return vector2|vector3|vector4?
   local function convert_to_vector(tbl) -- [Credits go to: Swkeep](https://github.com/swkeep)
-    local bool, param_type = check_type(tbl, 'table')
-    if not bool then print('bad argument #1 to \'ConvertToVector\' (table expected, got ' ..param_type.. ')') return end
-    if not tbl.x or not tbl.y then print('bad argument #1 to \'ConvertToVector\' (invalid vector)') return end
+    if not check_type(tbl, 'table', 'ConvertToVector', 1, 4) then return end
+    if not tbl.x or not tbl.y then error('bad argument #1 to \'ConvertToVector\' (invalid vector)', 3) return end
     return tbl.w and vector4(tbl.x, tbl.y, tbl.z, tbl.w) or tbl.z and vector3(tbl.x, tbl.y, tbl.z) or vector2(tbl.x, tbl.y)
   end
 
@@ -30,13 +26,10 @@ local CVector do
   ---@param fn_name string
   ---@return vector3?
   local function ensure_vector3(check, fn_name)
+    if not check_type(check, {'number', 'vector3', 'table'}, fn_name, 1, 4) then return end
     local param_type = type(check)
-    if param_type ~= 'vector3' and param_type ~= 'number' and param_type ~= 'table' then
-      error('bad argument #1 to \'' ..fn_name.. '\' (vector3, number or table expected, got ' ..param_type.. ')')
-      return
-    end
     check = param_type == 'vector3' and check or param_type == 'number' and does_entity_exist(check) and get_coords(check) or convert_to_vector(check --[[@as table]]) --[[@as vector3]]
-    if not check then print('bad argument #1 to \'' ..fn_name.. '\' (invalid vector3)') return end
+    if not check or not check_type(check, 'vector3', fn_name, 1, 4) then return end
     return check
   end
 
@@ -44,9 +37,8 @@ local CVector do
   ---@param fn_name string
   ---@return boolean?
   local function ensure_entity(entity, fn_name)
-    local bool, param_type = check_type(entity, 'number')
-    if not bool then print('bad argument #1 to \'' ..fn_name.. '\' (number expected, got ' ..param_type.. ')') return end
-    if not does_entity_exist(entity) then print('bad argument #1 to \'' ..fn_name.. '\' (entity does not exist)') return end
+    if not check_type(entity, 'number', fn_name, 1, 4) then return end
+    if not does_entity_exist(entity) then error('bad argument #1 to \'' ..fn_name.. '\' (entity does not exist)', 3) return end
     return true
   end
 
@@ -57,7 +49,7 @@ local CVector do
   ---@return integer|vector3?, number?, vector3[]|integer[]?
   local function get_closest(check, tbl, radius, excluding)
     local coords = ensure_vector3(check, 'GetClosest') --[[@as vector3]]
-    if not coords or not check_type(coords, 'vector3') then return end
+    if not coords or not check_type(coords, 'vector3', 'GetClosest', 1, 3) then return end
     tbl = not array.isarray(tbl) and array(tbl) or tbl --[[@as CArray]]
     local closest, dist = nil, nil
     local closests = tbl:filter(function(found)
@@ -96,9 +88,7 @@ local CVector do
     }
   else
     local get_rotation = GetEntityRotation
-    local rad = math.rad
-    local cos = math.cos
-    local sin = math.sin
+    local rad, cos, sin = math.rad, math.cos, math.sin
 
     ---@param entity integer
     ---@return vector3?, vector3?, vector3?, vector3?

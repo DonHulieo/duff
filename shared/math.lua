@@ -5,9 +5,10 @@
 ---@field random fun(m: integer, n: integer?): integer?
 ---@field timer fun(time: number, limit: number): boolean
 local CMath do
+  local math = math
   local math_floor = math.floor
-  local random_seed = math.randomseed
-  local math_random = math.random
+  local random_seed, math_random = math.randomseed, math.random
+  local tonumber, tostring = tonumber, tostring
   local is_server = IsDuplicityVersion() == 1
   local posix_time = is_server and os.time or GetCloudTimeAsInt
   local game_timer = GetGameTimer

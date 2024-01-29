@@ -6,15 +6,11 @@
 ---@field LoadModel fun(model: string|number, isAsync: boolean?): boolean?
 ---@field LoadPtfx fun(fx: string, isAsync: boolean?): boolean?
 local CStreaming do
-  local game_timer = GetGameTimer
+  local require = require
   local timer = require('duf.shared.math').timer
-  local type = type
-  local error = error
-  local tostring = tostring
-  local async_call = AsyncCall
-  local in_cd = IsModelInCdimage
-  local valid = IsModelValid
-  local joaat = joaat
+  local type, error, tostring = type, error, tostring
+  local check_type, async_call = CheckType, AsyncCall
+  local game_timer, in_cd, joaat, valid = GetGameTimer, IsModelInCdimage, joaat, IsModelValid
 
   ---@param asset string|number
   ---@param loaded function
@@ -32,7 +28,7 @@ local CStreaming do
   ---@param isAsync boolean?
   ---@return boolean?
   local function reqAnimDict(dict, isAsync)
-    if not dict or type(dict) ~= 'string' or not DoesAnimDictExist(dict) then error('Invalid animation dictionary requested: ' .. tostring(dict)) end
+    if not dict or not check_type(dict, 'string', 'LoadAnimDict', 1, 3) or not DoesAnimDictExist(dict) then return end
     return not isAsync and load_asset(dict, HasAnimDictLoaded, RequestAnimDict) or async_call(load_asset, dict, HasAnimDictLoaded, RequestAnimDict)
   end
 
@@ -40,7 +36,7 @@ local CStreaming do
   ---@param isAsync boolean?
   ---@return boolean?
   local function reqAnimSet(set, isAsync)
-    if not set or type(set) ~= 'string' then error('Invalid animation set requested: ' .. tostring(set)) end
+    if not set or not check_type(set, 'string', 'LoadAnimSet', 1, 3) then return end
     return not isAsync and load_asset(set, HasAnimSetLoaded, RequestAnimSet) or async_call(load_asset, set, HasAnimSetLoaded, RequestAnimSet)
   end
 
@@ -48,7 +44,7 @@ local CStreaming do
   ---@param isAsync boolean?
   ---@return boolean?
   local function reqCollision(model, isAsync)
-    if not model or not in_cd(model) or not valid(model) then error('Invalid model requested: ' .. tostring(model)) end
+    if not model or not in_cd(model) or not valid(model) then error('Invalid model requested: ' .. tostring(model), 2) end
     model = type(model) == 'number' and model or joaat(model)
     return not isAsync and load_asset(model, HasCollisionForModelLoaded, RequestCollisionForModel) or async_call(load_asset, model, HasCollisionForModelLoaded, RequestCollisionForModel)
   end
@@ -57,7 +53,7 @@ local CStreaming do
   ---@param isAsync boolean?
   ---@return boolean?
   local function reqIpl(ipl, isAsync)
-    if not ipl or type(ipl) ~= 'string' then error('Invalid IPL requested: ' .. tostring(ipl)) end
+    if not ipl or not check_type(ipl, 'string', 'LoadIpl', 1, 3) then return end
     return not isAsync and load_asset(ipl, IsIplActive, RequestIpl) or async_call(load_asset, ipl, IsIplActive, RequestIpl)
   end
 
@@ -65,7 +61,7 @@ local CStreaming do
   ---@param isAsync boolean?
   ---@return boolean?
   local function reqModel(model, isAsync)
-    if not model or not in_cd(model) or not valid(model) then error('Invalid model requested: ' .. tostring(model)) end
+    if not model or not in_cd(model) or not valid(model) then error('Invalid model requested: ' .. tostring(model), 2) end
     model = type(model) == 'number' and model or joaat(model)
     return not isAsync and load_asset(model, HasModelLoaded, RequestModel) or async_call(load_asset, model, HasModelLoaded, RequestModel)
   end
@@ -74,7 +70,7 @@ local CStreaming do
   ---@param isAsync boolean?
   ---@return boolean?
   local function reqPtfx(fx, isAsync)
-    if not fx or type(fx) ~= 'string' then error('Invalid PTFX requested: ' .. tostring(fx)) end
+    if not fx or not check_type(fx, 'string', 'LoadPtfx', 1, 3) then return end
     return not isAsync and load_asset(fx, HasNamedPtfxAssetLoaded, RequestNamedPtfxAsset) or async_call(load_asset, fx, HasNamedPtfxAssetLoaded, RequestNamedPtfxAsset)
   end
 

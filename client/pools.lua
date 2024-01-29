@@ -11,10 +11,8 @@ local CPools do
   local require = require
   ---@module 'duf.shared.array'
   local array = require 'duf.shared.array'
-  local get_pool = GetGamePool
   local type = type
-  local does_entity_exist = DoesEntityExist
-  local get_coords = GetEntityCoords
+  local get_pool, does_entity_exist, get_coords = GetGamePool, DoesEntityExist, GetEntityCoords
   local get_closest = require('duf.shared.vector').GetClosest
 
   ---@param ped_type integer?

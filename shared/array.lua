@@ -19,6 +19,7 @@
 ---@field foreach fun(self: CArray, fn: function) Executes a function for each element in the array.
 ---@field reverse fun(self: CArray): CArray Reverses the order of elements.
 local CArray do
+  local table = table
   CArray = {__actions = {}, __type = 'array'}
   CArray.__actions.__index = CArray
   CArray.insert = table.insert
@@ -27,19 +28,20 @@ local CArray do
   CArray.concat = table.concat
   local min = math.min
   local check_type = CheckType
-  local error = error
 
   ---@param tbl table
-  ---@return boolean, string
-  local function is_table(tbl)
-    return check_type(tbl, 'table')
+  ---@param fn_name string
+  ---@param arg_no integer?
+  ---@param level integer?
+  ---@return boolean?, string?
+  local function is_table(tbl, fn_name, arg_no, level)
+    return check_type(tbl, 'table', fn_name, arg_no, level)
   end
 
   ---@param tbl table
   ---@return boolean?
   local function isArray(tbl)
-    local bool, param_type = is_table(tbl)
-    if not bool then error('bad argument #1 to \'IsArray\' (table expected, got ' ..param_type.. ')') end
+    if not is_table(tbl, 'IsArray', 1, 3) then return end
     return tbl.__type == 'array'
   end
 
@@ -229,7 +231,7 @@ local CArray do
     __call = function(self, tbl)
       setmetatable(tbl, self.__actions)
       return tbl
-    end,
+    end
   })
   return CArray
 end

@@ -6,11 +6,12 @@
 ---@field RemoveSyncedScopeEvent fun(event: string)
 local CScope do
   local check_type = CheckType
-  local tostring = tostring
+  local tostring, table = tostring, table
+  local client_event, create_thread, wait = TriggerClientEvent, CreateThread, Wait
   local Scopes = {}
 
   local function clearScopes(resource)
-    local bool = check_type(resource, 'string')
+    local bool = check_type(resource, 'string', 'onResourceStop', 1, 3)
     if bool and resource ~= 'duf' then return end
     Scopes = {}
   end
@@ -18,7 +19,7 @@ local CScope do
   ---@param source number|integer
   ---@return table Scope
   local function getPlayerScope(source) -- [Credits go to: PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
-    local bool = check_type(source, 'string')
+    local bool = check_type(source, 'string', 'GetPlayerScope', 1, 3)
     local src = not bool and tostring(source) or source
     return Scopes[src]
   end
@@ -52,9 +53,9 @@ local CScope do
   ---@return {[string]: boolean}? targets
   local function triggerScopeEvent(event, owner, ...) -- [Credits go to: PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
     local targets = getPlayerScope(owner)
-    TriggerClientEvent(event, owner, ...)
+    client_event(event, owner, ...)
     if not targets then return end
-    for target, _ in pairs(targets) do TriggerClientEvent(event, target, ...) end
+    for target, _ in pairs(targets) do client_event(event, target, ...) end
     return targets
   end
 
@@ -68,14 +69,14 @@ local CScope do
     Scopes.Synced[event] = targets
     local args = {...}
     time = time or 1000
-    CreateThread(function()
+    create_thread(function()
       while Scopes.Synced[event] do
-        Wait(time)
+        wait(time)
         if not Scopes.Synced[event] then break end
         targets = Scopes[owner]
         if targets then
           for target, _ in pairs(targets) do
-            if not Scopes.Synced[event][target] then TriggerClientEvent(event, target, table.unpack(args)) end
+            if not Scopes.Synced[event][target] then client_event(event, target, table.unpack(args)) end
           end
           Scopes.Synced[event] = targets
         end
