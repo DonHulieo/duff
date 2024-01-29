@@ -16,8 +16,6 @@ Well, this is the solution for you! This is a collection of *optimised utility f
   - [Table of Contents](#table-of-contents)
     - [Credits](#credits)
     - [Installation](#installation)
-      - [Dependencies](#dependencies)
-      - [Initial Setup](#initial-setup)
     - [Documentation](#documentation)
       - [Importing the DUF Object](#importing-the-duf-object)
       - [CArray](#carray)
@@ -58,15 +56,6 @@ Well, this is the solution for you! This is a collection of *optimised utility f
 - [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
 
 ### Installation
-
-#### Dependencies
-
-**Depending on your Framework, you will need to have installed either of the following dependencies:**
-
-- [QBCore](https://github.com/qbcore-framework/qb-core)
-- [ESX](https://github.com/esx-framework/esx_core)
-
-#### Initial Setup
 
 - Always use the latest FiveM artifacts (tested on 6683), you can find them [here](https://runtime.fivem.net/artifacts/fivem/build_server_windows/master/).
 - Download the latest version from releases.
