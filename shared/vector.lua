@@ -50,13 +50,13 @@ local CVector do
   local function get_closest(check, tbl, radius, excluding)
     local coords = ensure_vector3(check, 'GetClosest') --[[@as vector3]]
     if not coords or not check_type(coords, 'vector3', 'GetClosest', 1, 3) then return end
-    tbl = not array.isarray(tbl) and array(tbl) or tbl --[[@as CArray]]
+    tbl = type(tbl) == 'table' and array(tbl) or array{tbl}
     local closest, dist = nil, nil
     local closests = tbl:filter(function(found)
-      local not_contains = not excluding or not array(excluding):contains(nil, found)
       local distance = #(coords - ensure_vector3(found, 'GetClosest'))
-      if not_contains and (not dist or distance < dist) then closest, dist = found, distance end
-      return not_contains and (radius and distance <= radius or distance == dist)
+      local contains = excluding and array(excluding):contains(nil, found)
+      if (not excluding or not contains) and (not dist or distance < dist) then closest, dist = found, distance end
+      return (not excluding or not contains) and (radius and distance <= radius or distance == dist)
     end, array.IN_PLACE)
     return closest, dist, closests
   end
