@@ -123,6 +123,7 @@ local CArray do
       for i = 1, #self do
         if self[i] == value then return true end
       end
+      return false
     end
     return key and (not value and self[key] or self[key] == value)
   end
