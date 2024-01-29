@@ -118,7 +118,13 @@ local CArray do
   ---@param value any?
   ---@return boolean?
   local function contains(self, key, value)
-    return not key and self:contains(value) or value and self[key] == value or self[key]
+    if not key and not value then return end
+    if not key and value then
+      for i = 1, #self do
+        if self[i] == value then return true end
+      end
+    end
+    return key and (not value and self[key] or self[key] == value)
   end
 
   ---@param self CArray
