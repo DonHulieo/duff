@@ -8,6 +8,7 @@
 local CBlips do
   local does_blip_exist = DoesBlipExist
   local require = require
+  ---@module 'duf.shared.array'
   local array = require 'duf.shared.array'
   local check_type = CheckType
   local error = error

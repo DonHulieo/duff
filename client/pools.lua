@@ -3,15 +3,17 @@
 ---@field GetVehicles fun(vehicle_type: integer?): integer[]
 ---@field GetObjects fun(): integer[]
 ---@field GetPickups fun(hash: string|number?): integer[]
----@field GetClosestPed fun(coords: vector3|number?, ped_type: integer?): integer?, number?
----@field GetClosestVehicle fun(coords: vector3|number?, vehicle_type: integer?): integer?, number?
----@field GetClosestObject fun(coords: vector3|number?): integer?, number?
----@field GetClosestPickup fun(coords: vector3|number?, hash: string|number?): integer?, number?
+---@field GetClosestPed fun(coords: vector3|number?, ped_type: integer?, radius: number?, excluding: integer[]|string[]|number[]): integer?, number?, integer[]?
+---@field GetClosestVehicle fun(coords: vector3|number?, vehicle_type: integer?, radius: number?, excluding: integer[]|string[]|number[]): integer?, number?, integer[]?
+---@field GetClosestObject fun(coords: vector3|number?, radius: number?, excluding: integer[]|string[]|number[]): integer?, number?, integer[]?
+---@field GetClosestPickup fun(coords: vector3|number?, hash: string|number?, radius: number?, excluding: integer[]|string[]|number[]): integer?, number?, integer[]?
 local CPools do
   local require = require
+  ---@module 'duf.shared.array'
   local array = require 'duf.shared.array'
   local get_pool = GetGamePool
   local type = type
+  local does_entity_exist = DoesEntityExist
   local get_coords = GetEntityCoords
   local get_closest = require('duf.shared.vector').GetClosest
 
@@ -43,34 +45,46 @@ local CPools do
   ---@return vector3
   local function ensure_coords(coords)
     local param_type = type(coords)
-    return param_type == 'vector3' and coords or param_type == 'number' and coords % 1 == 0 and get_coords(coords) or get_coords(PlayerPedId())
+    return param_type == 'vector3' and coords or param_type == 'number' and does_entity_exist(coords) and get_coords(coords) or get_coords(PlayerPedId())
   end
 
   ---@param coords vector3|number?
   ---@param ped_type integer?
-  ---@return integer? ped, number? distance
-  local function getClosestPed(coords, ped_type)
-    return get_closest(ensure_coords(coords), getPeds(ped_type)) --[[@as integer|number]]
+  ---@param radius number?
+  ---@param excluding integer[]?
+  ---@return integer? ped, number? dist, integer[]? peds
+  local function getClosestPed(coords, ped_type, radius, excluding)
+    local ped, dist, peds = get_closest(ensure_coords(coords), getPeds(ped_type), radius, excluding) --[[@cast ped -vector3]]--[=[@cast peds -vector3[]]=]
+    return ped, dist, peds
   end
 
   ---@param coords vector3|number?
   ---@param vehicle_type integer?
-  ---@return integer? vehicle, number? distance
-  local function getClosestVehicle(coords, vehicle_type)
-    return get_closest(ensure_coords(coords), getVehicles(vehicle_type)) --[[@as integer|number]]
+  ---@param radius number?
+  ---@param excluding integer[]?
+  ---@return integer? veh, number? dist, integer[]? vehs
+  local function getClosestVehicle(coords, vehicle_type, radius, excluding)
+    local veh, dist, vehs = get_closest(ensure_coords(coords), getVehicles(vehicle_type), radius, excluding) --[[@cast veh -vector3]]--[=[@cast vehs -vector3[]]=]
+    return veh, dist, vehs
   end
 
   ---@param coords vector3|number?
-  ---@return integer? object, number? distance
-  local function getClosestObject(coords)
-    return get_closest(ensure_coords(coords), getObjects()) --[[@as integer|number]]
+  ---@param radius number?
+  ---@param excluding integer[]?
+  ---@return integer? obj, number? dist, integer[]? objs
+  local function getClosestObject(coords, radius, excluding)
+    local obj, dist, objs = get_closest(ensure_coords(coords), getObjects(), radius, excluding) --[[@cast obj -vector3]]--[=[@cast objs -vector3[]]=]
+    return obj, dist, objs
   end
 
   ---@param coords vector3|number?
   ---@param hash string|number?
-  ---@return integer? pickup, number? distance
-  local function getClosestPickup(coords, hash)
-    return get_closest(ensure_coords(coords), getPickups(hash)) --[[@as integer|number]]
+  ---@param radius number?
+  ---@param excluding string[]|number[]?
+  ---@return integer? pickup, number? dist, integer[]? pickups
+  local function getClosestPickup(coords, hash, radius, excluding)
+    local pickup, dist, pickups = get_closest(ensure_coords(coords), getPickups(hash), radius, excluding) --[[@cast pickup -vector3]]--[=[@cast pickups -vector3[]]=]
+    return pickup, dist, pickups
   end
 
   return {

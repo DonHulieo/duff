@@ -1,5 +1,5 @@
 ---@class CVector
----@field GetClosest fun(check: integer|vector3|{x: number, y: number, z: number}, tbl: vector3[]|integer[]): integer?, number? @shared
+---@field GetClosest fun(check: integer|vector3|{x: number, y: number, z: number}, tbl: vector3[]|integer[], radius: number?, excluding: any[]): integer|vector3?, number?, vector3[]|integer[]? @shared
 ---@field GetEntityMatrix fun(entity: integer): vector3?, vector3?, vector3?, vector3? @server
 ---@field GetEntityForwardVector fun(entity: integer): vector3? @server
 ---@field GetEntityRightVector fun(entity: integer): vector3? @shared
@@ -13,8 +13,18 @@ local CVector do
   local vector3 = vector3
   local check_type = CheckType
   local require = require
+  ---@module 'duf.shared.array'
   local array = require 'duf.shared.array'
   local is_server = IsDuplicityVersion() == 1
+
+  ---@param tbl table
+  ---@return vector2|vector3|vector4?
+  local function convert_to_vector(tbl) -- [Credits go to: Swkeep](https://github.com/swkeep)
+    local bool, param_type = check_type(tbl, 'table')
+    if not bool then print('bad argument #1 to \'ConvertToVector\' (table expected, got ' ..param_type.. ')') return end
+    if not tbl.x or not tbl.y then print('bad argument #1 to \'ConvertToVector\' (invalid vector)') return end
+    return tbl.w and vector4(tbl.x, tbl.y, tbl.z, tbl.w) or tbl.z and vector3(tbl.x, tbl.y, tbl.z) or vector2(tbl.x, tbl.y)
+  end
 
   ---@param check integer|vector3|{x: number, y: number, z: number}
   ---@param fn_name string
@@ -25,7 +35,7 @@ local CVector do
       error('bad argument #1 to \'' ..fn_name.. '\' (vector3, number or table expected, got ' ..param_type.. ')')
       return
     end
-    check = param_type == 'vector3' and check or param_type == 'number' and does_entity_exist(check) and get_coords(check) or vector3(check.x, check.y, check.z)
+    check = param_type == 'vector3' and check or param_type == 'number' and does_entity_exist(check) and get_coords(check) or convert_to_vector(check --[[@as table]]) --[[@as vector3]]
     if not check then print('bad argument #1 to \'' ..fn_name.. '\' (invalid vector3)') return end
     return check
   end
@@ -40,29 +50,21 @@ local CVector do
     return true
   end
 
-  ---@param tbl table
-  ---@return vector2|vector3|vector4
-  local function convert_to_vector(tbl) -- [Credits go to: Swkeep](https://github.com/swkeep)
-    local bool, param_type = check_type(tbl, 'table')
-    if not bool then print('bad argument #1 to \'ConvertToVector\' (table expected, got ' ..param_type.. ')') end
-    if not tbl.x or not tbl.y then print('bad argument #1 to \'ConvertToVector\' (invalid vector)') end
-    return tbl.w and vector4(tbl.x, tbl.y, tbl.z, tbl.w) or tbl.z and vector3(tbl.x, tbl.y, tbl.z) or vector2(tbl.x, tbl.y)
-  end
-
   ---@param check integer|vector3|{x: number, y: number, z: number}
   ---@param tbl vector3[]|integer[]
-  ---@return integer|vector3? closest, number? distance
-  local function get_closest(check, tbl, radius)
+  ---@param radius number?
+  ---@param excluding any[]?
+  ---@return integer|vector3?, number?, vector3[]|integer[]?
+  local function get_closest(check, tbl, radius, excluding)
     local coords = ensure_vector3(check, 'GetClosest') --[[@as vector3]]
     if not coords or not check_type(coords, 'vector3') then return end
     tbl = not array.isarray(tbl) and array(tbl) or tbl --[[@as CArray]]
     local closest, dist = nil, nil
     local closests = tbl:filter(function(found)
+      local not_contains = not excluding or not array(excluding):contains(nil, found)
       local distance = #(coords - ensure_vector3(found, 'GetClosest'))
-      if not dist or distance < dist then
-        closest, dist = found, distance
-      end
-      return radius and distance <= radius or distance == dist
+      if not_contains and (not dist or distance < dist) then closest, dist = found, distance end
+      return not_contains and (radius and distance <= radius or distance == dist)
     end, array.IN_PLACE)
     return closest, dist, closests
   end
