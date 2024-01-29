@@ -18,7 +18,7 @@ local CScope do
 
   ---@param source number|integer
   ---@return table Scope
-  local function getPlayerScope(source) -- [Credits go to: PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
+  local function getPlayerScope(source) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
     local bool = check_type(source, 'string', 'GetPlayerScope', 1, 3)
     local src = not bool and tostring(source) or source
     return Scopes[src]
@@ -51,7 +51,7 @@ local CScope do
   ---@param owner number|integer
   ---@param ... any
   ---@return {[string]: boolean}? targets
-  local function triggerScopeEvent(event, owner, ...) -- [Credits go to: PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
+  local function triggerScopeEvent(event, owner, ...) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
     local targets = getPlayerScope(owner)
     client_event(event, owner, ...)
     if not targets then return end

@@ -4,7 +4,7 @@ local type, error = type, error
 local load_resource_file = LoadResourceFile
 ---@param path string the path to the file to load ie. 'duf.shared.require'
 ---@return {[string]: function}? @returns the loaded module
-function require(path)
+function require(path) -- Credits go to: [overextended](https://github.com/overextended/ox_lib/blob/master/imports/require/shared.lua) & [0xWaleed](https://github.com/citizenfx/fivem/pull/736)
   local param_type = type(path)
   if param_type ~= 'string' then error('bad argument #1 to \'require\' (string expected, got ' ..param_type.. ')', 2) end
   if Modules[path] then print('Module already loaded: ' .. path) return Modules[path] end

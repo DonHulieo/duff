@@ -16,7 +16,7 @@ local CVector do
 
   ---@param tbl table
   ---@return vector2|vector3|vector4?
-  local function convert_to_vector(tbl) -- [Credits go to: Swkeep](https://github.com/swkeep)
+  local function convert_to_vector(tbl) -- Credits go to: [Swkeep](https://github.com/swkeep)
     if not check_type(tbl, 'table', 'ConvertToVector', 1, 4) then return end
     if not tbl.x or not tbl.y then error('bad argument #1 to \'ConvertToVector\' (invalid vector)', 3) return end
     return tbl.w and vector4(tbl.x, tbl.y, tbl.z, tbl.w) or tbl.z and vector3(tbl.x, tbl.y, tbl.z) or vector2(tbl.x, tbl.y)
@@ -66,7 +66,7 @@ local CVector do
 
     ---@param entity integer
     ---@return vector3?
-    local function getEntityRightVector(entity) -- [Credits go to: VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
+    local function getEntityRightVector(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
       if not ensure_entity(entity, 'GetEntityRightVector') then return end
       local _, right = get_entity_matrix(entity)
       return right
@@ -74,7 +74,7 @@ local CVector do
 
     ---@param entity integer
     ---@return vector3?
-    local function getEntityUpVector(entity) -- [Credits go to: VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
+    local function getEntityUpVector(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
       if not ensure_entity(entity, 'GetEntityUpVector') then return end
       local _, _, up = get_entity_matrix(entity)
       return up
@@ -92,7 +92,7 @@ local CVector do
 
     ---@param entity integer
     ---@return vector3?, vector3?, vector3?, vector3?
-    local function getEntityMatrix(entity) -- [Credits goes to: draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297)
+    local function getEntityMatrix(entity) -- Credits go to: [draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297)
       if not ensure_entity(entity, 'GetEntityMatrix') then return end
       local rot = get_rotation(entity)
       local x, y, z in rot
@@ -131,7 +131,7 @@ local CVector do
 
     ---@param entity integer
     ---@return vector3?
-    local function getEntityRightVector(entity) -- [Credits goes to: VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
+    local function getEntityRightVector(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
       if not ensure_entity(entity, 'GetEntityRightVector') then return end
       local _, right = getEntityMatrix(entity)
       return right
@@ -139,7 +139,7 @@ local CVector do
 
     ---@param entity integer
     ---@return vector3?
-    local function getEntityUpVector(entity) -- [Credits goes to: VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
+    local function getEntityUpVector(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
       if not ensure_entity(entity, 'GetEntityUpVector') then return end
       local _, _, up = getEntityMatrix(entity)
       return up
@@ -150,7 +150,7 @@ local CVector do
     ---@param offset_y number
     ---@param offset_z number
     ---@return vector3?
-    local function getOffsetFromEntityInWorldCoords(entity, offset_x, offset_y, offset_z) -- [Credits goes to: draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297)
+    local function getOffsetFromEntityInWorldCoords(entity, offset_x, offset_y, offset_z) -- Credits go to: [draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297)
       if not ensure_entity(entity, 'GetOffsetFromEntityInWorldCoords') then return end
       local forward, right, up, pos = getEntityMatrix(entity)
       if not forward or not right or not up or not pos then return end

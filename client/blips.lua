@@ -13,8 +13,8 @@ local CBlips do
   local does_blip_exist = DoesBlipExist
   local get_closest = require('duf.shared.vector').GetClosest
 
-  ---@return CArray blips An array of all currently active blip handles | Credits go to: negbook, https://github.com/negbook/nbk_blips
-  local function get_all_blips()
+  ---@return CArray blips An array of all currently active blip handles
+  local function get_all_blips() -- Credits go to: [negbook](https://github.com/negbook/nbk_blips)
     local blips = array{}
     for i = 0, 883 do -- 884 is the max number of default blips b3095, if you have custom blips you need to increase this number
       local blip = GetFirstBlipInfoId(i)
