@@ -46,7 +46,7 @@ function CheckType(param, type_name, fn_name, arg_no, level)
   local equals = type(type_name) == 'table' and array(type_name):contains(nil, param_type) or param_type == type_name
   if not equals and fn_name then
     arg_no, level = arg_no or 1, level or 2
-    error('bad argument #' ..arg_no.. ' to \'' ..fn_name.. '\' (' ..array(type_name):concat().. ' expected, got ' ..param_type.. ')', level)
+    error('bad argument #' ..arg_no.. ' to \'' ..fn_name.. '\' (' ..array(type_name):concat(', ').. ' expected, got ' ..param_type.. ')', level)
   end
   return equals, param_type
 end
