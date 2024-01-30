@@ -57,7 +57,7 @@ local CVector do
       local contains = excluding and array(excluding):contains(nil, found)
       if (not excluding or not contains) and (not dist or distance < dist) then closest, dist = found, distance end
       return (not excluding or not contains) and (radius and distance <= radius or distance == dist)
-    end, array.IN_PLACE)
+    end, true)
     return closest, dist, closests
   end
 

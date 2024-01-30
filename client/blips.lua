@@ -31,7 +31,7 @@ local CBlips do
 
   ---@return CArray blips An array of all currently active blip handles that are on the minimap
   local function onScreenBlips()
-    return get_all_blips():filter(IsBlipOnMinimap, array.IN_PLACE)
+    return get_all_blips():filter(IsBlipOnMinimap, true)
   end
 
   ---@param coords vector3|vector3[]
@@ -49,14 +49,14 @@ local CBlips do
         local _, dist = get_closest(blip_coords, coords)
         return dist <= radius
       end
-    end, array.IN_PLACE)
+    end, true)
   end
 
   ---@param sprite integer
   ---@return CArray? blips An array of all currently active blip handles that have the specified sprite
   local function blipsBySprite(sprite)
     if check_type(sprite, 'number', 'BySprite', 1, 3) then return end
-    return get_all_blips():filter(function(blip) return GetBlipSprite(blip) == sprite end, array.IN_PLACE)
+    return get_all_blips():filter(function(blip) return GetBlipSprite(blip) == sprite end, true)
   end
 
   ---@enum (key) id_types
@@ -65,7 +65,7 @@ local CBlips do
   ---@return CArray? blips An array of all currently active blip handles that have the specified type
   local function blipsByType(id_type)
     if not check_type(id_type, 'number', 'ByType', 1, 3) or not id_types[id_type] then return end
-    return get_all_blips():filter(function(blip) return GetBlipInfoIdType(blip) == id_type end, array.IN_PLACE)
+    return get_all_blips():filter(function(blip) return GetBlipInfoIdType(blip) == id_type end, true)
   end
 
   ---@param blips integer|integer[]

@@ -14,8 +14,8 @@
 ---@field foldleft fun(self: CArray, fn: function, arg: any?): CArray Applies a function to each element from left to right, accumulating a result.
 ---@field foldright fun(self: CArray, fn: function, arg: any?): CArray Applies a function to each element from right to left, accumulating a result.
 ---@field setenum fun(self: CArray?): table Creates a read-only table that can be used for enumeration.
----@field map fun(self: CArray, fn: function, option: table?): CArray Applies a function to each element in the array and returns a new array with the results.
----@field filter fun(self: CArray, fn: function, option: table?): CArray Returns a new array containing only the elements that satisfy a given condition.
+---@field map fun(self: CArray, fn: function, inPlace: boolean?): CArray Applies a function to each element in the array and returns a new array with the results.
+---@field filter fun(self: CArray, fn: function, inPlace: boolean?): CArray Returns a new array containing only the elements that satisfy a given condition.
 ---@field foreach fun(self: CArray, fn: function) Executes a function for each element in the array.
 ---@field reverse fun(self: CArray): CArray Reverses the order of elements.
 local CArray do
@@ -138,7 +138,7 @@ local CArray do
 
   ---@param self CArray
   ---@param fn function
-  ---@param arg any
+  ---@param arg any?
   ---@return CArray
   local function foldLeft(self, fn, arg)
     local res = self[1]
@@ -149,7 +149,7 @@ local CArray do
 
   ---@param self CArray
   ---@param fn function
-  ---@param arg any
+  ---@param arg any?
   ---@return CArray
   local function foldRight(self, fn, arg)
     local res = self[#self]
@@ -166,24 +166,22 @@ local CArray do
     return res
   end
 
-  CArray.IN_PLACE = enum()
-
   ---@param self CArray
   ---@param fn function
-  ---@param option table
+  ---@param inPlace boolean?
   ---@return CArray
-  local function map(self, fn, option)
-    local res = option == CArray.IN_PLACE and self or CArray{}
+  local function map(self, fn, inPlace)
+    local res = inPlace and self or CArray{}
     for i = 1, #self do res[i] = fn(self[i]) end
     return res
   end
 
   ---@param self CArray
   ---@param fn function
-  ---@param option table?
+  ---@param inPlace boolean?
   ---@return CArray
-  local function filter(self, fn, option)
-    if option == CArray.IN_PLACE then
+  local function filter(self, fn, inPlace)
+    if inPlace then
       local i = 1
       while i <= #self do
         if not fn(self[i], i) then self:remove(i) else i += 1 end
