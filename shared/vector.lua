@@ -1,4 +1,5 @@
 ---@class CVector
+---@field ConvertToVec fun(tbl: table): vector2|vector3|vector4? @shared
 ---@field GetClosest fun(check: integer|vector3|{x: number, y: number, z: number}, tbl: vector3[]|integer[], radius: number?, excluding: any[]): integer|vector3?, number?, vector3[]|integer[]? @shared
 ---@field GetEntityMatrix fun(entity: integer): vector3?, vector3?, vector3?, vector3? @server
 ---@field GetEntityForwardVector fun(entity: integer): vector3? @server

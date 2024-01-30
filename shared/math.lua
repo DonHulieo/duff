@@ -1,9 +1,9 @@
 ---@class CMath
 ---@field clamp fun(val: number, min: number, max: number): number
----@field round fun(val: number, increment: number?): integer
+---@field round fun(val: number, increment: integer?): integer
 ---@field seedrng fun(): integer?
 ---@field random fun(m: integer, n: integer?): integer?
----@field timer fun(time: number, limit: number): boolean
+---@field timer fun(time: integer, limit: integer): boolean
 local CMath do
   local math = math
   local math_floor = math.floor
@@ -22,7 +22,7 @@ local CMath do
   end
 
   ---@param val number
-  ---@param increment number?
+  ---@param increment integer?
   ---@return integer
   local function round(val, increment)
     if increment then return round(val / increment) * increment end
@@ -45,8 +45,8 @@ local CMath do
     return math_floor(math_random() * (n - m + 1) + m)
   end
 
-  ---@param time number
-  ---@param limit number
+  ---@param time integer
+  ---@param limit integer
   ---@return boolean
   local function timer(time, limit)
     local current = game_timer()
