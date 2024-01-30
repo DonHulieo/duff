@@ -9,7 +9,9 @@ local CStreaming do
   local require = require
   local timer = require('duf.shared.math').timer
   local type, error, tostring = type, error, tostring
-  local check_type, async_call = CheckType, AsyncCall
+  local check_type = CheckType
+  local promise, table = promise, table
+  local await, wait, create_thread = Citizen.Await, Wait, CreateThread
   local game_timer, in_cd, joaat, valid = GetGameTimer, IsModelInCdimage, joaat, IsModelValid
 
   ---@param asset string|number
@@ -22,6 +24,21 @@ local CStreaming do
       repeat Wait(0) until loaded(asset) or timer(time, 1000)
     end
     return loaded(asset)
+  end
+
+  ---@async
+  ---@param fn function
+  ---@param ... any
+  ---@return boolean?
+  local function async_call(fn, ...)
+    if not check_type(fn, 'function', 'AsyncCall', 1, 2) then return end
+    wait(0) -- Yield to ensure the promise is created in a new thread
+    local args = {...}
+    local p = promise.new()
+    create_thread(function()
+      p:resolve(fn(table.unpack(args)))
+    end)
+    return await(p)
   end
 
   ---@param dict string

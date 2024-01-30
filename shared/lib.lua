@@ -50,22 +50,3 @@ function CheckType(param, type_name, fn_name, arg_no, level)
   end
   return equals, param_type
 end
-
-local check_type = CheckType
-local promise, table = promise, table
-local await, wait, create_thread = Citizen.Await, Wait, CreateThread
-
----@async
----@param fn function
----@param ... any
----@return boolean?
-function AsyncCall(fn, ...)
-  if not check_type(fn, 'function', 'AsyncCall', 1, 2) then return end
-  wait(0) -- Yield to ensure the promise is created in a new thread
-  local args = {...}
-  local p = promise.new()
-  create_thread(function()
-    p:resolve(fn(table.unpack(args)))
-  end)
-  return await(p)
-end
