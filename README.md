@@ -14,9 +14,10 @@ Well, this is the solution for you! This is a collection of *optimised utility f
 - [duff](#duff)
   - [Description](#description)
   - [Table of Contents](#table-of-contents)
-    - [Credits](#credits)
-    - [Installation](#installation)
-    - [Documentation](#documentation)
+  - [Credits](#credits)
+  - [Installation](#installation)
+  - [Documentation](#documentation)
+    - [Shared](#shared)
       - [Importing the DUF Object](#importing-the-duf-object)
       - [CArray](#carray)
         - [Importing the CArray Module](#importing-the-carray-module)
@@ -44,7 +45,7 @@ Well, this is the solution for you! This is a collection of *optimised utility f
 
 <!-- [ ] Document Various Function Calls -->
 
-### Credits
+## Credits
 
 - [overextended](https://github.com/overextended/ox_lib/blob/master/imports/require/shared.lua)
 - [0xWaleed](https://github.com/citizenfx/fivem/pull/736)
@@ -55,14 +56,16 @@ Well, this is the solution for you! This is a collection of *optimised utility f
 - [DurtyFrees' Data Dumps](https://github.com/DurtyFree/gta-v-data-dumps)
 - [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
 
-### Installation
+## Installation
 
 - Always use the latest FiveM artifacts (tested on 6683), you can find them [here](https://runtime.fivem.net/artifacts/fivem/build_server_windows/master/).
 - Download the latest version from releases.
 - Extract the contents of the zip file into your resources folder, into a folder which starts after your framework and any script this is a dependency for, or;
 - Ensure the script in your `server.cfg` after your framework and any script this is a dependency for.
 
-### Documentation
+## Documentation
+
+### Shared
 
 #### Importing the DUF Object
 
@@ -232,9 +235,9 @@ function array.setenum(self)
 ```lua
 ---@param self CArray
 ---@param func fun(val: any): any
----@param option table?
+---@param inPlace boolean?
 ---@return CArray
-function array.map(self, func, option)
+function array.map(self, func, inPlace)
 ```
 
 ##### filter
@@ -242,9 +245,9 @@ function array.map(self, func, option)
 ```lua
 ---@param self CArray
 ---@param func fun(val: any, i: integer): boolean
----@param option table?
+---@param inPlace boolean?
 ---@return CArray
-function array.filter(self, func, option)
+function array.filter(self, func, inPlace)
 ```
 
 ##### foreach
