@@ -14,13 +14,14 @@ local duf do
   local is_server = IsDuplicityVersion() == 1
   local require = require
   local array, math, vector = require 'duf.shared.array', require 'duf.shared.math', require 'duf.shared.vector'
-  local version = '1.0.0'
-  local url = ''
-  local description = ''
+  local resource = GetCurrentResourceName()
+  local version = GetResourceMetadata(resource, 'version', 0)
+  local url = GetResourceMetadata(resource, 'url', 0)
+  local des = GetResourceMetadata(resource, 'description', 0)
   return not is_server and {
     _VERSION = version,
     _URL = url,
-    _DESCRIPTION = description,
+    _DESCRIPTION = des,
     require = require,
     array = array,
     math = math,
@@ -31,7 +32,7 @@ local duf do
   } or {
     _VERSION = version,
     _URL = url,
-    _DESCRIPTION = description,
+    _DESCRIPTION = des,
     require = require,
     array = array,
     math = math,
