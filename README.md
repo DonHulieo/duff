@@ -59,6 +59,14 @@ Well, this is the solution for you! This is a collection of *optimised utility f
         - [GetEntityRightVector (Server)](#getentityrightvector-server)
         - [GetEntityUpVector (Server)](#getentityupvector-server)
         - [GetOffsetFromEntityInWorldCoords](#getoffsetfromentityinworldcoords)
+    - [CBlips](#cblips)
+      - [Importing the CBlips Module](#importing-the-cblips-module)
+      - [GetAll](#getall)
+      - [GetOnScreen](#getonscreen)
+      - [ByCoords](#bycoords)
+      - [BySprite](#bysprite)
+      - [GetInfo](#getinfo)
+      - [Remove](#remove)
     - [Support](#support)
     - [Changelog](#changelog)
 
@@ -449,6 +457,70 @@ function vector.GetEntityUpVector(entity)
 ---@param offsetZ number
 ---@return vector3?
 function vector.GetOffsetFromEntityInWorldCoords(entity, offsetX, offsetY, offsetZ)
+```
+
+### CBlips
+
+*This is a client module.*
+
+#### Importing the CBlips Module
+
+```lua
+-- Using the `require` export
+local blips = exports.duf:require 'duf.client.blips'
+
+-- Using the `require` export on the duf object
+local duf = exports.duf:require 'duf.shared.import'
+-- Attaching the blips object to a local variable (Lua 5.4+)
+local blips in duf
+-- Attaching the blips object to a local variable
+local blips = duf.blips
+```
+
+#### GetAll
+
+```lua
+---@return CArray? blips
+function blips.GetAll()
+```
+
+#### GetOnScreen
+
+```lua
+---@return CArray? blips
+function blips.GetOnScreen()
+```
+
+#### ByCoords
+
+```lua
+---@param coords vector3|vector3[]
+---@param radius number?
+---@return CArray? blips
+function blips.ByCoords(coords, radius)
+```
+
+#### BySprite
+
+```lua
+---@param sprite integer
+---@return CArray? blips
+function blips.BySprite(sprite)
+```
+
+#### GetInfo
+  
+```lua
+---@param blip integer
+---@return table? blip_info
+function blips.GetInfo(blip)
+```
+
+#### Remove
+
+```lua
+---@param blips integer|integer[]
+function blips.Remove(blips)
 ```
 
 ### Support

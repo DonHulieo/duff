@@ -4,6 +4,7 @@
 ---@field ByCoords fun(coords: vector3|vector3[], radius: number?): integer[]
 ---@field BySprite fun(sprite: integer): integer[]
 ---@field ByType fun(id_type: integer): integer[]
+---@field GetInfo fun(blip: integer): table
 ---@field Remove fun(blips: integer|integer[])
 local CBlips do
   local require = require
@@ -68,6 +69,23 @@ local CBlips do
     return get_all_blips():filter(function(blip) return GetBlipInfoIdType(blip) == id_type end, true)
   end
 
+  ---@param blip integer
+  ---@return table? blip_info
+  local function getBlipInfo(blip)
+    if not check_type(blip, 'number', 'GetBlipInfo', 1, 3) or not does_blip_exist(blip) then return end
+    return {
+      alpha = GetBlipAlpha(blip),
+      coords = GetBlipCoords(blip),
+      colour = GetBlipColour(blip),
+      display = GetBlipInfoIdDisplay(blip),
+      fade = N_0x2c173ae2bdb9385e(blip),
+      hud_colour = GetBlipHudColour(blip),
+      type = GetBlipInfoIdType(blip),
+      rotation = GetBlipRotation(blip),
+      is_shortrange = IsBlipShortRange(blip),
+    }
+  end
+
   ---@param blips integer|integer[]
   local function removeBlips(blips)
     local bool, param_type = check_type(blips, {'table', 'number'}, 'Remove', 1, 3)
@@ -80,5 +98,5 @@ local CBlips do
     SetThisScriptCanRemoveBlipsCreatedByAnyScript(false)
   end
 
-  return {GetAll = get_all_blips, GetOnScreen = onScreenBlips, ByCoords = blipsByCoords, BySprite = blipsBySprite, ByType = blipsByType, Remove = removeBlips}
+  return {GetAll = get_all_blips, GetOnScreen = onScreenBlips, ByCoords = blipsByCoords, BySprite = blipsBySprite, ByType = blipsByType, GetInfo = getBlipInfo, Remove = removeBlips}
 end
