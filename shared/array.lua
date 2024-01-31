@@ -129,6 +129,15 @@ local CArray do
   end
 
   ---@param self CArray
+  ---@param fn function
+  ---@return integer?
+  local function find(self, fn)
+    for i = 1, #self do
+      if fn(self[i], i) then return i end
+    end
+  end
+
+  ---@param self CArray
   ---@return any[]
   local function copy(self)
     local res = CArray{}
@@ -223,6 +232,7 @@ local CArray do
   CArray.pop = pop
   CArray.poparray = popArray
   CArray.contains = contains
+  CArray.find = find
   CArray.copy = copy
   CArray.foldleft = foldLeft
   CArray.foldright = foldRight
