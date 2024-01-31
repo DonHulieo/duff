@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'DonHulieo'
 description 'Don\'s Utility Functions for FiveM'
-version '0.7.4'
+version '0.8.0'
 url 'https://github.com/DonHulieo/duff'
 
 shared_script 'shared/lib.lua'
