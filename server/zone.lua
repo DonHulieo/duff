@@ -9,7 +9,7 @@
 local CMZone do
   local ZONES = json.decode(LoadResourceFile('duf', 'data/zones.json'))
   local check_type = CheckType
-  local convert_to_vec = require('duf.shared.vector').ConvertToVec
+  local convert_to_vec = require('shared.vector').ConvertToVec
   local Listeners = {}
 
   ---@param index integer

@@ -7,7 +7,7 @@
 ---@field LoadPtfx fun(fx: string, isAsync: boolean?): boolean?
 local CStreaming do
   local require = require
-  local timer = require('duf.shared.math').timer
+  local timer = require('shared.math').timer
   local type, error, tostring = type, error, tostring
   local check_type = CheckType
   local promise, table = promise, table

@@ -13,7 +13,7 @@
 local duf do
   local is_server = IsDuplicityVersion() == 1
   local require = require
-  local array, math, vector = require 'duf.shared.array', require 'duf.shared.math', require 'duf.shared.vector'
+  local array, math, vector = require 'shared.array', require 'shared.math', require 'shared.vector'
   local resource = GetCurrentResourceName()
   local version = GetResourceMetadata(resource, 'version', 0)
   local url = GetResourceMetadata(resource, 'url', 0)
@@ -25,9 +25,9 @@ local duf do
     require = require,
     array = array,
     math = math,
-    blips = require 'duf.client.blips',
-    pools = require 'duf.client.pools',
-    streaming = require 'duf.client.streaming',
+    blips = require 'client.blips',
+    pools = require 'client.pools',
+    streaming = require 'client.streaming',
     vector = vector
   } or {
     _VERSION = version,
@@ -36,7 +36,7 @@ local duf do
     require = require,
     array = array,
     math = math,
-    scope = require 'duf.server.scope',
+    scope = require 'server.scope',
     vector = vector
   }
 end

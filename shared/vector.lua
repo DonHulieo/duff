@@ -12,7 +12,7 @@ local CVector do
   local check_type, require = CheckType, require
   local math, vector3 = math, vector3
   ---@module 'duf.shared.array'
-  local array = require 'duf.shared.array'
+  local array = require 'shared.array'
   local is_server = IsDuplicityVersion() == 1
 
   ---@param tbl table

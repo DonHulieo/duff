@@ -9,10 +9,10 @@
 local CBlips do
   local require = require
   ---@module 'duf.shared.array'
-  local array = require 'duf.shared.array'
+  local array = require 'shared.array'
   local check_type = CheckType
   local does_blip_exist = DoesBlipExist
-  local get_closest = require('duf.shared.vector').GetClosest
+  local get_closest = require('shared.vector').GetClosest
 
   ---@return CArray blips An array of all currently active blip handles
   local function get_all_blips() -- Credits go to: [negbook](https://github.com/negbook/nbk_blips)
