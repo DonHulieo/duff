@@ -18,8 +18,8 @@ local CVector do
   ---@param tbl table
   ---@return vector2|vector3|vector4?
   local function convert_to_vector(tbl) -- Credits go to: [Swkeep](https://github.com/swkeep)
-    if not check_type(tbl, 'table', 'ConvertToVector', 1, 4) then return end
-    if not tbl.x or not tbl.y then error('bad argument #1 to \'ConvertToVector\' (invalid vector)', 3) return end
+    if not check_type(tbl, 'table', 'ConvertToVec', 1, 5) then return end
+    if not tbl.x or not tbl.y then error('bad argument #1 to \'ConvertToVec\' (invalid vector)', 5) return end
     return tbl.w and vector4(tbl.x, tbl.y, tbl.z, tbl.w) or tbl.z and vector3(tbl.x, tbl.y, tbl.z) or vector2(tbl.x, tbl.y)
   end
 
@@ -27,10 +27,10 @@ local CVector do
   ---@param fn_name string
   ---@return vector3?
   local function ensure_vector3(check, fn_name)
-    if not check_type(check, {'number', 'vector3', 'table'}, fn_name, 1, 4) then return end
+    if not check_type(check, {'number', 'vector3', 'table'}, fn_name, 1, 6) then return end
     local param_type = type(check)
     check = param_type == 'vector3' and check or param_type == 'number' and does_entity_exist(check) and get_coords(check) or convert_to_vector(check --[[@as table]]) --[[@as vector3]]
-    if not check or not check_type(check, 'vector3', fn_name, 1, 4) then return end
+    if not check or not check_type(check, 'vector3', fn_name, 1, 6) then return end
     return check
   end
 
@@ -38,8 +38,8 @@ local CVector do
   ---@param fn_name string
   ---@return boolean?
   local function ensure_entity(entity, fn_name)
-    if not check_type(entity, 'number', fn_name, 1, 4) then return end
-    if not does_entity_exist(entity) then error('bad argument #1 to \'' ..fn_name.. '\' (entity does not exist)', 3) return end
+    if not check_type(entity, 'number', fn_name, 1, 6) then return end
+    if not does_entity_exist(entity) then error('bad argument #1 to \'' ..fn_name.. '\' (entity does not exist)', 6) return end
     return true
   end
 
@@ -50,7 +50,7 @@ local CVector do
   ---@return integer|vector3?, number?, vector3[]|integer[]?
   local function get_closest(check, tbl, radius, excluding)
     local coords = ensure_vector3(check, 'GetClosest') --[[@as vector3]]
-    if not coords or not check_type(coords, 'vector3', 'GetClosest', 1, 3) then return end
+    if not coords or not check_type(coords, 'vector3', 'GetClosest', 1, 5) then return end
     tbl = type(tbl) == 'table' and array(tbl) or array{tbl}
     local closest, dist = nil, nil
     local closests = tbl:filter(function(found)
