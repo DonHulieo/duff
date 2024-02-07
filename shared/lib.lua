@@ -4,8 +4,8 @@ local load_resource_file = LoadResourceFile
 package = {loaded = {}, path = {}, preload = {}}
 
 --#TODO
---#[ ] Change Error functionality to get the line and function name using debug library
---#[ ] Possibly Create a Debug Library to handle errors and debugging and add CheckType to it
+--#[x] Change Error functionality to get the line and function name using debug library
+--#[x] Possibly Create a Debug Library to handle errors and debugging and add CheckType to it
 
 ---@enum file_ids
 local file_ids = {'file', 'files'}
@@ -31,8 +31,8 @@ end
 ---@param resource string
 local function init_paths(resource)
   local filLim = ensure_files(resource, GetNumResourceMetadata) - 1
-  for j = 0, filLim do
-    local file = ensure_files(resource, GetResourceMetadata, j) --[[@as string]]
+  for i = 0, filLim do
+    local file = ensure_files(resource, GetResourceMetadata, i) --[[@as string]]
     local name = file:match('^(.-)%.lua$') or file:match('^(.-)%*%*$')
     if name then
       local path = name:gsub('%.', '/')
@@ -89,8 +89,8 @@ local function find_path(name)
         local new_path = found_path:gsub('%*%*', folder):gsub('%*$', file)
         path = test_path(found_res, new_path)
       else
-        for j = 1, #contexts do
-          local new_path = found_path:gsub('%*%*', contexts[j]):gsub('%*$', file)
+        for i = 1, #contexts do
+          local new_path = found_path:gsub('%*%*', contexts[i]):gsub('%*$', file)
           path = test_path(found_res, new_path)
         end
       end
@@ -154,23 +154,3 @@ end
 
 AddEventHandler('onResourceStart', init_paths)
 AddEventHandler('onResourceStop', deinit_package)
-
----@module 'duf.shared.array'
-local array = require 'shared.array'
-
----@param param any
----@param type_name string|string[]
----@param fn_name string
----@param arg_no integer?
----@param level integer?
----@return boolean?, string?
-function CheckType(param, type_name, fn_name, arg_no, level)
-  local param_type = type(param)
-  type_name = type(type_name) == 'table' and array(type_name) or array{type_name}
-  local equals = array(type_name):contains(nil, param_type)
-  if not equals and fn_name then
-    arg_no, level = arg_no or 1, level or 2
-    error('bad argument #' ..arg_no.. ' to \'' ..fn_name.. '\' (' ..array(type_name):concat(', ').. ' expected, got ' ..param_type.. ')', level)
-  end
-  return equals, param_type
-end
