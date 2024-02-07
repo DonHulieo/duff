@@ -9,7 +9,7 @@ local CStreaming do
   local require = require
   local timer = require('shared.math').timer
   local type, error, tostring = type, error, tostring
-  local check_type = CheckType
+  local check_type = require('shared.debug').checktype
   local promise, table = promise, table
   local await, wait, create_thread = Citizen.Await, Wait, CreateThread
   local game_timer, in_cd, joaat, valid = GetGameTimer, IsModelInCdimage, joaat, IsModelValid
@@ -31,7 +31,7 @@ local CStreaming do
   ---@param ... any
   ---@return boolean?
   local function async_call(fn, ...)
-    if not check_type(fn, 'function', 'AsyncCall', 1, 2) then return end
+    if not check_type(fn, 'function', async_call, 1) then return end
     wait(0) -- Yield to ensure the promise is created in a new thread
     local args = {...}
     local p = promise.new()
@@ -45,7 +45,7 @@ local CStreaming do
   ---@param isAsync boolean?
   ---@return boolean?
   local function reqAnimDict(dict, isAsync)
-    if not dict or not check_type(dict, 'string', 'LoadAnimDict', 1, 3) or not DoesAnimDictExist(dict) then return end
+    if not dict or not check_type(dict, 'string', reqAnimDict, 1) or not DoesAnimDictExist(dict) then return end
     return not isAsync and load_asset(dict, HasAnimDictLoaded, RequestAnimDict) or async_call(load_asset, dict, HasAnimDictLoaded, RequestAnimDict)
   end
 
@@ -53,7 +53,7 @@ local CStreaming do
   ---@param isAsync boolean?
   ---@return boolean?
   local function reqAnimSet(set, isAsync)
-    if not set or not check_type(set, 'string', 'LoadAnimSet', 1, 3) then return end
+    if not set or not check_type(set, 'string', reqAnimSet, 1) then return end
     return not isAsync and load_asset(set, HasAnimSetLoaded, RequestAnimSet) or async_call(load_asset, set, HasAnimSetLoaded, RequestAnimSet)
   end
 
@@ -70,7 +70,7 @@ local CStreaming do
   ---@param isAsync boolean?
   ---@return boolean?
   local function reqIpl(ipl, isAsync)
-    if not ipl or not check_type(ipl, 'string', 'LoadIpl', 1, 3) then return end
+    if not ipl or not check_type(ipl, 'string', reqIpl, 1) then return end
     return not isAsync and load_asset(ipl, IsIplActive, RequestIpl) or async_call(load_asset, ipl, IsIplActive, RequestIpl)
   end
 
@@ -87,7 +87,7 @@ local CStreaming do
   ---@param isAsync boolean?
   ---@return boolean?
   local function reqPtfx(fx, isAsync)
-    if not fx or not check_type(fx, 'string', 'LoadPtfx', 1, 3) then return end
+    if not fx or not check_type(fx, 'string', reqPtfx, 1) then return end
     return not isAsync and load_asset(fx, HasNamedPtfxAssetLoaded, RequestNamedPtfxAsset) or async_call(load_asset, fx, HasNamedPtfxAssetLoaded, RequestNamedPtfxAsset)
   end
 

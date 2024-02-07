@@ -9,37 +9,39 @@
 local CVector do
   local type, error = type, error
   local does_entity_exist, get_coords = DoesEntityExist, GetEntityCoords
-  local check_type, require = CheckType, require
+  local require = require
+  local check_type = require('shared.debug').checktype
   local math, vector3 = math, vector3
   ---@module 'duf.shared.array'
   local array = require 'shared.array'
   local is_server = IsDuplicityVersion() == 1
 
   ---@param tbl table
+  ---@param fn function?
   ---@return vector2|vector3|vector4?
-  local function convert_to_vector(tbl) -- Credits go to: [Swkeep](https://github.com/swkeep)
-    if not check_type(tbl, 'table', 'ConvertToVec', 1, 5) then return end
+  local function convert_to_vector(tbl, fn) -- Credits go to: [Swkeep](https://github.com/swkeep)
+    if not check_type(tbl, 'table', fn or convert_to_vector, 1) then return end
     if not tbl.x or not tbl.y then error('bad argument #1 to \'ConvertToVec\' (invalid vector)', 5) return end
     return tbl.w and vector4(tbl.x, tbl.y, tbl.z, tbl.w) or tbl.z and vector3(tbl.x, tbl.y, tbl.z) or vector2(tbl.x, tbl.y)
   end
 
   ---@param check integer|vector3|{x: number, y: number, z: number}
-  ---@param fn_name string
+  ---@param fn function
   ---@return vector3?
-  local function ensure_vector3(check, fn_name)
-    if not check_type(check, {'number', 'vector3', 'table'}, fn_name, 1, 6) then return end
+  local function ensure_vector3(check, fn)
+    if not check_type(check, {'number', 'vector3', 'table'}, fn, 1) then return end
     local param_type = type(check)
-    check = param_type == 'vector3' and check or param_type == 'number' and does_entity_exist(check) and get_coords(check) or convert_to_vector(check --[[@as table]]) --[[@as vector3]]
-    if not check or not check_type(check, 'vector3', fn_name, 1, 6) then return end
+    check = param_type == 'vector3' and check or param_type == 'number' and does_entity_exist(check) and get_coords(check) or convert_to_vector(check --[[@as table]], fn) --[[@as vector3]]
+    if not check or not check_type(check, 'vector3', fn, 1) then return end
     return check
   end
 
   ---@param entity integer
-  ---@param fn_name string
+  ---@param fn function
   ---@return boolean?
-  local function ensure_entity(entity, fn_name)
-    if not check_type(entity, 'number', fn_name, 1, 6) then return end
-    if not does_entity_exist(entity) then error('bad argument #1 to \'' ..fn_name.. '\' (entity does not exist)', 6) return end
+  local function ensure_entity(entity, fn)
+    if not check_type(entity, 'number', fn, 1) then return end
+    -- if not does_entity_exist(entity) then error('bad argument #1 to \'' ..fn_name.. '\' (entity does not exist)', 6) return end
     return true
   end
 
@@ -49,12 +51,12 @@ local CVector do
   ---@param excluding any[]?
   ---@return integer|vector3?, number?, vector3[]|integer[]?
   local function get_closest(check, tbl, radius, excluding)
-    local coords = ensure_vector3(check, 'GetClosest') --[[@as vector3]]
-    if not coords or not check_type(coords, 'vector3', 'GetClosest', 1, 5) then return end
+    local coords = ensure_vector3(check, get_closest) --[[@as vector3]]
+    if not coords or not check_type(coords, 'vector3', get_closest, 1) then return end
     tbl = type(tbl) == 'table' and array(tbl) or array{tbl}
     local closest, dist = nil, nil
     local closests = tbl:filter(function(found)
-      local distance = #(coords - ensure_vector3(found, 'GetClosest'))
+      local distance = #(coords - ensure_vector3(found, get_closest))
       local contains = excluding and array(excluding):contains(nil, found)
       if (not excluding or not contains) and (not dist or distance < dist) then closest, dist = found, distance end
       return (not excluding or not contains) and (radius and distance <= radius or distance == dist)
@@ -68,7 +70,7 @@ local CVector do
     ---@param entity integer
     ---@return vector3?
     local function getEntityRightVector(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
-      if not ensure_entity(entity, 'GetEntityRightVector') then return end
+      if not ensure_entity(entity, getEntityRightVector) then return end
       local _, right = get_entity_matrix(entity)
       return right
     end
@@ -76,7 +78,7 @@ local CVector do
     ---@param entity integer
     ---@return vector3?
     local function getEntityUpVector(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
-      if not ensure_entity(entity, 'GetEntityUpVector') then return end
+      if not ensure_entity(entity, getEntityUpVector) then return end
       local _, _, up = get_entity_matrix(entity)
       return up
     end
@@ -94,7 +96,7 @@ local CVector do
     ---@param entity integer
     ---@return vector3?, vector3?, vector3?, vector3?
     local function getEntityMatrix(entity) -- Credits go to: [draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297)
-      if not ensure_entity(entity, 'GetEntityMatrix') then return end
+      if not ensure_entity(entity, getEntityMatrix) then return end
       local rot = get_rotation(entity)
       local x, y, z in rot
       x, y, z = rad(x), rad(y), rad(z)
@@ -125,7 +127,7 @@ local CVector do
     ---@param entity integer
     ---@return vector3?
     local function getEntityForwardVector(entity)
-      if not ensure_entity(entity, 'GetEntityForwardVector') then return end
+      if not ensure_entity(entity, getEntityForwardVector) then return end
       local forward = getEntityMatrix(entity)
       return forward
     end
@@ -133,7 +135,7 @@ local CVector do
     ---@param entity integer
     ---@return vector3?
     local function getEntityRightVector(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
-      if not ensure_entity(entity, 'GetEntityRightVector') then return end
+      if not ensure_entity(entity, getEntityRightVector) then return end
       local _, right = getEntityMatrix(entity)
       return right
     end
@@ -141,7 +143,7 @@ local CVector do
     ---@param entity integer
     ---@return vector3?
     local function getEntityUpVector(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
-      if not ensure_entity(entity, 'GetEntityUpVector') then return end
+      if not ensure_entity(entity, getEntityUpVector) then return end
       local _, _, up = getEntityMatrix(entity)
       return up
     end
@@ -152,7 +154,7 @@ local CVector do
     ---@param offset_z number
     ---@return vector3?
     local function getOffsetFromEntityInWorldCoords(entity, offset_x, offset_y, offset_z) -- Credits go to: [draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297)
-      if not ensure_entity(entity, 'GetOffsetFromEntityInWorldCoords') then return end
+      if not ensure_entity(entity, getOffsetFromEntityInWorldCoords) then return end
       local forward, right, up, pos = getEntityMatrix(entity)
       if not forward or not right or not up or not pos then return end
       local x = offset_x * forward.x + offset_y * right.x + offset_z * up.x + pos.x

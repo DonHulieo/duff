@@ -27,21 +27,20 @@ local CArray do
   CArray.sort = table.sort
   CArray.concat = table.concat
   local min = math.min
-  local check_type = CheckType
+  local check_type = require('shared.debug').checktype
 
   ---@param tbl table
-  ---@param fn_name string
+  ---@param fn function
   ---@param arg_no integer?
-  ---@param level integer?
   ---@return boolean?, string?
-  local function is_table(tbl, fn_name, arg_no, level)
-    return check_type(tbl, 'table', fn_name, arg_no, level)
+  local function is_table(tbl, fn, arg_no)
+    return check_type(tbl, 'table', fn, arg_no)
   end
 
   ---@param tbl table
   ---@return boolean?
   local function isArray(tbl)
-    if not is_table(tbl, 'IsArray', 1, 3) then return end
+    if not is_table(tbl, isArray, 1) then return end
     return tbl.__type == 'array'
   end
 

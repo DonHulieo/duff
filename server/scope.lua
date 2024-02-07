@@ -5,21 +5,22 @@
 ---@field CreateSyncedScopeEvent fun(event: string, owner: number|integer, time: integer?, ...: any)
 ---@field RemoveSyncedScopeEvent fun(event: string)
 local CScope do
-  local check_type = CheckType
+  local check_type = require('shared.debug').checktype
   local tostring, table = tostring, table
   local client_event, create_thread, wait = TriggerClientEvent, CreateThread, Wait
   local Scopes = {}
 
   local function clearScopes(resource)
-    local bool = check_type(resource, 'string', 'onResourceStop', 1, 3)
+    local bool = check_type(resource, 'string', clearScopes, 1)
     if bool and resource ~= 'duf' then return end
     Scopes = {}
   end
 
   ---@param source number|integer
-  ---@return table Scope
+  ---@return table? Scope
   local function getPlayerScope(source) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
-    local bool = check_type(source, 'string', 'GetPlayerScope', 1, 3)
+    local bool = check_type(source, 'string', getPlayerScope, 1)
+    if bool then return end
     local src = not bool and tostring(source) or source
     return Scopes[src]
   end

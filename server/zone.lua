@@ -8,7 +8,7 @@
 ---@field RemoveZoneEvent fun(event: string)
 local CMZone do
   local ZONES = json.decode(LoadResourceFile('duf', 'data/zones.json'))
-  local check_type = CheckType
+  local check_type = require('shared.debug').checktype
   local convert_to_vec = require('shared.vector').ConvertToVec
   local Listeners = {}
 
@@ -29,7 +29,7 @@ local CMZone do
   ---@param check vector3|{x: number, y: number, z: number}|string
   ---@return boolean?, integer?
   local function contains(check)
-    local bool, param_type = check_type(check, {'vector3', 'table', 'string'}, 'Contains', 1, 3)
+    local bool, param_type = check_type(check, {'vector3', 'table', 'string'}, contains, 1)
     if not bool then return end
     check = param_type == 'table' and convert_to_vec(check--[[@as table]]) or param_type == 'string' and check--[[@as string]]:upper() or check
     if not check then return end
@@ -55,7 +55,7 @@ local CMZone do
   ---@param coords vector3|{x: number, y: number, z: number}
   ---@return string? name
   local function getNameOfZone(coords)
-    if not check_type(coords, {'vector3', 'table'}, 'GetNameOfZone', 1, 3) then return end
+    if not check_type(coords, {'vector3', 'table'}, getNameOfZone, 1) then return end
     local bool, index = contains(coords)
     return bool and ZONES[index].Name:upper() or nil
   end
@@ -63,7 +63,7 @@ local CMZone do
   ---@param coords vector3|{x: number, y: number, z: number}
   ---@return integer? index
   local function getIndexOfZone(coords)
-    if not check_type(coords, {'vector3', 'table'}, 'GetZoneAtCoords', 1, 3) then return end
+    if not check_type(coords, {'vector3', 'table'}, getIndexOfZone, 1) then return end
     local bool, index = contains(coords)
     return bool and index or nil
   end
@@ -71,7 +71,7 @@ local CMZone do
   ---@param name string
   ---@return integer? index
   local function getZoneFromNameId(name)
-    if not check_type(name, 'string', 'GetZoneFromNameId', 1, 3) then return end
+    if not check_type(name, 'string', getZoneFromNameId, 1) then return end
     local bool, index = contains(name)
     return bool and index or nil
   end
@@ -83,12 +83,12 @@ local CMZone do
   ---@param time integer?
   ---@param player string?
   local function addZoneEvent(event, zone, onEnter, onExit, time, player)
-    if not check_type(event, 'string', 'AddZoneEvent', 1, 3) then return end
-    if not check_type(zone, 'string', 'AddZoneEvent', 2, 3) then return end
-    if not check_type(onEnter, 'function', 'AddZoneEvent', 3, 3) then return end
-    if not check_type(onExit, 'function', 'AddZoneEvent', 4, 3) then return end
-    if time and not check_type(time, 'integer', 'AddZoneEvent', 5, 3) then return end
-    if player and not check_type(player, 'string', 'AddZoneEvent', 6, 3) then return end
+    if not check_type(event, 'string', addZoneEvent, 1) then return end
+    if not check_type(zone, 'string', addZoneEvent, 2) then return end
+    if not check_type(onEnter, 'function', addZoneEvent, 3) then return end
+    if not check_type(onExit, 'function', addZoneEvent, 4) then return end
+    if time and not check_type(time, 'integer', addZoneEvent, 5) then return end
+    if player and not check_type(player, 'string', addZoneEvent, 6) then return end
     local index = getZoneFromNameId(zone)
     if not index or Listeners[event] then return end
     Listeners[event] = {players = {}}
@@ -133,7 +133,7 @@ local CMZone do
 
   ---@param event string
   local function removeZoneEvent(event)
-    if not check_type(event, 'string', 'RemoveZoneEvent', 1, 3) then return end
+    if not check_type(event, 'string', removeZoneEvent, 1) then return end
     if Listeners[event] then Listeners[event] = nil end
   end
 

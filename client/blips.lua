@@ -10,7 +10,7 @@ local CBlips do
   local require = require
   ---@module 'duf.shared.array'
   local array = require 'shared.array'
-  local check_type = CheckType
+  local check_type = require('shared.debug').checktype
   local does_blip_exist = DoesBlipExist
   local get_closest = require('shared.vector').GetClosest
 
@@ -39,7 +39,7 @@ local CBlips do
   ---@param radius number?
   ---@return CArray? blips An array of all currently active blip handles that are within the specified coordinates
   local function blipsByCoords(coords, radius)
-    local bool, param_type = check_type(coords, {'vector3', 'table'}, 'ByCoords', 1, 3)
+    local bool, param_type = check_type(coords, {'vector3', 'table'}, blipsByCoords, 1)
     if not bool then return end
     radius = radius or 1.0
     return get_all_blips():filter(function(blip)
@@ -56,7 +56,7 @@ local CBlips do
   ---@param sprite integer
   ---@return CArray? blips An array of all currently active blip handles that have the specified sprite
   local function blipsBySprite(sprite)
-    if check_type(sprite, 'number', 'BySprite', 1, 3) then return end
+    if check_type(sprite, 'number', blipsBySprite, 1) then return end
     return get_all_blips():filter(function(blip) return GetBlipSprite(blip) == sprite end, true)
   end
 
@@ -65,14 +65,14 @@ local CBlips do
   ---@param id_type integer {1, 2, 3, 4, 5, 6, 7}
   ---@return CArray? blips An array of all currently active blip handles that have the specified type
   local function blipsByType(id_type)
-    if not check_type(id_type, 'number', 'ByType', 1, 3) or not id_types[id_type] then return end
+    if not check_type(id_type, 'number', blipsByType, 1) or not id_types[id_type] then return end
     return get_all_blips():filter(function(blip) return GetBlipInfoIdType(blip) == id_type end, true)
   end
 
   ---@param blip integer
   ---@return table? blip_info
   local function getBlipInfo(blip)
-    if not check_type(blip, 'number', 'GetBlipInfo', 1, 3) or not does_blip_exist(blip) then return end
+    if not check_type(blip, 'number', getBlipInfo, 1) or not does_blip_exist(blip) then return end
     return {
       alpha = GetBlipAlpha(blip),
       coords = GetBlipCoords(blip),
@@ -88,7 +88,7 @@ local CBlips do
 
   ---@param blips integer|integer[]
   local function removeBlips(blips)
-    local bool, param_type = check_type(blips, {'table', 'number'}, 'Remove', 1, 3)
+    local bool, param_type = check_type(blips, {'table', 'number'}, removeBlips, 1)
     if not bool then return end
     blips = param_type == 'table' and array(blips) or array{blips}
     SetThisScriptCanRemoveBlipsCreatedByAnyScript(true)
