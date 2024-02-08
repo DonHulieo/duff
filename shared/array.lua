@@ -10,6 +10,7 @@
 ---@field pop fun(self: CArray, index: integer?): any, CArray Removes and returns the element at the specified index in the array.
 ---@field poparray fun(self: CArray, index: integer?): CArray Removes and returns a new array containing the elements from the specified index to the end of the array.
 ---@field contains fun(self: CArray, key: integer?, value: any?): boolean? Checks if the array contains a specific element or key or key-value pair.
+---@field find fun(self: CArray, fn: function): integer? Searches for the first element in the array that satisfies a given condition and returns its index.
 ---@field copy fun(self: CArray): CArray Creates a shallow copy of the array.
 ---@field foldleft fun(self: CArray, fn: function, arg: any?): CArray Applies a function to each element from left to right, accumulating a result.
 ---@field foldright fun(self: CArray, fn: function, arg: any?): CArray Applies a function to each element from right to left, accumulating a result.

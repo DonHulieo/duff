@@ -5,6 +5,7 @@
 ---@field random fun(m: integer, n: integer?): integer?
 ---@field timer fun(time: integer, limit: integer): boolean
 local CMath do
+  local require = require
   local check_type = require('shared.debug').checktype
   local math = math
   local math_floor = math.floor
