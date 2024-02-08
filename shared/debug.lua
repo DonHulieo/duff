@@ -6,16 +6,15 @@
 local CDebug do
   local debug = debug
   local get_info = debug.getinfo
-  local require = require
-  local array = require 'shared.array'
+  local type = type
 
   ---@param level integer
   ---@return string[]?
   local function get_fn_chain(level)
-    local chain = array{}
+    local chain = {}
     local info = get_info(level + 1, 'n')
     while info do
-      chain:push(info.name)
+      chain[#chain + 1] = info.name
       level = level + 1
       info = get_info(level + 1, 'n')
     end
@@ -57,13 +56,20 @@ local CDebug do
   ---@return boolean?, string?
   local function check_type(param, type_name, fn, arg_no)
     local param_type = type(param)
-    type_name = type(type_name) == 'table' and array(type_name) or array{type_name}
-    local equals = array(type_name):contains(nil, param_type)
+    type_name = type(type_name) == 'table' and type_name or {type_name} --[=[@cast type_name string[] ]=]
+    local equals do
+      for i = 1, #type_name do
+        if param_type == type_name[i] then
+          equals = true
+          break
+        end
+      end
+    end
     if not equals and fn then
       arg_no = arg_no or 1
       local info = get_fn_info(fn)
       if not info then error('bad argument #3 to \'checktype\' (invalid function)', 0) end
-      error(info.source..':'..info.line..': bad argument #'..arg_no..' to \''..info.name..'\' ('..array(type_name):concat(', ')..' expected, got '..param_type..')', 0)
+      error(info.source..':'..info.line..': bad argument #'..arg_no..' to \''..info.name..'\' ('..table.concat(type_name, ', ')..' expected, got '..param_type..')', 0)
     end
     return equals, param_type
   end

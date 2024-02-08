@@ -3,10 +3,6 @@ local type, error = type, error
 local load_resource_file = LoadResourceFile
 package = {loaded = {}, path = {}, preload = {}}
 
---#TODO
---#[x] Change Error functionality to get the line and function name using debug library
---#[x] Possibly Create a Debug Library to handle errors and debugging and add CheckType to it
-
 ---@enum file_ids
 local file_ids = {'file', 'files'}
 ---@param resource string
