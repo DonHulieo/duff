@@ -16,7 +16,7 @@ local CBlips do
 
   ---@return CArray blips An array of all currently active blip handles
   local function get_all_blips() -- Credits go to: [negbook](https://github.com/negbook/nbk_blips)
-    local blips = array{}
+    local blips = array.new{}
     for i = 0, 883 do -- 884 is the max number of default blips b3095, if you have custom blips you need to increase this number
       local blip = GetFirstBlipInfoId(i)
       local exists = does_blip_exist(blip)
@@ -61,7 +61,7 @@ local CBlips do
   end
 
   ---@enum (key) id_types
-  local id_types = array{true, true, true, true, true, true, true}:setenum()
+  local id_types = array.new{true, true, true, true, true, true, true}:setenum()
   ---@param id_type integer {1, 2, 3, 4, 5, 6, 7}
   ---@return CArray? blips An array of all currently active blip handles that have the specified type
   local function blipsByType(id_type)
@@ -90,7 +90,7 @@ local CBlips do
   local function removeBlips(blips)
     local bool, param_type = check_type(blips, {'table', 'number'}, removeBlips, 1)
     if not bool then return end
-    blips = param_type == 'table' and array(blips) or array{blips}
+    blips = param_type == 'table' and array.new(blips--[[@as integer[]?]]) or array.new{blips}
     SetThisScriptCanRemoveBlipsCreatedByAnyScript(true)
     blips:foreach(function(blip)
       if does_blip_exist(blip) then RemoveBlip(blip) end

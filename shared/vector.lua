@@ -3,8 +3,8 @@
 ---@field GetClosest fun(check: integer|vector3|{x: number, y: number, z: number}, tbl: vector3[]|integer[], radius: number?, excluding: any[]): integer|vector3?, number?, vector3[]|integer[]? @shared
 ---@field GetEntityMatrix fun(entity: integer): vector3?, vector3?, vector3?, vector3? @server
 ---@field GetEntityForwardVector fun(entity: integer): vector3? @server
----@field GetEntityRightVector fun(entity: integer): vector3? @shared
----@field GetEntityUpVector fun(entity: integer): vector3? @shared
+---@field GetEntityRightVector fun(entity: integer): vector3? @client
+---@field GetEntityUpVector fun(entity: integer): vector3? @client
 ---@field GetOffsetFromEntityInWorldCoords fun(entity: integer, offset_x: number, offset_y: number, offset_z: number): vector3? @server
 local CVector do
   local type, error = type, error
@@ -53,7 +53,7 @@ local CVector do
   local function get_closest(check, tbl, radius, excluding)
     local coords = ensure_vector3(check, get_closest) --[[@as vector3]]
     if not coords or not check_type(coords, 'vector3', get_closest, 1) then return end
-    tbl = type(tbl) == 'table' and array(tbl) or array{tbl}
+    tbl = type(tbl) == 'table' and array.new(tbl) or array.new{tbl}
     local closest, dist = nil, nil
     local closests = tbl:filter(function(found)
       local distance = #(coords - ensure_vector3(found, get_closest))

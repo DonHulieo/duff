@@ -18,25 +18,25 @@ local CPools do
   ---@param ped_type integer?
   ---@return integer[]
   local function getPeds(ped_type)
-    return array(get_pool('CPed')):filter(function(ped) return not ped_type or GetPedType(ped) == ped_type end, true)
+    return array.new(get_pool('CPed')):filter(function(ped) return not ped_type or GetPedType(ped) == ped_type end, true)
   end
 
   ---@param vehicle_type integer?
   ---@return integer[]
   local function getVehicles(vehicle_type)
-    return array(get_pool('CVehicle')):filter(function(vehicle) return not vehicle_type or GetVehicleClass(vehicle) == vehicle_type end, true)
+    return array.new(get_pool('CVehicle')):filter(function(vehicle) return not vehicle_type or GetVehicleClass(vehicle) == vehicle_type end, true)
   end
 
   ---@return integer[]
   local function getObjects()
-    return array(get_pool('CObject'))
+    return array.new(get_pool('CObject'))
   end
 
   ---@param hash string|number?
   ---@return integer[]
   local function getPickups(hash)
     hash = type(hash) == 'string' and joaat(hash) or hash
-    return array(get_pool('CPickup')):filter(function(pickup) return not hash or GetPickupHash(pickup) == hash end, true)
+    return array.new(get_pool('CPickup')):filter(function(pickup) return not hash or GetPickupHash(pickup) == hash end, true)
   end
 
   ---@param coords vector3|number?
