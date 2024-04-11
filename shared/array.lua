@@ -1,7 +1,7 @@
 ---@class CArray
 ---@field private __actions table
 ---@field private __type string
----@field private __call fun(self: CArray, tbl: table): CArray
+---@field new fun(self: any[]?): self|any? Creates a new array.
 ---@field isarray fun(tbl: table): boolean, string Checks if the table is an array.
 ---@field push fun(self: CArray, arg: any?, ...: any?): CArray Adds one or more elements to the end of the array.
 ---@field pusharray fun(self: CArray, tbl: table): CArray Adds all elements from a table to the end of the array.
@@ -28,7 +28,9 @@ local CArray do
   CArray.sort = table.sort
   CArray.concat = table.concat
   local min = math.min
-  local check_type = require('shared.debug').checktype
+  ---@module 'shared.debug'
+  local debug = require('shared.debug')
+  local check_type = debug.checktype
 
   ---@param tbl table
   ---@param fn function
@@ -36,6 +38,29 @@ local CArray do
   ---@return boolean?, string?
   local function is_table(tbl, fn, arg_no)
     return check_type(tbl, 'table', fn, arg_no)
+  end
+
+  ---@param tbl table
+  ---@param fn function
+  ---@param arg_no integer?
+  ---@return boolean
+  local function is_true_array(tbl, fn, arg_no)
+    local len = #tbl
+    for k, _ in pairs(tbl) do
+      if type(k) ~= 'number' or k < 1 or k > len then return false end
+    end
+    return true
+  end
+
+  ---@param self table
+  ---@return CArray?
+  local function new(self)
+    self = self or {}
+    if not is_table(self, new, 1) then return end
+    if not is_true_array(self, new, 1) then return end
+    for k, v in pairs(CArray) do self[k] = v end
+    self.__index = CArray
+    return self
   end
 
   ---@param tbl table
@@ -241,12 +266,7 @@ local CArray do
   CArray.filter = filter
   CArray.foreach = forEach
   CArray.reverse = reverse
+  CArray.new = new
 
-  setmetatable(CArray, {
-    __call = function(self, tbl)
-      setmetatable(tbl, self.__actions)
-      return tbl
-    end
-  })
   return CArray
 end
