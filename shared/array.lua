@@ -124,7 +124,7 @@ local CArray do
   local function popArray(self, index)
     index = index or 1
     local res = new{}
-    for i = 1, min(index, #self) do res[i] = CArray.remove(self) end
+    for i = 1, min(index, #self) do res[i] = CArray.remove(self, i) end
     return res
   end
 
