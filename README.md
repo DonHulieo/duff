@@ -17,6 +17,7 @@ Well, this is the solution for you! This is a collection of *optimised utility f
   - [Credits](#credits)
   - [Installation](#installation)
   - [Documentation](#documentation)
+    - [Require](#require)
     - [Importing the DUF Object](#importing-the-duf-object)
     - [CArray](#carray)
       - [Importing the CArray Module](#importing-the-carray-module)
@@ -92,6 +93,16 @@ Well, this is the solution for you! This is a collection of *optimised utility f
 
 ## Documentation
 
+### Require
+
+Require is a function that allows you to import modules, emulating Lua Default require function, using package.path, package.preload and package.loaded. It also precaches all modules labled as `file` in the `fxmanifest.lua` file and any modules that are imported using the `require` function.
+
+```lua
+---@param path string @The name of the module to require. This can be a path, or a module name. If a path is provided, it must be relative to the resource root.
+---@return {[string]: any} module
+exports.duf:require(path)
+```
+
 ### Importing the DUF Object
 
 ```lua
@@ -126,8 +137,9 @@ local array = duf.array
 #### Creating a CArray
 
 ```lua
----@type CArray
-local tbl = array{1, 2, 3, 4, 5}
+---@param list any[]
+---@return CArray
+local tbl = array.new(list)
 ```
 
 #### Internal Methods
