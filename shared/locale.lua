@@ -1,3 +1,9 @@
+---@class locale
+---@field set fun(key: string, value: string)
+---@field load fun(context: string?, data: table)
+---@field loadfile fun(resource: string?, file: string?)
+---@field translate fun(key: string, data: table): string
+---@field t fun(key: string, data: table): string
 local locale do
   local require = require
   local check_type = require('shared.debug').checktype
@@ -63,7 +69,7 @@ local locale do
   ---@return table, integer
   local function split(string)
     local result, length = {}, 0
-    string = string:gsub('[^%.]+', function(c)
+    string = string:gsub('%-', '.'):gsub('[^%.]+', function(c)
       length += 1
       result[length] = c
     end)
@@ -149,9 +155,10 @@ local locale do
   ---@param context string?
   ---@param data table
   local function recursive_load(context, data)
+    if not data then return end
     local composed_key = ''
     for key, value in pairs(data) do
-      composed_key = (context and (context .. '.') or '')..tostring(key)
+      composed_key = (context and (context..'.') or '')..tostring(key)
       if type(value) == 'string' then
         set(composed_key, value)
       else
@@ -160,9 +167,15 @@ local locale do
     end
   end
 
+  ---@param context string?
+  ---@param data table
+  local function load_table(context, data)
+    recursive_load(context, data)
+  end
+
   ---@param resource string?
   ---@param file string?
-  local function load_translations(resource, file)
+  local function load_file(resource, file)
     resource = resource or GetInvokingResource()
     file = not file and 'locales/'..dialect or file --[[@as string]]
     local translations = safe_load(resource, file) and load(load_resource_file(resource, file..'.lua'))
@@ -171,13 +184,13 @@ local locale do
   end
 
   ---@param key string
-  ---@param data table
+  ---@param data table?
   ---@return string
   local function translate(key, data)
     assert_string(translate, key, 'key')
     data = data or {}
-    if #storage == 0 then load_translations() end
-    local used_locale = data.locale or region
+    if #storage == 0 then load_file() end
+    local used_locale = data.locale or default_locale
     local result = fallbacks(used_locale, dialect)
     for i = 1, #result do
       local value = locale_translate(key, result[i], data)
@@ -186,14 +199,5 @@ local locale do
     return data.default
   end
 
-  ---@return string
-  local function get()
-    return default_locale
-  end
-
-  return {
-    load = load_translations,
-    get = get,
-    translate = translate
-  }
+  return {set = set, load = load_table, loadfile = load_file, translate = translate, t = translate}
 end
