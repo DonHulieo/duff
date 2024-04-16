@@ -52,7 +52,7 @@ local CDebug do
   ---@param param any
   ---@param type_name string|string[]
   ---@param fn function
-  ---@param arg_no integer?
+  ---@param arg_no integer|string?
   ---@return boolean?, string?
   local function check_type(param, type_name, fn, arg_no)
     local param_type = type(param)
@@ -66,10 +66,11 @@ local CDebug do
       end
     end
     if not equals and fn then
-      arg_no = arg_no or 1
+      local arg_no_type = type(arg_no)
+      arg_no = (arg_no_type == 'number' or arg_no_type == 'nil') and '#'..arg_no and (arg_no or 1)..'' or arg_no
       local info = get_fn_info(fn)
       if not info then error('bad argument #3 to \'checktype\' (invalid function)', 0) end
-      error(info.source..':'..info.line..': bad argument #'..arg_no..' to \''..info.name..'\' ('..table.concat(type_name, ', ')..' expected, got '..param_type..')', 0)
+      error(info.source..':'..info.line..': bad argument '..arg_no..' to \''..info.name..'\' ('..table.concat(type_name, ', ')..' expected, got '..param_type..')', 0)
     end
     return equals, param_type
   end
