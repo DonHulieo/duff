@@ -22,7 +22,7 @@
 ---@field map fun(self: CArray, fn: function, inPlace: boolean?): CArray Applies a function to each element and returns a new array with the results.
 ---@field filter fun(self: CArray, fn: function, inPlace: boolean?): CArray Returns a new array containing only the elements that satisfy a given condition.
 ---@field foreach fun(self: CArray, fn: function) Executes a function for each element across the array.
----@field reverse fun(self: CArray): CArray Reverses the order of elements.
+---@field reverse fun(self: CArray, length: integer?): CArray Reverses the order of elements.
 local CArray do
   local table = table
   CArray = {__actions = {__index = CArray}, __type = 'array'}
@@ -227,10 +227,11 @@ local CArray do
   end
 
   ---@param self CArray
+  ---@param length integer?
   ---@return CArray
-  local function reverse(self)
-    if #self <= 1 then return self end
-    local i, j = 1, #self
+  local function reverse(self, length)
+    if length and length <= 1 or #self <= 1 then return self end
+    local i, j = 1, length and length or #self
     while i < j do
       self[i], self[j] = self[j], self[i]
       i += 1
