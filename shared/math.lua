@@ -1,4 +1,5 @@
 ---@class CMath
+---@field between fun(val: number, min: number, max: number): boolean?
 ---@field clamp fun(val: number, min: number, max: number): number
 ---@field round fun(val: number, increment: integer?): integer
 ---@field seedrng fun(): integer?
@@ -7,13 +8,22 @@
 local CMath do
   local require = require
   local check_type = require('shared.debug').checktype
-  local math = math
-  local math_floor = math.floor
-  local random_seed, math_random = math.randomseed, math.random
+  local _math = math
+  local math_floor = _math.floor
+  local random_seed, math_random = _math.randomseed, _math.random
   local tonumber, tostring = tonumber, tostring
   local is_server = IsDuplicityVersion() == 1
   local posix_time = is_server and os.time or GetCloudTimeAsInt
   local game_timer = GetGameTimer
+
+  ---@param val number
+  ---@param min number
+  ---@param max number
+  ---@return boolean?
+  local function between(val, min, max)
+    if not check_type(val, 'number', between, 1) or not check_type(min, 'number', between, 2) or not check_type(max, 'number', between, 3) then return end
+    return val >= min and val <= max
+  end
 
   ---@param val number
   ---@param min number
@@ -58,5 +68,5 @@ local CMath do
     return current - time > limit
   end
 
-  return {clamp = clamp, round = round, seedrng = seed_rng, random = random, timer = timer}
+  return {between = between, clamp = clamp, round = round, seedrng = seed_rng, random = random, timer = timer}
 end
