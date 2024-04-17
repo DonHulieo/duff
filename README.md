@@ -7,8 +7,6 @@ Don's Utility Functions for FiveM
 Has you're script gone up the *[duff](https://www.urbandictionary.com/define.php?term=Up%20The%20Duff)*?
 Well, this is the solution for you! This is a collection of *optimised utility functions* that are exports for you to use in your scripts.
 
-- *This is a work in progress, and I'll be adding more functions as I go along.*
-
 ## Table of Contents
 
 - [duff](#duff)
@@ -78,6 +76,16 @@ Well, this is the solution for you! This is a collection of *optimised utility f
       - [bysprite](#bysprite)
       - [getinfo](#getinfo)
       - [remove](#remove)
+    - [pools](#pools)
+      - [Importing the pools Module](#importing-the-pools-module)
+      - [getpeds](#getpeds)
+      - [getvehicles](#getvehicles)
+      - [getobjects](#getobjects)
+      - [getpickups](#getpickups)
+      - [getclosestped](#getclosestped)
+      - [getclosestvehicle](#getclosestvehicle)
+      - [getclosestobject](#getclosestobject)
+      - [getclosestpickup](#getclosestpickup)
     - [Support](#support)
     - [Changelog](#changelog)
 
@@ -708,6 +716,97 @@ function blips.getinfo(blip)
 ```lua
 ---@param blips integer|integer[]
 function blips.remove(blips)
+```
+
+### pools
+
+*This is a client module.*
+
+#### Importing the pools Module
+
+```lua
+-- Using the `require` export
+---@module 'duff.client.pools'
+local pools = exports.duff:require 'duff.client.pools'
+
+-- Using the `require` export on the duff object
+---@module 'duff.shared.import'
+local duff = exports.duff:require 'duff.shared.import'
+-- Attaching the pools object to a local variable (Lua 5.4+)
+local pools in duff
+-- Attaching the pools object to a local variable
+local pools = duff.pools
+```
+
+#### getpeds
+
+```lua
+---@return array? peds
+function pools.getpeds()
+```
+
+#### getvehicles
+
+```lua
+---@return array? vehicles
+function pools.getvehicles()
+```
+
+#### getobjects
+
+```lua
+---@return array? objects
+function pools.getobjects()
+```
+
+#### getpickups
+
+```lua
+---@return array? pickups
+function pools.getpickups()
+```
+
+#### getclosestped
+
+```lua
+---@param coords vector3|integer?
+---@param ped_type integer?
+---@param radius number?
+---@param ignore integer[]?
+---@return integer? ped, number? distance, array? peds
+function pools.getclosestped(coords, ped_type, radius, ignore)
+```
+
+#### getclosestvehicle
+
+```lua
+---@param coords vector3|integer?
+---@param vehicle_type integer?
+---@param radius number?
+---@param ignore integer[]?
+---@return integer? vehicle, number? distance, array? vehicles
+function pools.getclosestvehicle(coords, vehicle_type, radius, ignore)
+```
+
+#### getclosestobject
+
+```lua
+---@param coords vector3|integer?
+---@param radius number?
+---@param ignore integer[]?
+---@return integer? object, number? distance, array? objects
+function pools.getclosestobject(coords, radius, ignore)
+```
+
+#### getclosestpickup
+
+```lua
+---@param coords vector3|integer?
+---@param hash string|number?
+---@param radius number?
+---@param ignore integer[]?
+---@return integer? pickup, number? distance, array? pickups
+function pools.getclosestpickup(coords, hash, radius, ignore)
 ```
 
 ### Support

@@ -7,7 +7,7 @@
 ---@field blips blips
 ---@field locale locale
 ---@field math math
----@field pools CPools
+---@field pools pools
 ---@field streaming CStreaming
 ---@field scope CScope
 ---@field vector vector
