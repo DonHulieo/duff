@@ -59,20 +59,17 @@ Well, this is the solution for you! This is a collection of *optimised utility f
       - [seedrng](#seedrng)
       - [random](#random)
       - [timer](#timer)
-    - [CVector](#cvector)
-      - [Importing the CVector Module](#importing-the-cvector-module)
+    - [vector](#vector)
+      - [Importing the vector Module](#importing-the-vector-module)
       - [Shared Functions](#shared-functions)
-        - [ConvertToVec](#converttovec)
-        - [GetClosest](#getclosest)
-      - [Client Functions](#client-functions)
-        - [GetEntityRightVector](#getentityrightvector)
-        - [GetEntityUpVector](#getentityupvector)
+        - [tabletovector](#tabletovector)
+        - [getclosest](#getclosest)
+        - [getentityright](#getentityright)
+        - [getentityup](#getentityup)
       - [Server Functions](#server-functions)
-        - [GetEntityMatrix](#getentitymatrix)
-        - [GetEntityForwardVector](#getentityforwardvector)
-        - [GetEntityRightVector (Server)](#getentityrightvector-server)
-        - [GetEntityUpVector (Server)](#getentityupvector-server)
-        - [GetOffsetFromEntityInWorldCoords](#getoffsetfromentityinworldcoords)
+        - [getentitymatrix](#getentitymatrix)
+        - [getentityforward](#getentityforward)
+        - [getoffsetfromentityinworldcoords](#getoffsetfromentityinworldcoords)
     - [blips](#blips)
       - [Importing the blips Module](#importing-the-blips-module)
       - [getall](#getall)
@@ -557,11 +554,11 @@ function math.random(min, max)
 function math.timer(time, limit)
 ```
 
-### CVector
+### vector
 
 *This is a shared module, but has functions which are exclusive to their respective enviroments.*
 
-#### Importing the CVector Module
+#### Importing the vector Module
 
 ```lua
 -- Using the `require` export
@@ -579,78 +576,64 @@ local vector = duff.vector
 
 #### Shared Functions
 
-##### ConvertToVec
+##### tabletovector
+
+Checks if the table is a vector and converts it to a vector.
 
 ```lua
 ---@param tbl {x: number, y: number, z: number?, w: number?}
 ---@return vector2|vector3|vector4
-function vector.ConvertToVec(tbl)
+function vector.tabletovector(tbl)
 ```
 
-##### GetClosest
+##### getclosest
+
+Finds the closest vector3 in an array to a given vector3.
 
 ```lua
 ---@param check integer|vector3|{x: number, y: number, z: number}
----@param list integer[]|vector3[]|{x: number, y: number, z: number}[]
+---@param tbl vector3[]|integer[]
 ---@param radius number?
----@param ignore integer[]|vector3[]|{x: number, y: number, z: number}[]?
----@return integer|vector3?, number?, integer[]|vector3[]|{x: number, y: number, z: number}[]
-function vector.GetClosest(check, list, radius, ignore)
+---@param excluding any[]?
+---@return integer|vector3?, number?, array?
+function vector.getclosest(check, list, radius, ignore)
 ```
 
-#### Client Functions
-
-##### GetEntityRightVector
+##### getentityright
 
 ```lua
 ---@param entity integer
 ---@return vector3?
-function vector.GetEntityRightVector(entity)
+function vector.getentityright(entity)
 ```
 
-##### GetEntityUpVector
+##### getentityup
 
 ```lua
 ---@param entity integer
 ---@return vector3?
-function vector.GetEntityUpVector(entity)
+function vector.getentityup(entity)
 ```
 
 #### Server Functions
 
-##### GetEntityMatrix
+##### getentitymatrix
 
 ```lua
 ---@param entity integer
----@return vector3, vector3, vector3, vector3
-function vector.GetEntityMatrix(entity)
+---@return vector3?, vector3?, vector3?, vector3?
+function vector.getentitymatrix(entity)
 ```
 
-##### GetEntityForwardVector
-
-```lua
----@param entity integer
----@return vector3?
-function vector.GetEntityForwardVector(entity)
-```
-
-##### GetEntityRightVector (Server)
+##### getentityforward
 
 ```lua
 ---@param entity integer
 ---@return vector3?
-function vector.GetEntityRightVector(entity)
+function vector.getentityforward(entity)
 ```
 
-##### GetEntityUpVector (Server)
-
-```lua
----@param entity integer
----@return vector3?
-function vector.GetEntityUpVector(entity)
-```
-
-##### GetOffsetFromEntityInWorldCoords
+##### getoffsetfromentityinworldcoords
 
 ```lua
 ---@param entity integer
@@ -658,7 +641,7 @@ function vector.GetEntityUpVector(entity)
 ---@param offsetY number
 ---@param offsetZ number
 ---@return vector3?
-function vector.GetOffsetFromEntityInWorldCoords(entity, offsetX, offsetY, offsetZ)
+function vector.getoffsetfromentityinworldcoords(entity, offsetX, offsetY, offsetZ)
 ```
 
 ### blips

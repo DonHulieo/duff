@@ -10,7 +10,7 @@
 ---@field pools CPools
 ---@field streaming CStreaming
 ---@field scope CScope
----@field vector CVector
+---@field vector vector
 local duff do
   local is_server = IsDuplicityVersion() == 1
   local require = require
