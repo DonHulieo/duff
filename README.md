@@ -28,7 +28,7 @@ Well, this is the solution for you! This is a collection of *optimised utility f
       - [peekarray](#peekarray)
       - [pop](#pop)
       - [poparray](#poparray)
-      - [contains](#contains)
+      - [contains (array)](#contains-array)
       - [copy](#copy)
       - [foldleft](#foldleft)
       - [foldright](#foldright)
@@ -100,6 +100,14 @@ Well, this is the solution for you! This is a collection of *optimised utility f
       - [triggerscopeevent](#triggerscopeevent)
       - [createsyncedscopeevent](#createsyncedscopeevent)
       - [removesyncedscopeevent](#removesyncedscopeevent)
+    - [zone](#zone)
+      - [Importing the zone Module](#importing-the-zone-module)
+      - [contains (zone)](#contains-zone)
+      - [getzone](#getzone)
+      - [getzonename](#getzonename)
+      - [getzoneindex](#getzoneindex)
+      - [addzoneevent](#addzoneevent)
+      - [removezoneevent](#removezoneevent)
     - [Support](#support)
     - [Changelog](#changelog)
 
@@ -279,7 +287,7 @@ Removes and returns a new array containing the elements from the specified index
 function array.poparray(self, index)
 ```
 
-#### contains
+#### contains (array)
 
 Checks if the array contains a specific element or key or key-value pair.
 
@@ -1003,6 +1011,77 @@ function scope.createsyncedscopeevent(event, source, timer, ...)
 ```lua
 ---@param event string
 function scope.removesyncedscopeevent(event)
+```
+
+### zone
+
+*This is a server module.*
+
+#### Importing the zone Module
+
+```lua
+-- Using the `require` export
+---@module 'duff.server.zone'
+local zone = exports.duff:require 'duff.server.zone'
+
+-- Using the `require` export on the duff object
+---@module 'duff.shared.import'
+local duff = exports.duff:require 'duff.shared.import'
+-- Attaching the zone object to a local variable (Lua 5.4+)
+local zone in duff
+-- Attaching the zone object to a local variable
+local zone = duff.zone
+```
+
+#### contains (zone)
+
+```lua
+---@param check vector3|{x: number, y: number, z: number}|string
+---@return boolean?, integer?
+function zone.contains(check)
+```
+
+#### getzone
+
+```lua
+---@param index integer
+---@return table?
+function zone.getzone(index)
+```
+
+#### getzonename
+
+```lua
+---@param check vector3|{x: number, y: number, z: number}|string
+---@return string? name
+function zone.getzonename(check)
+```
+
+#### getzoneindex
+
+```lua
+---@param check vector3|{x: number, y: number, z: number}|string
+---@return integer? index
+function zone.getzoneindex(check)
+```
+
+#### addzoneevent
+
+```lua
+---@param event string
+---@param zone_id vector3|{x: number, y: number, z: number}|string
+---@param onEnter fun(player: string, coords: vector3)
+---@param onExit fun(player: string, coords: vector3, disconnected: boolean?)
+---@param time integer?
+---@param players string?\
+function zone.addzoneevent(event, zone_id, onEnter, onExit, time, players)
+```
+
+#### removezoneevent
+
+```lua
+---@param event string
+function zone.removezoneevent(event)
 ```
 
 ### Support

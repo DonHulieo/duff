@@ -11,6 +11,7 @@
 ---@field streaming streaming
 ---@field scope scope
 ---@field vector vector
+---@field zone zone
 local duff do
   local is_server = IsDuplicityVersion() == 1
   local require = require
@@ -40,6 +41,7 @@ local duff do
     locale = locale,
     math = math,
     scope = require 'server.scope',
-    vector = vector
+    vector = vector,
+    zone = require 'server.zone'
   }
 end
