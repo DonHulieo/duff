@@ -1,14 +1,14 @@
----@class CMath
+local _math = math
+---@class math
 ---@field between fun(val: number, min: number, max: number): boolean?
 ---@field clamp fun(val: number, min: number, max: number): number
 ---@field round fun(val: number, increment: integer?): integer
 ---@field seedrng fun(): integer?
 ---@field random fun(m: integer, n: integer?): integer?
 ---@field timer fun(time: integer, limit: integer): boolean
-local CMath do
+local math do
   local require = require
   local check_type = require('shared.debug').checktype
-  local _math = math
   local math_floor = _math.floor
   local random_seed, math_random = _math.randomseed, _math.random
   local tonumber, tostring = tonumber, tostring

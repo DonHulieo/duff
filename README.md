@@ -39,8 +39,9 @@ Well, this is the solution for you! This is a collection of *optimised utility f
       - [filter](#filter)
       - [foreach](#foreach)
       - [reverse](#reverse)
-    - [CMath](#cmath)
-      - [Importing the CMath Module](#importing-the-cmath-module)
+    - [math](#math)
+      - [Importing the math Module](#importing-the-math-module)
+      - [between](#between)
       - [clamp](#clamp)
       - [round](#round)
       - [seedrng](#seedrng)
@@ -60,14 +61,14 @@ Well, this is the solution for you! This is a collection of *optimised utility f
         - [GetEntityRightVector (Server)](#getentityrightvector-server)
         - [GetEntityUpVector (Server)](#getentityupvector-server)
         - [GetOffsetFromEntityInWorldCoords](#getoffsetfromentityinworldcoords)
-    - [CBlips](#cblips)
-      - [Importing the CBlips Module](#importing-the-cblips-module)
-      - [GetAll](#getall)
-      - [GetOnScreen](#getonscreen)
-      - [ByCoords](#bycoords)
-      - [BySprite](#bysprite)
-      - [GetInfo](#getinfo)
-      - [Remove](#remove)
+    - [blips](#blips)
+      - [Importing the blips Module](#importing-the-blips-module)
+      - [getall](#getall)
+      - [onscreen](#onscreen)
+      - [bycoords](#bycoords)
+      - [bysprite](#bysprite)
+      - [getinfo](#getinfo)
+      - [remove](#remove)
     - [Support](#support)
     - [Changelog](#changelog)
 
@@ -303,15 +304,16 @@ function array.foreach(self, func)
 
 ```lua
 ---@param self CArray
+---@param length integer?
 ---@return CArray
-function array.reverse(self)
+function array.reverse(self, length)
 ```
 
-### CMath
+### math
 
-CMath is an object containing some useful math functions. Most notably, it contains a `seedrng` function which generates a random seed based on the current time, and a `random` function which generates a random number between two values which should be an improvement over the default Lua pseudo-random number generator.
+math is an object containing some useful math functions. Most notably, it contains a `seedrng` function which generates a random seed based on the current time, and a `random` function which generates a random number between two values which should be an improvement over the default Lua pseudo-random number generator.
 
-#### Importing the CMath Module
+#### Importing the math Module
 
 ```lua
 -- Using the `require` export
@@ -323,6 +325,16 @@ local duf = exports.duf:require 'duf.shared.import'
 local math in duf
 -- Attaching the math object to a local variable
 local math = duf.math
+```
+
+#### between
+
+```lua
+---@param val number
+---@param min number
+---@param max number
+---@return boolean?
+function math.between(val, min, max)
 ```
 
 #### clamp
@@ -471,11 +483,11 @@ function vector.GetEntityUpVector(entity)
 function vector.GetOffsetFromEntityInWorldCoords(entity, offsetX, offsetY, offsetZ)
 ```
 
-### CBlips
+### blips
 
 *This is a client module.*
 
-#### Importing the CBlips Module
+#### Importing the blips Module
 
 ```lua
 -- Using the `require` export
@@ -489,50 +501,50 @@ local blips in duf
 local blips = duf.blips
 ```
 
-#### GetAll
+#### getall
 
 ```lua
 ---@return CArray? blips
-function blips.GetAll()
+function blips.getall()
 ```
 
-#### GetOnScreen
+#### onscreen
 
 ```lua
 ---@return CArray? blips
-function blips.GetOnScreen()
+function blips.onscreen()
 ```
 
-#### ByCoords
+#### bycoords
 
 ```lua
 ---@param coords vector3|vector3[]
 ---@param radius number?
 ---@return CArray? blips
-function blips.ByCoords(coords, radius)
+function blips.bycoords(coords, radius)
 ```
 
-#### BySprite
+#### bysprite
 
 ```lua
 ---@param sprite integer
 ---@return CArray? blips
-function blips.BySprite(sprite)
+function blips.bysprite(sprite)
 ```
 
-#### GetInfo
+#### getinfo
   
 ```lua
 ---@param blip integer
 ---@return table? blip_info
-function blips.GetInfo(blip)
+function blips.getinfo(blip)
 ```
 
-#### Remove
+#### remove
 
 ```lua
 ---@param blips integer|integer[]
-function blips.Remove(blips)
+function blips.remove(blips)
 ```
 
 ### Support
