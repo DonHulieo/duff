@@ -9,7 +9,7 @@
 ---@field math math
 ---@field pools pools
 ---@field streaming streaming
----@field scope CScope
+---@field scope scope
 ---@field vector vector
 local duff do
   local is_server = IsDuplicityVersion() == 1

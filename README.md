@@ -94,6 +94,12 @@ Well, this is the solution for you! This is a collection of *optimised utility f
       - [loadipl](#loadipl)
       - [loadmodel](#loadmodel)
       - [loadptfx](#loadptfx)
+    - [scope](#scope)
+      - [Importing the scope Module](#importing-the-scope-module)
+      - [getplayerscope](#getplayerscope)
+      - [triggerscopeevent](#triggerscopeevent)
+      - [createsyncedscopeevent](#createsyncedscopeevent)
+      - [removesyncedscopeevent](#removesyncedscopeevent)
     - [Support](#support)
     - [Changelog](#changelog)
 
@@ -439,6 +445,16 @@ locale is an object containing functions for localisation and translation. It's 
 
 The module automatically uses the servers' convars to determine locale , both dialect and region. If the convars (`sets locale`) are not set, it defaults to `en`.
 
+- Interpolation
+  - `welcome = 'Hello, {name}!'` -> `locale.translate('welcome', {name = 'John'})` -> `Hello, John!` (where `name` is a key in the data table)
+- Fallbacks: When a value is not found, the lib has several fallback mechanisms:
+  - First, it will look in the current locale's parents. For example, if the locale was set to 'en-US' and the key 'msg' was not found there, it will be looked over in 'en'.
+  - Second, if the value is not found in the locale ancestry, a 'fallback locale' (by default: 'en') can be used. If the fallback locale has any parents, they will be looked over too.
+  - Third, if all the locales have failed, but there is a param called 'default' on the provided data, it will be used.
+- Using files
+  - The language files are stored in the `locales` folder in the resource root.
+  - The files are named after the locale they represent, e.g. `en.lua`, `en-US.lua`, `es.lua`.
+
 ```lua
 -- Using the `require` export
 ---@module 'duff.shared.locale'
@@ -473,6 +489,17 @@ Loads a translation table from a table.
 function locale.load(context, data)
 ```
 
+The table should contain translation keys and values.
+
+```lua
+locale.load(nil, {
+  en = {
+    welcome = 'Hello, {name}!',
+    goodbye = 'Goodbye, {name}!',
+  }
+})
+```
+
 #### loadfile
 
 Loads a translation table from a file.
@@ -481,6 +508,38 @@ Loads a translation table from a file.
 ---@param resource string? @The resource name to load the translation file from.
 ---@param file string? @The file path to load the translation file from.
 function locale.loadfile(resource, file)
+```
+
+The file should return a table containing translation keys and values.
+
+```lua
+return {
+  en = {
+    welcome = 'Hello, {name}!',
+    goodbye = 'Goodbye, {name}!',
+  }
+}
+```
+
+You can also use a context to load translations into a specific context, or even load all translations into a single context.
+
+```lua
+return {
+  en = {
+    AU = {
+      welcome = 'G\'day, {name}!',
+      goodbye = 'Later, {name}!',
+    },
+    US = {
+      welcome = 'Howdy, {name}!',
+      goodbye = 'See ya later, {name}!',
+    }
+  },
+  es = {
+    welcome = '¡Hola, {name}!',
+    goodbye = '¡Adiós, {name}!',
+  }
+}
 ```
 
 #### translate
@@ -889,6 +948,61 @@ function streaming.loadmodel(model, isAsync)
 ---@param isAsync boolean?
 ---@return boolean?
 function streaming.loadptfx(fx, isAsync)
+```
+
+### scope
+
+*This is a server module.*
+
+#### Importing the scope Module
+
+```lua
+-- Using the `require` export
+---@module 'duff.server.scope'
+local scope = exports.duff:require 'duff.server.scope'
+
+-- Using the `require` export on the duff object
+---@module 'duff.shared.import'
+local duff = exports.duff:require 'duff.shared.import'
+-- Attaching the scope object to a local variable (Lua 5.4+)
+local scope in duff
+-- Attaching the scope object to a local variable
+local scope = duff.scope
+```
+
+#### getplayerscope
+
+```lua
+---@param source number|integer
+---@return {[string]: boolean}? Scope
+function scope.getplayerscope(source)
+```
+
+#### triggerscopeevent
+
+```lua
+---@param event string
+---@param source number|integer
+---@param ... any
+---@return {[string]: boolean}? targets
+function scope.triggerscopeevent(event, source, ...)
+```
+
+#### createsyncedscopeevent
+  
+```lua
+---@param event string
+---@param source number|integer
+---@param timer integer?
+---@param ... any
+function scope.createsyncedscopeevent(event, source, timer, ...)
+```
+
+#### removesyncedscopeevent
+
+```lua
+---@param event string
+function scope.removesyncedscopeevent(event)
 ```
 
 ### Support

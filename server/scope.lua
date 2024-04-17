@@ -1,10 +1,10 @@
----@class CScope
+---@class scope
 ---@field Scopes {[string]: {[string]: boolean}, Synced: {[string]: {[string]: boolean}}}?
----@field GetPlayerScope fun(source: number|integer): {[string]: boolean}?
----@field TriggerScopeEvent fun(event: string, owner: number|integer, ...: any): {[string]: boolean}?
----@field CreateSyncedScopeEvent fun(event: string, owner: number|integer, time: integer?, ...: any)
----@field RemoveSyncedScopeEvent fun(event: string)
-local CScope do
+---@field getplayerscope fun(source: number|integer): {[string]: boolean}?
+---@field triggerscopeevent fun(event: string, owner: number|integer, ...: any): {[string]: boolean}?
+---@field createsyncedscopeevent fun(event: string, owner: number|integer, time: integer?, ...: any)
+---@field removesyncedscopeevent fun(event: string)
+local scope do
   local check_type = require('shared.debug').checktype
   local tostring, table = tostring, table
   local client_event, create_thread, wait = TriggerClientEvent, CreateThread, Wait
@@ -17,29 +17,29 @@ local CScope do
   end
 
   ---@param source number|integer
-  ---@return table? Scope
-  local function getPlayerScope(source) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
-    local bool = check_type(source, 'string', getPlayerScope, 1)
+  ---@return {[string]: boolean}? Scope
+  local function get_player_scope(source) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
+    local bool = check_type(source, 'string', get_player_scope, 1)
     if bool then return end
     local src = not bool and tostring(source) or source
     return Scopes[src]
   end
 
   ---@param data table
-  local function onPlayerEnteredScope(data)
+  local function on_entered_scope(data)
     local player, owner = data['player'], data['for']
     Scopes[player] = Scopes[player] or {}
     Scopes[owner][player] = true
   end
 
   ---@param data table
-  local function onPlayerLeftScope(data)
+  local function on_exited_scope(data)
     local playerLeaving, player = data['player'], data['for']
     if not Scopes[player] then return end
     Scopes[player][playerLeaving] = nil
   end
 
-  local function onPlayerDropped()
+  local function on_dropped()
     local src = source
     if not src then return end
     Scopes[src] = nil
@@ -52,8 +52,8 @@ local CScope do
   ---@param owner number|integer
   ---@param ... any
   ---@return {[string]: boolean}? targets
-  local function triggerScopeEvent(event, owner, ...) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
-    local targets = getPlayerScope(owner)
+  local function trigger_scope_event(event, owner, ...) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
+    local targets = get_player_scope(owner)
     client_event(event, owner, ...)
     if not targets then return end
     for target, _ in pairs(targets) do client_event(event, target, ...) end
@@ -64,8 +64,8 @@ local CScope do
   ---@param owner number|integer
   ---@param time integer?
   ---@param ... any
-  local function createSyncedScopeEvent(event, owner, time, ...)
-    local targets = triggerScopeEvent(event, owner, ...)
+  local function create_synced_scope_event(event, owner, time, ...)
+    local targets = trigger_scope_event(event, owner, ...)
     Scopes.Synced = Scopes.Synced or {}
     Scopes.Synced[event] = targets
     local args = {...}
@@ -86,21 +86,21 @@ local CScope do
   end
 
   ---@param event string
-  local function removeSyncedScopeEvent(event)
+  local function remove_synced_scope_event(event)
     Scopes.Synced[event] = nil
   end
 
   -------------------------------- INTERNAL HANDLERS --------------------------------
   AddEventHandler('onResourceStop', clearScopes)
-  AddEventHandler('playerEnteredScope', onPlayerEnteredScope)
-  AddEventHandler('playerLeftScope', onPlayerLeftScope)
-  AddEventHandler('playerDropped', onPlayerDropped)
+  AddEventHandler('playerEnteredScope', on_entered_scope)
+  AddEventHandler('playerLeftScope', on_exited_scope)
+  AddEventHandler('playerDropped', on_dropped)
   -----------------------------------------------------------------------------------
   return {
     Scopes = Scopes,
-    GetPlayerScope = getPlayerScope,
-    TriggerScopeEvent = triggerScopeEvent,
-    CreateSyncedScopeEvent = createSyncedScopeEvent,
-    RemoveSyncedScopeEvent = removeSyncedScopeEvent
+    getplayerscope = get_player_scope,
+    triggerscopeevent = trigger_scope_event,
+    createsyncedscopeevent = create_synced_scope_event,
+    removesyncedscopeevent = remove_synced_scope_event
   }
 end
