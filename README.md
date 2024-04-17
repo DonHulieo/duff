@@ -111,7 +111,7 @@ Well, this is the solution for you! This is a collection of *optimised utility f
     - [Support](#support)
     - [Changelog](#changelog)
 
-<!-- [ ] Document Various Function Calls -->
+<!-- [x] Document Various Function Calls -->
 
 ## Credits
 
