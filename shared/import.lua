@@ -3,7 +3,7 @@
 ---@field _URL string
 ---@field _DESCRIPTION string
 ---@field require fun(path: string): {[string]: function}? @returns the loaded module
----@field array CArray
+---@field array array
 ---@field blips blips
 ---@field math math
 ---@field pools CPools

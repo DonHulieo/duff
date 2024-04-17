@@ -19,9 +19,9 @@ Well, this is the solution for you! This is a collection of *optimised utility f
   - [Documentation](#documentation)
     - [Require](#require)
     - [Importing the DUF Object](#importing-the-duf-object)
-    - [CArray](#carray)
-      - [Importing the CArray Module](#importing-the-carray-module)
-      - [Creating a CArray](#creating-a-carray)
+    - [array](#array)
+      - [Importing the array Module](#importing-the-array-module)
+      - [Creating a array](#creating-a-array)
       - [Internal Methods](#internal-methods)
       - [isarray](#isarray)
       - [push](#push)
@@ -115,13 +115,13 @@ local duf = exports.duf:require 'duf.shared.import'
 shared_script '@duf/shared/import.lua'
 ```
 
-### CArray
+### array
 
-CArray is a class for the creation and manipulation of consecutive integer indexed arrays. It provides a number of Functional Programming methods, and is designed to be used in a similar way to the Array class in JavaScript.
+array is a class for the creation and manipulation of consecutive integer indexed arrays. It provides a number of Functional Programming methods, and is designed to be used in a similar way to the Array class in JavaScript.
 
 *This is a shared module, and can be used on both the client, server and shared enviroment.*
 
-#### Importing the CArray Module
+#### Importing the array Module
 
 ```lua
 -- Using the `require` export
@@ -137,31 +137,31 @@ local array in duf
 local array = duf.array
 ```
 
-#### Creating a CArray
+#### Creating a array
 
 ```lua
 ---@param list any[]
----@return CArray
+---@return array
 local tbl = array.new(list)
 ```
 
 #### Internal Methods
 
 ```lua
----@param self CArray
+---@param self array
 ---@param pos integer
 ---@param value any
 function array.insert(self, pos, value)
 
----@param self CArray
+---@param self array
 ---@param pos integer?
 function array.remove(self, pos)
 
----@param self CArray
+---@param self array
 ---@param compare fun(a: any, b: any): boolean
 function array.sort(self, compare)
 
----@param self CArray
+---@param self array
 ---@param sep any?
 ---@param i integer?
 ---@param j integer?
@@ -179,7 +179,7 @@ function array.isarray(tbl)
 #### push
 
 ```lua
----@param self CArray
+---@param self array
 ---@param arg any
 ---@param ... any?
 function array.push(self, arg, ...)
@@ -188,16 +188,16 @@ function array.push(self, arg, ...)
 #### pusharray
 
 ```lua
----@param self CArray
+---@param self array
 ---@param list any[]
----@return CArray
+---@return array
 function array.pusharray(self, list)
 ```
 
 #### peek
   
 ```lua
----@param self CArray
+---@param self array
 ---@param index integer?
 ---@return any
 function array.peek(self, index)
@@ -206,7 +206,7 @@ function array.peek(self, index)
 #### peekarray
 
 ```lua
----@param self CArray
+---@param self array
 ---@param index integer?
 ---@return any[]
 function array.peekarray(self, index)
@@ -215,7 +215,7 @@ function array.peekarray(self, index)
 #### pop
 
 ```lua
----@param self CArray
+---@param self array
 ---@param index integer?
 ---@return any?, CAarray?
 function array.pop(self, index)
@@ -224,16 +224,16 @@ function array.pop(self, index)
 #### poparray
 
 ```lua
----@param self CArray
+---@param self array
 ---@param index integer?
----@return any[], CArray?
+---@return any[], array?
 function array.poparray(self, index)
 ```
 
 #### contains
 
 ```lua
----@param self CArray
+---@param self array
 ---@param key integer?
 ---@param value any?
 ---@return boolean?
@@ -243,15 +243,15 @@ function array.contains(self, key, value)
 #### copy
 
 ```lua
----@param self CArray
----@return CArray
+---@param self array
+---@return array
 function array.copy(self)
 ```
 
 #### foldleft
 
 ```lua
----@param self CArray
+---@param self array
 ---@param func fun(acc: any, val: any): any
 ---@param arg any?
 function array.foldleft(self, func, arg)
@@ -260,7 +260,7 @@ function array.foldleft(self, func, arg)
 #### foldright
 
 ```lua
----@param self CArray
+---@param self array
 ---@param func fun(acc: any, val: any): any
 ---@param arg any?
 function array.foldright(self, func, arg)
@@ -269,35 +269,35 @@ function array.foldright(self, func, arg)
 #### setenum
 
 ```lua
----@param self CArray
----@return CArray
+---@param self array
+---@return array
 function array.setenum(self)
 ```
 
 #### map
 
 ```lua
----@param self CArray
+---@param self array
 ---@param func fun(val: any): any
 ---@param inPlace boolean?
----@return CArray
+---@return array
 function array.map(self, func, inPlace)
 ```
 
 #### filter
 
 ```lua
----@param self CArray
+---@param self array
 ---@param func fun(val: any, i: integer): boolean
 ---@param inPlace boolean?
----@return CArray
+---@return array
 function array.filter(self, func, inPlace)
 ```
 
 #### foreach
 
 ```lua
----@param self CArray
+---@param self array
 ---@param func fun(val: any, i: integer)
 function array.foreach(self, func)
 ```
@@ -305,9 +305,9 @@ function array.foreach(self, func)
 #### reverse
 
 ```lua
----@param self CArray
+---@param self array
 ---@param length integer?
----@return CArray
+---@return array
 function array.reverse(self, length)
 ```
 
@@ -319,9 +319,11 @@ math is an object containing some useful math functions. Most notably, it contai
 
 ```lua
 -- Using the `require` export
+---@module 'duf.shared.math'
 local math = exports.duf:require 'duf.shared.math'
 
 -- Using the `require` export on the duf object
+---@module 'duf.shared.import'
 local duf = exports.duf:require 'duf.shared.import'
 -- Attaching the math object to a local variable (Lua 5.4+)
 local math in duf
@@ -391,9 +393,11 @@ function math.timer(time, limit)
 
 ```lua
 -- Using the `require` export
+---@module 'duf.shared.vector'
 local vector = exports.duf:require 'duf.shared.vector'
 
 -- Using the `require` export on the duf object
+---@module 'duf.shared.import'
 local duf = exports.duf:require 'duf.shared.import'
 -- Attaching the vector object to a local variable (Lua 5.4+)
 local vector in duf
@@ -493,9 +497,11 @@ function vector.GetOffsetFromEntityInWorldCoords(entity, offsetX, offsetY, offse
 
 ```lua
 -- Using the `require` export
+---@module 'duf.client.blips'
 local blips = exports.duf:require 'duf.client.blips'
 
 -- Using the `require` export on the duf object
+---@module 'duf.shared.import'
 local duf = exports.duf:require 'duf.shared.import'
 -- Attaching the blips object to a local variable (Lua 5.4+)
 local blips in duf
@@ -506,14 +512,14 @@ local blips = duf.blips
 #### getall
 
 ```lua
----@return CArray? blips
+---@return array? blips
 function blips.getall()
 ```
 
 #### onscreen
 
 ```lua
----@return CArray? blips
+---@return array? blips
 function blips.onscreen()
 ```
 
@@ -522,7 +528,7 @@ function blips.onscreen()
 ```lua
 ---@param coords vector3|vector3[]
 ---@param radius number?
----@return CArray? blips
+---@return array? blips
 function blips.bycoords(coords, radius)
 ```
 
@@ -530,7 +536,7 @@ function blips.bycoords(coords, radius)
 
 ```lua
 ---@param sprite integer
----@return CArray? blips
+---@return array? blips
 function blips.bysprite(sprite)
 ```
 

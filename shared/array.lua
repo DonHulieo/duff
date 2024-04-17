@@ -1,35 +1,35 @@
----@class CArray
+---@class array
 ---@field private __actions table
 ---@field private __type string
 ---@field new fun(self: any[]?): self|any? Creates a new array.
----@field insert fun(self: CArray, index: integer, value: any): CArray Inserts an element at the specified index.
----@field remove fun(self: CArray, index: integer): any? Removes and returns the element at the specified index.
----@field sort fun(self: CArray, fn: function): CArray Sorts the elements of the array.
----@field concat fun(self: CArray, sep: string): string Concatenates all elements of the array with an optional separator.
+---@field insert fun(self: array, index: integer, value: any): array Inserts an element at the specified index.
+---@field remove fun(self: array, index: integer): any? Removes and returns the element at the specified index.
+---@field sort fun(self: array, fn: function): array Sorts the elements of the array.
+---@field concat fun(self: array, sep: string): string Concatenates all elements of the array with an optional separator.
 ---@field isarray fun(tbl: table): boolean? Checks if a table is an array.
----@field push fun(self: CArray, arg: any?, ...: any?): CArray Adds one or more elements to the end of the array.
----@field pusharray fun(self: CArray, tbl: table): CArray Adds all elements from a table to the end of the array.
----@field peek fun(self: CArray, index: integer?): any Returns the element at the specified index without removing it.
----@field peekarray fun(self: CArray, index: integer?): CArray Returns a new array containing the elements from the specified index to the end of the array.
----@field pop fun(self: CArray, index: integer?): any, CArray Removes and returns the element at the specified index.
----@field poparray fun(self: CArray, index: integer?): CArray Removes and returns a new array containing the elements from the specified index to the end of the array.
----@field contains fun(self: CArray, key: integer?, value: any?): boolean? Checks if the array contains a specific element or key or key-value pair.
----@field find fun(self: CArray, fn: function): integer? Searches for the first element that satisfies a given condition and returns its index.
----@field copy fun(self: CArray): CArray Creates a shallow copy of the array.
----@field foldleft fun(self: CArray, fn: function, arg: any?): CArray Applies a function to each element from left to right, accumulating a result.
----@field foldright fun(self: CArray, fn: function, arg: any?): CArray Applies a function to each element from right to left, accumulating a result.
----@field setenum fun(self: CArray?): table Creates a read-only array that can be used for enumeration.
----@field map fun(self: CArray, fn: function, inPlace: boolean?): CArray Applies a function to each element and returns a new array with the results.
----@field filter fun(self: CArray, fn: function, inPlace: boolean?): CArray Returns a new array containing only the elements that satisfy a given condition.
----@field foreach fun(self: CArray, fn: function) Executes a function for each element across the array.
----@field reverse fun(self: CArray, length: integer?): CArray Reverses the order of elements.
-local CArray do
+---@field push fun(self: array, arg: any?, ...: any?): array Adds one or more elements to the end of the array.
+---@field pusharray fun(self: array, tbl: table): array Adds all elements from a table to the end of the array.
+---@field peek fun(self: array, index: integer?): any Returns the element at the specified index without removing it.
+---@field peekarray fun(self: array, index: integer?): array Returns a new array containing the elements from the specified index to the end of the array.
+---@field pop fun(self: array, index: integer?): any, array Removes and returns the element at the specified index.
+---@field poparray fun(self: array, index: integer?): array Removes and returns a new array containing the elements from the specified index to the end of the array.
+---@field contains fun(self: array, key: integer?, value: any?): boolean? Checks if the array contains a specific element or key or key-value pair.
+---@field find fun(self: array, fn: function): integer? Searches for the first element that satisfies a given condition and returns its index.
+---@field copy fun(self: array): array Creates a shallow copy of the array.
+---@field foldleft fun(self: array, fn: function, arg: any?): array Applies a function to each element from left to right, accumulating a result.
+---@field foldright fun(self: array, fn: function, arg: any?): array Applies a function to each element from right to left, accumulating a result.
+---@field setenum fun(self: array?): table Creates a read-only array that can be used for enumeration.
+---@field map fun(self: array, fn: function, inPlace: boolean?): array Applies a function to each element and returns a new array with the results.
+---@field filter fun(self: array, fn: function, inPlace: boolean?): array Returns a new array containing only the elements that satisfy a given condition.
+---@field foreach fun(self: array, fn: function) Executes a function for each element across the array.
+---@field reverse fun(self: array, length: integer?): array Reverses the order of elements.
+local array do
   local table = table
-  CArray = {__actions = {__index = CArray}, __type = 'array'}
-  CArray.insert = table.insert
-  CArray.remove = table.remove
-  CArray.sort = table.sort
-  CArray.concat = table.concat
+  array = {__actions = {__index = array}, __type = 'array'}
+  array.insert = table.insert
+  array.remove = table.remove
+  array.sort = table.sort
+  array.concat = table.concat
   local min = math.min
   ---@module 'shared.debug'
   local debug = require 'shared.debug'
@@ -44,26 +44,26 @@ local CArray do
   end
 
   ---@param self table
-  ---@return CArray
+  ---@return array
   local function new(self)
     self = self or {}
     if not is_table(self, new, 1) then return self end
-    for k, v in pairs(CArray) do self[k] = v end
-    setmetatable(self, {__index = CArray.__actions, __type = 'array'})
+    for k, v in pairs(array) do self[k] = v end
+    setmetatable(self, {__index = array.__actions, __type = 'array'})
     return self
   end
 
   ---@param tbl table
   ---@return boolean?
-  local function isArray(tbl)
-    if not is_table(tbl, isArray, 1) then return end
+  local function is_array(tbl)
+    if not is_table(tbl, is_array, 1) then return end
     return tbl.__type == 'array'
   end
 
-  ---@param self CArray
+  ---@param self array
   ---@param arg any?
   ---@param ... any?
-  ---@return CArray
+  ---@return array
   local function push(self, arg, ...)
     if not arg then return self end
     self[#self + 1] = arg
@@ -74,15 +74,15 @@ local CArray do
     return self
   end
 
-  ---@param self CArray
+  ---@param self array
   ---@param tbl table
-  ---@return CArray
-  local function pushArray(self, tbl)
+  ---@return array
+  local function push_array(self, tbl)
     for i = 1, #tbl do self[#self + 1] = tbl[i] end
     return self
   end
 
-  ---@param self CArray
+  ---@param self array
   ---@param index integer?
   ---@return any
   local function peek(self, index)
@@ -96,10 +96,10 @@ local CArray do
     return do_peek(index, 0)
   end
 
-  ---@param self CArray
+  ---@param self array
   ---@param index integer
   ---@return any[]
-  local function peekArray(self, index)
+  local function peek_array(self, index)
     index = index or 1
     local res = new{}
     local len = #self
@@ -107,28 +107,28 @@ local CArray do
     return res
   end
 
-  ---@param self CArray
+  ---@param self array
   ---@param index integer
-  ---@return any?, CArray?
+  ---@return any?, array?
   local function pop(self, index)
     index = index or 1
     if index <= 0 or index > #self then return end
     local value = self[index]
-    value = CArray.remove(self, index)
+    value = array.remove(self, index)
     return value and value, value and pop(self, index - 1)
   end
 
-  ---@param self CArray
+  ---@param self array
   ---@param index integer
   ---@return any[]
-  local function popArray(self, index)
+  local function pop_array(self, index)
     index = index or 1
     local res = new{}
-    for i = 1, min(index, #self) do res[i] = CArray.remove(self, i) end
+    for i = 1, min(index, #self) do res[i] = array.remove(self, i) end
     return res
   end
 
-  ---@param self CArray
+  ---@param self array
   ---@param key integer?
   ---@param value any?
   ---@return boolean?
@@ -143,7 +143,7 @@ local CArray do
     return key and (not value and self[key] or self[key] == value)
   end
 
-  ---@param self CArray
+  ---@param self array
   ---@param fn function
   ---@return integer?
   local function find(self, fn)
@@ -152,7 +152,7 @@ local CArray do
     end
   end
 
-  ---@param self CArray
+  ---@param self array
   ---@return any[]
   local function copy(self)
     local res = new{}
@@ -160,29 +160,29 @@ local CArray do
     return res
   end
 
-  ---@param self CArray
+  ---@param self array
   ---@param fn function
   ---@param arg any?
-  ---@return CArray
-  local function foldLeft(self, fn, arg)
+  ---@return array
+  local function fold_left(self, fn, arg)
     local res = self[1]
     res = arg and fn(res, arg) or res
     for i = 2, #self do res = fn(res, self[i]) end
     return res
   end
 
-  ---@param self CArray
+  ---@param self array
   ---@param fn function
   ---@param arg any?
-  ---@return CArray
-  local function foldRight(self, fn, arg)
+  ---@return array
+  local function fold_right(self, fn, arg)
     local res = self[#self]
     res = arg and fn(res, arg) or res
     for i = #self - 1, 1, -1 do res = fn(res, self[i]) end
     return res
   end
 
-  ---@param self CArray?
+  ---@param self array?
   ---@return table
   local function enum(self)
     local res = self or {}
@@ -190,25 +190,25 @@ local CArray do
     return res
   end
 
-  ---@param self CArray
+  ---@param self array
   ---@param fn function
   ---@param inPlace boolean?
-  ---@return CArray
+  ---@return array
   local function map(self, fn, inPlace)
     local res = inPlace and self or new{}
     for i = 1, #self do res[i] = fn(self[i]) end
     return res
   end
 
-  ---@param self CArray
+  ---@param self array
   ---@param fn function
   ---@param inPlace boolean?
-  ---@return CArray
+  ---@return array
   local function filter(self, fn, inPlace)
     if inPlace then
       local i = 1
       while i <= #self do
-        if not fn(self[i], i) then CArray.remove(self, i) else i += 1 end
+        if not fn(self[i], i) then array.remove(self, i) else i += 1 end
       end
       return self
     end
@@ -220,15 +220,15 @@ local CArray do
     return res
   end
 
-  ---@param self CArray
+  ---@param self array
   ---@param fn function
-  local function forEach(self, fn)
+  local function for_each(self, fn)
     for i = 1, #self do fn(self[i], i) end
   end
 
-  ---@param self CArray
+  ---@param self array
   ---@param length integer?
-  ---@return CArray
+  ---@return array
   local function reverse(self, length)
     if length and length <= 1 or #self <= 1 then return self end
     local i, j = 1, length and length or #self
@@ -240,24 +240,24 @@ local CArray do
     return self
   end
 
-  CArray.new = new
-  CArray.isarray = isArray
-  CArray.push = push
-  CArray.pusharray = pushArray
-  CArray.peek = peek
-  CArray.peekarray = peekArray
-  CArray.pop = pop
-  CArray.poparray = popArray
-  CArray.contains = contains
-  CArray.find = find
-  CArray.copy = copy
-  CArray.foldleft = foldLeft
-  CArray.foldright = foldRight
-  CArray.setenum = enum
-  CArray.map = map
-  CArray.filter = filter
-  CArray.foreach = forEach
-  CArray.reverse = reverse
+  array.new = new
+  array.isarray = is_array
+  array.push = push
+  array.pusharray = push_array
+  array.peek = peek
+  array.peekarray = peek_array
+  array.pop = pop
+  array.poparray = pop_array
+  array.contains = contains
+  array.find = find
+  array.copy = copy
+  array.foldleft = fold_left
+  array.foldright = fold_right
+  array.setenum = enum
+  array.map = map
+  array.filter = filter
+  array.foreach = for_each
+  array.reverse = reverse
 
-  return CArray
+  return setmetatable(array, {__index = array.__actions})
 end
