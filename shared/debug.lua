@@ -1,15 +1,15 @@
----@class CDebug
----@field getfuncchain fun(level: integer): string[]?
----@field getfunclevel fun(fn: function): integer?
----@field getfuncinfo fun(fn: function): {name: string, source: string, line: integer}?
----@field checktype fun(param: any, type_name: string|string[], fn: function, arg_no: integer?): boolean?, string?
-local CDebug do
-  local debug = debug
-  local get_info = debug.getinfo
+local _debug = debug
+---@class debug
+---@field getfuncchain fun(level: integer): string[]? Retrieves the function call chain at the specified level.
+---@field getfunclevel fun(fn: function): integer? Retrieves the level of the specified function in the call stack.
+---@field getfuncinfo fun(fn: function): {name: string, source: string, line: integer}? Retrieves information about the specified function.
+---@field checktype fun(param: any, type_name: string|string[], fn: function, arg_no: integer?): boolean?, string? Checks if the parameter matches the expected type(s).
+local debug do
+  local get_info = _debug.getinfo
   local type = type
 
-  ---@param level integer
-  ---@return string[]?
+  ---@param level integer  The level in the call stack.
+  ---@return string[]?  fn_chain The function call chain as a string array.
   local function get_fn_chain(level)
     local chain = {}
     local info = get_info(level + 1, 'n')
@@ -21,8 +21,8 @@ local CDebug do
     return chain
   end
 
-  ---@param fn function
-  ---@return integer?
+  ---@param fn function  The function to find the level for.
+  ---@return integer?  level The level of the function in the call stack, or nil if not found.
   local function get_fn_level(fn)
     local level = 1
     local info = get_info(level, 'f')
@@ -35,8 +35,8 @@ local CDebug do
     end
   end
 
-  ---@param fn function
-  ---@return {name: string, source: string, line: integer}?
+  ---@param fn function The Lua function to retrieve information for.
+  ---@return {name: string, source: string, line: integer}? info A table containing the name, source, and line number of the function, or nil if the information could not be retrieved.
   local function get_fn_info(fn)
     local level = get_fn_level(fn)
     if level then
@@ -49,11 +49,11 @@ local CDebug do
     end
   end
 
-  ---@param param any
-  ---@param type_name string|string[]
-  ---@param fn function
-  ---@param arg_no integer|string?
-  ---@return boolean?, string?
+  ---@param param any The parameter to check the type of.
+  ---@param type_name string|string[] The expected type(s) of the parameter.
+  ---@param fn function The function where the parameter is being checked.
+  ---@param arg_no integer|string|nil The argument number or name being checked.
+  ---@return boolean? type_valid, string param_type Returns true if the parameter type matches the expected type, or false if it does not. Also returns the actual type of the parameter.
   local function check_type(param, type_name, fn, arg_no)
     local param_type = type(param)
     type_name = type(type_name) == 'table' and type_name or {type_name} --[=[@cast type_name string[] ]=]

@@ -39,6 +39,12 @@ Well, this is the solution for you! This is a collection of *optimised utility f
       - [filter](#filter)
       - [foreach](#foreach)
       - [reverse](#reverse)
+    - [debug](#debug)
+      - [Importing the debug Module](#importing-the-debug-module)
+      - [getfuncchain](#getfuncchain)
+      - [getfunclevel](#getfunclevel)
+      - [getfuncinfo](#getfuncinfo)
+      - [checktype](#checktype)
     - [math](#math)
       - [Importing the math Module](#importing-the-math-module)
       - [between](#between)
@@ -309,6 +315,69 @@ function array.foreach(self, func)
 ---@param length integer?
 ---@return array
 function array.reverse(self, length)
+```
+
+### debug
+
+debug is a class mainly used internally to ensure error handling and debugging is done correctly. It provides a number of methods to help with this.
+
+#### Importing the debug Module
+
+```lua
+-- Using the `require` export
+---@module 'duf.shared.debug'
+local debug = exports.duf:require 'duf.shared.debug'
+
+-- Using the `require` export on the duf object
+---@module 'duf.shared.import'
+local duf = exports.duf:require 'duf.shared.import'
+-- Attaching the debug object to a local variable (Lua 5.4+)
+local debug in duf
+-- Attaching the debug object to a local variable
+local debug = duf.debug
+```
+
+#### getfuncchain
+
+Retrieves the function call chain at the specified level.
+
+```lua
+---@param level integer @The level of the stack to get the function chain from.
+---@return string[]? func_chain @The function chain as a string array.
+function debug.getfuncchain(level)
+```
+
+#### getfunclevel
+
+Retrieves the level of the specified function in the call stack.
+
+```lua
+---@param func fn @The function to get the level of.
+---@return integer? level @The level of the function in the call stack, or nil if the function was not found.
+function debug.getfunclevel(func)
+```
+
+#### getfuncinfo
+
+Retrieves information about the specified function.
+
+```lua
+---@param func fn @The function to get information about.
+---@return {name: string, source: string, line: integer}? info @A table containing the name, source, and line number of the function, or nil if the information could not be retrieved.function.
+function debug.getfuncinfo(func)
+```
+
+#### checktype
+
+Checks if the parameter matches the expected type(s).
+
+```lua
+---@param param any @The parameter to check the type of.
+---@param type_name string|string[] @The expected type(s) of the parameter.
+---@param fn function @The function where the parameter is being checked.
+---@param arg_no integer|string? @The argument number or name being checked.
+---@return boolean? type_valid, string param_type @Returns true if the parameter type matches the expected type, or false if it does not. Also returns the actual type of the parameter.
+local function check_type(param, type_name, fn, arg_no)
 ```
 
 ### math
