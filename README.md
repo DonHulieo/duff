@@ -45,6 +45,12 @@ Well, this is the solution for you! This is a collection of *optimised utility f
       - [getfunclevel](#getfunclevel)
       - [getfuncinfo](#getfuncinfo)
       - [checktype](#checktype)
+    - [locale](#locale)
+      - [Importing the locale Module](#importing-the-locale-module)
+      - [set](#set)
+      - [load](#load)
+      - [loadfile](#loadfile)
+      - [translate](#translate)
     - [math](#math)
       - [Importing the math Module](#importing-the-math-module)
       - [between](#between)
@@ -90,6 +96,7 @@ Well, this is the solution for you! This is a collection of *optimised utility f
 - [draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297)
 - [DurtyFrees' Data Dumps](https://github.com/DurtyFree/gta-v-data-dumps)
 - [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
+- [kikito](https://github.com/kikito/i18n.lua/tree/master)
 
 ## Installation
 
@@ -354,22 +361,16 @@ function array.reverse(self, length)
 
 ### debug
 
-debug is a class mainly used internally to ensure error handling and debugging is done correctly. It provides a number of methods to help with this.
+debug is an internal class mainly used to ensure error handling and debugging is done correctly. It provides a number of methods to help with this.
 
 #### Importing the debug Module
+
+The module can __only__ be imported using the `require` export.
 
 ```lua
 -- Using the `require` export
 ---@module 'duff.shared.debug'
 local debug = exports.duff:require 'duff.shared.debug'
-
--- Using the `require` export on the duff object
----@module 'duff.shared.import'
-local duff = exports.duff:require 'duff.shared.import'
--- Attaching the debug object to a local variable (Lua 5.4+)
-local debug in duff
--- Attaching the debug object to a local variable
-local debug = duff.debug
 ```
 
 #### getfuncchain
@@ -413,6 +414,73 @@ Checks if the parameter matches the expected type(s).
 ---@param arg_no integer|string? @The argument number or name being checked.
 ---@return boolean? type_valid, string param_type @Returns true if the parameter type matches the expected type, or false if it does not. Also returns the actual type of the parameter.
 local function check_type(param, type_name, fn, arg_no)
+```
+
+### locale
+
+locale is an object containing functions for localisation and translation. It's inspired by the i18n.lua library by kikito, and provides a simple way to manage translations in your FiveM scripts.
+
+*This is a shared module, and can be used on both the client, server and shared enviroment.*
+
+#### Importing the locale Module
+
+The module automatically uses the servers' convars to determine locale , both dialect and region. If the convars (`sets locale`) are not set, it defaults to `en`.
+
+```lua
+-- Using the `require` export
+---@module 'duff.shared.locale'
+local locale = exports.duff:require 'duff.shared.locale'
+
+-- Using the `require` export on the duff object
+---@module 'duff.shared.import'
+local duff = exports.duff:require 'duff.shared.import'
+-- Attaching the locale object to a local variable (Lua 5.4+)
+local locale in duff
+-- Attaching the locale object to a local variable
+local locale = duff.locale
+```
+
+#### set
+
+Sets a translation key to a value.
+
+```lua
+---@param key string @A dot-separated key to set the translation value for.
+---@param value string @The value to set the translation key to.
+function locale.set(key, value)
+```
+
+#### load
+
+Loads a translation table from a table.
+
+```lua
+---@param context string? @The context to load the translations into.
+---@param data {[string]: {[string]: string}|string} @A table containing translation keys and values.
+function locale.load(context, data)
+```
+
+#### loadfile
+
+Loads a translation table from a file.
+
+```lua
+---@param resource string? @The resource name to load the translation file from.
+---@param file string? @The file path to load the translation file from.
+function locale.loadfile(resource, file)
+```
+
+#### translate
+
+*This function has a wrapper function called `t`.*
+
+Translates a key to a value. This function also supports placeholders, which can be replaced by providing a table of data.
+
+```lua
+---@param key string @The key to translate.
+---@param data {[string]: string}? @A table containing data to replace placeholders in the translation.
+---@return string? translation @The translated value, or nil if the key was not found.
+function locale.translate(key, data)
 ```
 
 ### math

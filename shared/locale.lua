@@ -1,9 +1,9 @@
 ---@class locale
----@field set fun(key: string, value: string)
----@field load fun(context: string?, data: table)
----@field loadfile fun(resource: string?, file: string?)
----@field translate fun(key: string, data: table): string
----@field t fun(key: string, data: table): string
+---@field set fun(key: string, value: string) Sets a translation key to a value.
+---@field load fun(context: string?, data: table) Loads a table of translations.
+---@field loadfile fun(resource: string?, file: string?) Loads a file of translations.
+---@field translate fun(key: string, data: table?): string Translates a key with optional data.
+---@field t fun(key: string, data: table): string Translates a key with optional data.
 local locale do
   local require = require
   local check_type = require('shared.debug').checktype
@@ -138,8 +138,8 @@ local locale do
     return pcall(load, load_resource_file(res, file..'.lua'))
   end
 
-  ---@param key string
-  ---@param value string
+  ---@param key string A dot-separated key.
+  ---@param value string A phrase to set.
   local function set(key, value)
     assert_string(set, key, 'key')
     assert_string(set, value, 'value')
@@ -173,8 +173,8 @@ local locale do
     recursive_load(context, data)
   end
 
-  ---@param resource string?
-  ---@param file string?
+  ---@param resource string? The resource name.
+  ---@param file string? The file path.
   local function load_file(resource, file)
     resource = resource or GetInvokingResource()
     file = not file and 'locales/'..dialect or file --[[@as string]]
