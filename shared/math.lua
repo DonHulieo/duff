@@ -68,5 +68,34 @@ local math do
     return current - time > limit
   end
 
-  return {between = between, clamp = clamp, round = round, seedrng = seed_rng, random = random, timer = timer}
+  return {
+    abs = _math.abs,
+    acos = _math.acos,
+    asin = _math.asin,
+    atan = _math.atan,
+    ceil = _math.ceil,
+    cos = _math.cos,
+    deg = _math.deg,
+    exp = _math.exp,
+    floor = _math.floor,
+    fmod = _math.fmod,
+    huge = _math.huge,
+    log = _math.log,
+    max = _math.max,
+    min = _math.min,
+    modf = _math.modf,
+    pi = _math.pi,
+    rad = _math.rad,
+    sin = _math.sin,
+    sqrt = _math.sqrt,
+    tan = _math.tan,
+    _random = math_random,
+    randomseed = random_seed,
+    between = between,
+    clamp = clamp,
+    round = round,
+    seedrng = seed_rng,
+    random = random,
+    timer = timer
+  }
 end

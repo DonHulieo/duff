@@ -125,9 +125,11 @@ CArray is a class for the creation and manipulation of consecutive integer index
 
 ```lua
 -- Using the `require` export
+---@module 'duf.shared.array'
 local array = exports.duf:require 'duf.shared.array'
 
 -- Using the `require` export on the duf object
+---@module 'duf.shared.import'
 local duf = exports.duf:require 'duf.shared.import'
 -- Attaching the array object to a local variable (Lua 5.4+)
 local array in duf

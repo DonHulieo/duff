@@ -4,8 +4,8 @@
 ---@field _DESCRIPTION string
 ---@field require fun(path: string): {[string]: function}? @returns the loaded module
 ---@field array CArray
----@field blips CBlips
----@field math CMath
+---@field blips blips
+---@field math math
 ---@field pools CPools
 ---@field streaming CStreaming
 ---@field scope CScope
