@@ -12,7 +12,7 @@ local blips do
   local array = require 'shared.array'
   local check_type = require('shared.debug').checktype
   local does_blip_exist = DoesBlipExist
-  local get_closest = require('shared.vector').GetClosest
+  local get_closest = require('shared.vector').getclosest
 
   ---@return array blips An array of all currently active blip handles
   local function get_all() -- Credits go to: [negbook](https://github.com/negbook/nbk_blips)
