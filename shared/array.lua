@@ -1,24 +1,24 @@
 ---@class array
 ---@field private __actions table
----@field private __type string
----@field new fun(self: any[]?): self|any? Creates a new array.
+---@field __type string
+---@field new fun(self: any[]?): array Creates a new array.
 ---@field insert fun(self: array, index: integer, value: any): array Inserts an element at the specified index.
 ---@field remove fun(self: array, index: integer): any? Removes and returns the element at the specified index.
 ---@field sort fun(self: array, fn: function): array Sorts the elements of the array.
 ---@field concat fun(self: array, sep: string): string Concatenates all elements of the array with an optional separator.
----@field isarray fun(tbl: table): boolean? Checks if a table is an array.
+---@field isarray fun(tbl: any[]): boolean? Checks if a table is an array.
 ---@field push fun(self: array, arg: any?, ...: any?): array Adds one or more elements to the end of the array.
----@field pusharray fun(self: array, tbl: table): array Adds all elements from a table to the end of the array.
+---@field pusharray fun(self: array, tbl: any[]): array Adds all elements from a table to the end of the array.
 ---@field peek fun(self: array, index: integer?): any Returns the element at the specified index without removing it.
 ---@field peekarray fun(self: array, index: integer?): array Returns a new array containing the elements from the specified index to the end of the array.
----@field pop fun(self: array, index: integer?): any, array Removes and returns the element at the specified index.
+---@field pop fun(self: array, index: integer?): any?, array? Removes and returns the element at the specified index.
 ---@field poparray fun(self: array, index: integer?): array Removes and returns a new array containing the elements from the specified index to the end of the array.
 ---@field contains fun(self: array, key: integer?, value: any?): boolean? Checks if the array contains a specific element or key or key-value pair.
 ---@field find fun(self: array, fn: function): integer? Searches for the first element that satisfies a given condition and returns its index.
 ---@field copy fun(self: array): array Creates a shallow copy of the array.
 ---@field foldleft fun(self: array, fn: function, arg: any?): array Applies a function to each element from left to right, accumulating a result.
 ---@field foldright fun(self: array, fn: function, arg: any?): array Applies a function to each element from right to left, accumulating a result.
----@field setenum fun(self: array?): table Creates a read-only array that can be used for enumeration.
+---@field setenum fun(self: array?): enum: array Creates a read-only array that can be used for enumeration.
 ---@field map fun(self: array, fn: function, inPlace: boolean?): array Applies a function to each element and returns a new array with the results.
 ---@field filter fun(self: array, fn: function, inPlace: boolean?): array Returns a new array containing only the elements that satisfy a given condition.
 ---@field foreach fun(self: array, fn: function) Executes a function for each element across the array.
@@ -43,7 +43,7 @@ local array do
     return check_type(tbl, 'table', fn, arg_no)
   end
 
-  ---@param self table
+  ---@param self any[]?
   ---@return array
   local function new(self)
     self = self or {}
@@ -53,7 +53,7 @@ local array do
     return self
   end
 
-  ---@param tbl table
+  ---@param tbl any[]|array
   ---@return boolean?
   local function is_array(tbl)
     if not is_table(tbl, is_array, 1) then return end
@@ -75,7 +75,7 @@ local array do
   end
 
   ---@param self array
-  ---@param tbl table
+  ---@param tbl any[]
   ---@return array
   local function push_array(self, tbl)
     for i = 1, #tbl do self[#self + 1] = tbl[i] end
@@ -97,7 +97,7 @@ local array do
   end
 
   ---@param self array
-  ---@param index integer
+  ---@param index integer?
   ---@return any[]
   local function peek_array(self, index)
     index = index or 1
@@ -108,7 +108,7 @@ local array do
   end
 
   ---@param self array
-  ---@param index integer
+  ---@param index integer?
   ---@return any?, array?
   local function pop(self, index)
     index = index or 1
@@ -119,8 +119,8 @@ local array do
   end
 
   ---@param self array
-  ---@param index integer
-  ---@return any[]
+  ---@param index integer?
+  ---@return array
   local function pop_array(self, index)
     index = index or 1
     local res = new{}
@@ -153,7 +153,7 @@ local array do
   end
 
   ---@param self array
-  ---@return any[]
+  ---@return array
   local function copy(self)
     local res = new{}
     for i = 1, #self do res[i] = self[i] end
@@ -183,7 +183,7 @@ local array do
   end
 
   ---@param self array?
-  ---@return table
+  ---@return array enum
   local function enum(self)
     local res = self or {}
     setmetatable(res, {__newindex = function() error('attempt to modify a read-only table') end})

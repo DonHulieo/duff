@@ -18,10 +18,10 @@ Well, this is the solution for you! This is a collection of *optimised utility f
   - [Installation](#installation)
   - [Documentation](#documentation)
     - [Require](#require)
-    - [Importing the DUF Object](#importing-the-duf-object)
+    - [Importing the duff Object](#importing-the-duff-object)
     - [array](#array)
       - [Importing the array Module](#importing-the-array-module)
-      - [Creating a array](#creating-a-array)
+      - [Creating an array](#creating-an-array)
       - [Internal Methods](#internal-methods)
       - [isarray](#isarray)
       - [push](#push)
@@ -107,18 +107,18 @@ Require is a function that allows you to import modules, emulating Lua Default r
 ```lua
 ---@param path string @The name of the module to require. This can be a path, or a module name. If a path is provided, it must be relative to the resource root.
 ---@return {[string]: any} module
-exports.duf:require(path)
+exports.duff:require(path)
 ```
 
-### Importing the DUF Object
+### Importing the duff Object
 
 ```lua
 -- Using the `require` export
----@module 'duf.shared.import'
-local duf = exports.duf:require 'duf.shared.import'
+---@module 'duff.shared.import'
+local duff = exports.duff:require 'duff.shared.import'
 
--- Using '@duf/shared/import.lua' in your `fxmanifest.lua`
-shared_script '@duf/shared/import.lua'
+-- Using '@duff/shared/import.lua' in your `fxmanifest.lua`
+shared_script '@duff/shared/import.lua'
 ```
 
 ### array
@@ -131,19 +131,21 @@ array is a class for the creation and manipulation of consecutive integer indexe
 
 ```lua
 -- Using the `require` export
----@module 'duf.shared.array'
-local array = exports.duf:require 'duf.shared.array'
+---@module 'duff.shared.array'
+local array = exports.duff:require 'duff.shared.array'
 
--- Using the `require` export on the duf object
----@module 'duf.shared.import'
-local duf = exports.duf:require 'duf.shared.import'
+-- Using the `require` export on the duff object
+---@module 'duff.shared.import'
+local duff = exports.duff:require 'duff.shared.import'
 -- Attaching the array object to a local variable (Lua 5.4+)
-local array in duf
+local array in duff
 -- Attaching the array object to a local variable
-local array = duf.array
+local array = duff.array
 ```
 
-#### Creating a array
+#### Creating an array
+
+Creates a new array.
 
 ```lua
 ---@param list any[]
@@ -176,22 +178,29 @@ function array.concat(self, sep, i, j)
 
 #### isarray
 
+Checks if a table is an array.
+
 ```lua
----@param tbl table
----@return boolean
+---@param tbl any[]|array
+---@return boolean?
 function array.isarray(tbl)
 ```
 
 #### push
 
+Adds one or more elements to the end of the array.
+
 ```lua
 ---@param self array
----@param arg any
+---@param arg any?
 ---@param ... any?
+---@return array
 function array.push(self, arg, ...)
 ```
 
 #### pusharray
+
+Adds all elements from a table to the end of the array.
 
 ```lua
 ---@param self array
@@ -202,6 +211,8 @@ function array.pusharray(self, list)
 
 #### peek
   
+Returns the element at the specified index without removing it.
+
 ```lua
 ---@param self array
 ---@param index integer?
@@ -210,6 +221,8 @@ function array.peek(self, index)
 ```
 
 #### peekarray
+
+Returns a new array containing the elements from the specified index to the end of the array.
 
 ```lua
 ---@param self array
@@ -220,23 +233,29 @@ function array.peekarray(self, index)
 
 #### pop
 
+Removes and returns the element at the specified index.
+
 ```lua
 ---@param self array
 ---@param index integer?
----@return any?, CAarray?
+---@return any?, array?
 function array.pop(self, index)
 ```
 
 #### poparray
 
+Removes and returns a new array containing the elements from the specified index to the end of the array.
+
 ```lua
 ---@param self array
 ---@param index integer?
----@return any[], array?
+---@return array
 function array.poparray(self, index)
 ```
 
 #### contains
+
+Checks if the array contains a specific element or key or key-value pair.
 
 ```lua
 ---@param self array
@@ -248,6 +267,8 @@ function array.contains(self, key, value)
 
 #### copy
 
+Creates a shallow copy of the array.
+
 ```lua
 ---@param self array
 ---@return array
@@ -255,6 +276,8 @@ function array.copy(self)
 ```
 
 #### foldleft
+
+Applies a function to each element from left to right, accumulating a result.
 
 ```lua
 ---@param self array
@@ -265,6 +288,8 @@ function array.foldleft(self, func, arg)
 
 #### foldright
 
+Applies a function to each element from right to left, accumulating a result.
+
 ```lua
 ---@param self array
 ---@param func fun(acc: any, val: any): any
@@ -274,13 +299,17 @@ function array.foldright(self, func, arg)
 
 #### setenum
 
+Creates a read-only array that can be used for enumeration.
+
 ```lua
 ---@param self array
----@return array
+---@return array enum
 function array.setenum(self)
 ```
 
 #### map
+
+Applies a function to each element and returns a new array with the results.
 
 ```lua
 ---@param self array
@@ -292,6 +321,8 @@ function array.map(self, func, inPlace)
 
 #### filter
 
+Returns a new array containing only the elements that satisfy a given condition.
+
 ```lua
 ---@param self array
 ---@param func fun(val: any, i: integer): boolean
@@ -302,6 +333,8 @@ function array.filter(self, func, inPlace)
 
 #### foreach
 
+Executes a function for each element across the array.
+
 ```lua
 ---@param self array
 ---@param func fun(val: any, i: integer)
@@ -309,6 +342,8 @@ function array.foreach(self, func)
 ```
 
 #### reverse
+
+Reverses the order of elements.
 
 ```lua
 ---@param self array
@@ -325,16 +360,16 @@ debug is a class mainly used internally to ensure error handling and debugging i
 
 ```lua
 -- Using the `require` export
----@module 'duf.shared.debug'
-local debug = exports.duf:require 'duf.shared.debug'
+---@module 'duff.shared.debug'
+local debug = exports.duff:require 'duff.shared.debug'
 
--- Using the `require` export on the duf object
----@module 'duf.shared.import'
-local duf = exports.duf:require 'duf.shared.import'
+-- Using the `require` export on the duff object
+---@module 'duff.shared.import'
+local duff = exports.duff:require 'duff.shared.import'
 -- Attaching the debug object to a local variable (Lua 5.4+)
-local debug in duf
+local debug in duff
 -- Attaching the debug object to a local variable
-local debug = duf.debug
+local debug = duff.debug
 ```
 
 #### getfuncchain
@@ -388,16 +423,16 @@ math is an object containing some useful math functions. Most notably, it contai
 
 ```lua
 -- Using the `require` export
----@module 'duf.shared.math'
-local math = exports.duf:require 'duf.shared.math'
+---@module 'duff.shared.math'
+local math = exports.duff:require 'duff.shared.math'
 
--- Using the `require` export on the duf object
----@module 'duf.shared.import'
-local duf = exports.duf:require 'duf.shared.import'
+-- Using the `require` export on the duff object
+---@module 'duff.shared.import'
+local duff = exports.duff:require 'duff.shared.import'
 -- Attaching the math object to a local variable (Lua 5.4+)
-local math in duf
+local math in duff
 -- Attaching the math object to a local variable
-local math = duf.math
+local math = duff.math
 ```
 
 #### between
@@ -462,16 +497,16 @@ function math.timer(time, limit)
 
 ```lua
 -- Using the `require` export
----@module 'duf.shared.vector'
-local vector = exports.duf:require 'duf.shared.vector'
+---@module 'duff.shared.vector'
+local vector = exports.duff:require 'duff.shared.vector'
 
--- Using the `require` export on the duf object
----@module 'duf.shared.import'
-local duf = exports.duf:require 'duf.shared.import'
+-- Using the `require` export on the duff object
+---@module 'duff.shared.import'
+local duff = exports.duff:require 'duff.shared.import'
 -- Attaching the vector object to a local variable (Lua 5.4+)
-local vector in duf
+local vector in duff
 -- Attaching the vector object to a local variable
-local vector = duf.vector
+local vector = duff.vector
 ```
 
 #### Shared Functions
@@ -566,16 +601,16 @@ function vector.GetOffsetFromEntityInWorldCoords(entity, offsetX, offsetY, offse
 
 ```lua
 -- Using the `require` export
----@module 'duf.client.blips'
-local blips = exports.duf:require 'duf.client.blips'
+---@module 'duff.client.blips'
+local blips = exports.duff:require 'duff.client.blips'
 
--- Using the `require` export on the duf object
----@module 'duf.shared.import'
-local duf = exports.duf:require 'duf.shared.import'
+-- Using the `require` export on the duff object
+---@module 'duff.shared.import'
+local duff = exports.duff:require 'duff.shared.import'
 -- Attaching the blips object to a local variable (Lua 5.4+)
-local blips in duf
+local blips in duff
 -- Attaching the blips object to a local variable
-local blips = duf.blips
+local blips = duff.blips
 ```
 
 #### getall

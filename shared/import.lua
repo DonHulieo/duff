@@ -1,4 +1,4 @@
----@class duf
+---@class duff
 ---@field _VERSION string
 ---@field _URL string
 ---@field _DESCRIPTION string
@@ -10,7 +10,7 @@
 ---@field streaming CStreaming
 ---@field scope CScope
 ---@field vector CVector
-local duf do
+local duff do
   local is_server = IsDuplicityVersion() == 1
   local require = require
   local array, math, vector = require 'shared.array', require 'shared.math', require 'shared.vector'
