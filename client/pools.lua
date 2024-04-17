@@ -16,24 +16,24 @@ local CPools do
   local get_closest = require('shared.vector').GetClosest
 
   ---@param ped_type integer?
-  ---@return integer[]
+  ---@return array
   local function getPeds(ped_type)
     return array.new(get_pool('CPed')):filter(function(ped) return not ped_type or GetPedType(ped) == ped_type end, true)
   end
 
   ---@param vehicle_type integer?
-  ---@return integer[]
+  ---@return array
   local function getVehicles(vehicle_type)
     return array.new(get_pool('CVehicle')):filter(function(vehicle) return not vehicle_type or GetVehicleClass(vehicle) == vehicle_type end, true)
   end
 
-  ---@return integer[]
+  ---@return array
   local function getObjects()
     return array.new(get_pool('CObject'))
   end
 
   ---@param hash string|number?
-  ---@return integer[]
+  ---@return array
   local function getPickups(hash)
     hash = type(hash) == 'string' and joaat(hash) or hash
     return array.new(get_pool('CPickup')):filter(function(pickup) return not hash or GetPickupHash(pickup) == hash end, true)

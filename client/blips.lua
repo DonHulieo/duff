@@ -14,7 +14,7 @@ local blips do
   local does_blip_exist = DoesBlipExist
   local get_closest = require('shared.vector').GetClosest
 
-  ---@return CArray blips An array of all currently active blip handles
+  ---@return array blips An array of all currently active blip handles
   local function get_all() -- Credits go to: [negbook](https://github.com/negbook/nbk_blips)
     local blips_ids = array.new{}
     for i = 0, 883 do -- 884 is the max number of default blips b3095, if you have custom blips you need to increase this number
@@ -30,14 +30,14 @@ local blips do
     return blips_ids
   end
 
-  ---@return CArray blips An array of all currently active blip handles that are on the minimap
+  ---@return array blips An array of all currently active blip handles that are on the minimap
   local function on_screen()
     return get_all():filter(IsBlipOnMinimap, true)
   end
 
   ---@param coords vector3|vector3[]
   ---@param radius number?
-  ---@return CArray? blips An array of all currently active blip handles that are within the specified coordinates
+  ---@return array? blips An array of all currently active blip handles that are within the specified coordinates
   local function by_coords(coords, radius)
     local bool, param_type = check_type(coords, {'vector3', 'table'}, by_coords, 1)
     if not bool then return end
@@ -54,7 +54,7 @@ local blips do
   end
 
   ---@param sprite integer
-  ---@return CArray? blips An array of all currently active blip handles that have the specified sprite
+  ---@return array? blips An array of all currently active blip handles that have the specified sprite
   local function by_sprite(sprite)
     if check_type(sprite, 'number', by_sprite, 1) then return end
     return get_all():filter(function(blip) return GetBlipSprite(blip) == sprite end, true)
@@ -63,7 +63,7 @@ local blips do
   ---@enum (key) id_types
   local id_types = array.new{true, true, true, true, true, true, true}:setenum()
   ---@param id_type integer {1, 2, 3, 4, 5, 6, 7}
-  ---@return CArray? blips An array of all currently active blip handles that have the specified type
+  ---@return array? blips An array of all currently active blip handles that have the specified type
   local function by_type(id_type)
     if not check_type(id_type, 'number', by_type, 1) or not id_types[id_type] then return end
     return get_all():filter(function(blip) return GetBlipInfoIdType(blip) == id_type end, true)
