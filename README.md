@@ -86,6 +86,14 @@ Well, this is the solution for you! This is a collection of *optimised utility f
       - [getclosestvehicle](#getclosestvehicle)
       - [getclosestobject](#getclosestobject)
       - [getclosestpickup](#getclosestpickup)
+    - [streaming](#streaming)
+      - [Importing the streaming Module](#importing-the-streaming-module)
+      - [loadanimdict](#loadanimdict)
+      - [loadanimset](#loadanimset)
+      - [loadcollision](#loadcollision)
+      - [loadipl](#loadipl)
+      - [loadmodel](#loadmodel)
+      - [loadptfx](#loadptfx)
     - [Support](#support)
     - [Changelog](#changelog)
 
@@ -807,6 +815,80 @@ function pools.getclosestobject(coords, radius, ignore)
 ---@param ignore integer[]?
 ---@return integer? pickup, number? distance, array? pickups
 function pools.getclosestpickup(coords, hash, radius, ignore)
+```
+
+### streaming
+
+*This is a client module.*
+
+#### Importing the streaming Module
+
+```lua
+-- Using the `require` export
+---@module 'duff.client.streaming'
+local streaming = exports.duff:require 'duff.client.streaming'
+
+-- Using the `require` export on the duff object
+---@module 'duff.shared.import'
+local duff = exports.duff:require 'duff.shared.import'
+-- Attaching the streaming object to a local variable (Lua 5.4+)
+local streaming in duff
+-- Attaching the streaming object to a local variable
+local streaming = duff.streaming
+```
+
+#### loadanimdict
+  
+```lua
+---@param dict string
+---@param isAsync boolean?
+---@return boolean?
+function streaming.loadanimdict(dict, isAsync)
+```
+
+#### loadanimset
+
+```lua
+---@param set string
+---@param isAsync boolean?
+---@return boolean?
+function streaming.loadanimset(set, isAsync)
+```
+
+#### loadcollision
+
+```lua
+---@param model string|number
+---@param isAsync boolean?
+---@return boolean?
+function streaming.loadcollision(model, isAsync)
+```
+
+#### loadipl
+
+```lua
+---@param ipl string
+---@param isAsync boolean?
+---@return boolean?
+function streaming.loadipl(ipl, isAsync)
+```
+
+#### loadmodel
+
+```lua
+---@param model string|number
+---@param isAsync boolean?
+---@return boolean?
+function streaming.loadmodel(model, isAsync)
+```
+
+#### loadptfx
+
+```lua
+---@param fx string
+---@param isAsync boolean?
+---@return boolean?
+function streaming.loadptfx(fx, isAsync)
 ```
 
 ### Support

@@ -1,11 +1,11 @@
----@class CStreaming
----@field LoadAnimDict fun(dict: string, isAsync: boolean?): boolean?
----@field LoadAnimSet fun(set: string, isAsync: boolean?): boolean?
----@field LoadCollision fun(model: string|number, isAsync: boolean?): boolean?
----@field LoadIpl fun(ipl: string, isAsync: boolean?): boolean?
----@field LoadModel fun(model: string|number, isAsync: boolean?): boolean?
----@field LoadPtfx fun(fx: string, isAsync: boolean?): boolean?
-local CStreaming do
+---@class streaming
+---@field loadanimdict fun(dict: string, isAsync: boolean?): boolean?
+---@field loadanimset fun(set: string, isAsync: boolean?): boolean?
+---@field loadcollision fun(model: string|number, isAsync: boolean?): boolean?
+---@field loadipl fun(ipl: string, isAsync: boolean?): boolean?
+---@field loadmodel fun(model: string|number, isAsync: boolean?): boolean?
+---@field loadptfx fun(fx: string, isAsync: boolean?): boolean?
+local streaming do
   local require = require
   local timer = require('shared.math').timer
   local type, error, tostring = type, error, tostring
@@ -44,23 +44,23 @@ local CStreaming do
   ---@param dict string
   ---@param isAsync boolean?
   ---@return boolean?
-  local function reqAnimDict(dict, isAsync)
-    if not dict or not check_type(dict, 'string', reqAnimDict, 1) or not DoesAnimDictExist(dict) then return end
+  local function req_anim_dict(dict, isAsync)
+    if not dict or not check_type(dict, 'string', req_anim_dict, 1) or not DoesAnimDictExist(dict) then return end
     return not isAsync and load_asset(dict, HasAnimDictLoaded, RequestAnimDict) or async_call(load_asset, dict, HasAnimDictLoaded, RequestAnimDict)
   end
 
   ---@param set string
   ---@param isAsync boolean?
   ---@return boolean?
-  local function reqAnimSet(set, isAsync)
-    if not set or not check_type(set, 'string', reqAnimSet, 1) then return end
+  local function req_anim_set(set, isAsync)
+    if not set or not check_type(set, 'string', req_anim_set, 1) then return end
     return not isAsync and load_asset(set, HasAnimSetLoaded, RequestAnimSet) or async_call(load_asset, set, HasAnimSetLoaded, RequestAnimSet)
   end
 
   ---@param model string|number
   ---@param isAsync boolean?
   ---@return boolean?
-  local function reqCollision(model, isAsync)
+  local function req_collision(model, isAsync)
     if not model or not in_cd(model) or not valid(model) then error('Invalid model requested: ' .. tostring(model), 2) end
     model = type(model) == 'number' and model or joaat(model)
     return not isAsync and load_asset(model, HasCollisionForModelLoaded, RequestCollisionForModel) or async_call(load_asset, model, HasCollisionForModelLoaded, RequestCollisionForModel)
@@ -69,15 +69,15 @@ local CStreaming do
   ---@param ipl string
   ---@param isAsync boolean?
   ---@return boolean?
-  local function reqIpl(ipl, isAsync)
-    if not ipl or not check_type(ipl, 'string', reqIpl, 1) then return end
+  local function req_ipl(ipl, isAsync)
+    if not ipl or not check_type(ipl, 'string', req_ipl, 1) then return end
     return not isAsync and load_asset(ipl, IsIplActive, RequestIpl) or async_call(load_asset, ipl, IsIplActive, RequestIpl)
   end
 
   ---@param model string|number
   ---@param isAsync boolean?
   ---@return boolean?
-  local function reqModel(model, isAsync)
+  local function req_model(model, isAsync)
     if not model or not in_cd(model) or not valid(model) then error('Invalid model requested: ' .. tostring(model), 2) end
     model = type(model) == 'number' and model or joaat(model)
     return not isAsync and load_asset(model, HasModelLoaded, RequestModel) or async_call(load_asset, model, HasModelLoaded, RequestModel)
@@ -86,10 +86,10 @@ local CStreaming do
   ---@param fx string
   ---@param isAsync boolean?
   ---@return boolean?
-  local function reqPtfx(fx, isAsync)
-    if not fx or not check_type(fx, 'string', reqPtfx, 1) then return end
+  local function req_ptfx(fx, isAsync)
+    if not fx or not check_type(fx, 'string', req_ptfx, 1) then return end
     return not isAsync and load_asset(fx, HasNamedPtfxAssetLoaded, RequestNamedPtfxAsset) or async_call(load_asset, fx, HasNamedPtfxAssetLoaded, RequestNamedPtfxAsset)
   end
 
-  return {LoadAnimDict = reqAnimDict, LoadAnimSet = reqAnimSet, LoadCollision = reqCollision, LoadIpl = reqIpl, LoadModel = reqModel, LoadPtfx = reqPtfx}
+  return {loadanimdict = req_anim_dict, loadanimset = req_anim_set, loadcollision = req_collision, loadipl = req_ipl, loadmodel = req_model, loadptfx = req_ptfx}
 end

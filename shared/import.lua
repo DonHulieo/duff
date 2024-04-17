@@ -8,7 +8,7 @@
 ---@field locale locale
 ---@field math math
 ---@field pools pools
----@field streaming CStreaming
+---@field streaming streaming
 ---@field scope CScope
 ---@field vector vector
 local duff do
