@@ -19,7 +19,7 @@ end
 
 ---@param res string
 ---@param file string
----@return boolean, function?
+---@return boolean, function|table?
 local function safe_load(res, file)
   return pcall(load, load_resource_file(res, file..'.lua'))
 end
@@ -52,60 +52,37 @@ find_paths() -- Find As Many Paths As Possible On Startup
 
 ---@param resource string
 ---@param file string
----@return {[1]: string, [2]: string, [3]: function}|boolean path
+---@return function|table|boolean path
 local function test_path(resource, file)
   local loaded, func = safe_load(resource, file)
-  return loaded and {resource, file, func}
+  return loaded and func or false
 end
 
----@enum contexts
-local contexts = {'shared', 'server', 'client'}
 ---@param name string
----@return string[]? path
+---@return string?, function|table?
 local function find_path(name)
   local parts = {}
-  ---@type {[1]: string, [2]: string, [3]: function}|false
-  local path = {}
   for part in name:gmatch('[^.]+') do parts[#parts + 1] = part end
-  local parts_len = #parts
-  local resource = parts_len >= 3 and parts[1]
-  local folder = parts_len >= 3 and table.concat(parts, '/', 2, parts_len - 1) or parts[1]
-  local file = parts[parts_len]
-  local found = parts_len >= 3 and package.path[resource..':'..folder..'/'..file]
-  if found then return found end
-  for _, val in pairs(package.path) do
-    local found_res, found_path = val[1], val[2]
-    if resource and found_res ~= resource then goto continue end
-    if found_path:match('%'..folder..'/'..file..'$') then
-      local new_path = found_path
-      path = test_path(found_res, new_path)
-      if path then break end
-    elseif found_path:match('%*%*') and found_path:match('%*$') then
-      if folder then
-        local new_path = found_path:gsub('%*%*', folder):gsub('%*$', file)
-        path = test_path(found_res, new_path)
-      else
-        for i = 1, #contexts do
-          local new_path = found_path:gsub('%*%*', contexts[i]):gsub('%*$', file)
-          path = test_path(found_res, new_path)
-        end
-      end
-      if path then break end
-    elseif found_path:match('%*%*') then
-      local new_path = found_path:gsub('%*%*', folder):gsub('%*$', file)
-      path = test_path(found_res, new_path)
-      if path then break end
-    elseif found_path:match('%*$') then
-      local new_path = found_path:gsub('%*$', file)
-      path = test_path(found_res, new_path)
+  local resource_state = GetResourceState
+  local resource, file = parts[1], ''
+  local is_resource = resource_state(resource) ~= 'missing' and resource_state(resource) ~= 'unknown'
+  local func
+  if is_resource then
+    file = table.concat(parts, '/', 2, #parts)
+    func = test_path(resource, file)
+  else
+    file = table.concat(parts, '/')
+    for _, val in pairs(package.path) do
+      local found_res = val[1]
+      func = test_path(found_res, file)
+      if func then resource = found_res break end
     end
-    ::continue::
   end
-  if type(path) == 'table' and #path > 0 then
-    name = path[1]..':'..path[2]
-    package.path[name] = {path[1], path[2]}
-    package.preload[name] = path[3]
-    return package.path[name]
+  if func then
+    name = resource..':'..file
+    package.path[name] = {resource, file}
+    package.preload[name] = func
+    return name, package.path[name]
   end
 end
 
@@ -113,13 +90,14 @@ end
 ---@return {[string]: any} module
 function require(name)
   local param_type = type(name)
-  if param_type ~= 'string' then error('bad argument #1 to \'require\' (string expected, got ' ..param_type.. ')', 2) end
+  if param_type ~= 'string' then error('bad argument #1 to \'require\' (string expected, got ' ..param_type.. ')', 1) end
   local path = find_path(name)
-  if not path then error('bad argument #1 to \'require\' (invalid path)', 2) end
-  name = path[1]..':'..path[2]
-  if not package.preload[name] then error('bad argument #1 to \'require\' (no file found)', 2) end
-  local loaded, module = pcall(package.preload[name])
-  if not loaded then error('bad argument #1 to \'require\' (error loading file)', 2) end
+  if not path then error('bad argument #1 to \'require\' (invalid path)', 1) end
+  if package.loaded[name] then return package.loaded[name] end
+  if not package.preload[path] then error('bad argument #1 to \'require\' (no file found)', 1) end
+  local loaded, module = pcall(package.preload[path])
+  if not loaded then error('bad argument #1 to \'require\' (error loading file) \n' ..module, 1)
+  elseif not module then module = package.preload[path] end
   for k, v in pairs(module) do
     if type(v) == 'function' then
       module[k] = function(...)

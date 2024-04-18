@@ -6,7 +6,7 @@ description 'Don\'s Utility Functions for FiveM'
 version '0.8.8'
 url 'https://github.com/DonHulieo/duff'
 
-shared_script 'shared/lib.lua'
+shared_scripts {'@ox_lib/init.lua', 'shared/lib.lua'}
 
 files {'data/*.json', '**/*.lua'}
 
