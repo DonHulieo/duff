@@ -71,7 +71,13 @@ local function find_path(name)
     file = table.concat(parts, '/', 2, #parts)
     func = test_path(resource, file)
   else
+    local sources = {GetInvokingResource(), GetCurrentResourceName()} -- This checks for the module (if named w/o resource name ie. shared.bridge) inside the invoking resource and the current resource respectively.
     file = table.concat(parts, '/')
+    for i = 1, #sources do
+      local source = sources[i]
+      func = test_path(source, file)
+      if func then resource = source break end
+    end
     for _, val in pairs(package.path) do
       local found_res = val[1]
       func = test_path(found_res, file)
