@@ -19,6 +19,8 @@ local bridge do
   local check_type = require('shared.debug').checktype
   local is_server = IsDuplicityVersion() == 1
 
+  --------------------- INTERNAL ---------------------
+
   ---@param resource string
   ---@return boolean
   local function is_resource_present(resource)
@@ -33,6 +35,8 @@ local bridge do
       if fn(key) then return value end
     end
   end
+
+  --------------------- SHARED ---------------------
 
   local FRAMEWORK = for_each(Frameworks, is_resource_present) --[[@as string?]]
   local INVENTORY = for_each(Inventories, is_resource_present) or FRAMEWORK --[[@as string?]]
@@ -216,7 +220,7 @@ local bridge do
   ---@param name string The name of the callback
   ---@param cb function The callback to call when the event is triggered
   local function create_callback(name, cb, ...)
-    if not ensure_core_object(create_callback, 'Core') then return end
+    if FRAMEWORK == 'esx' or FRAMEWORK == 'qb' and not ensure_core_object(create_callback, 'Core') then return end
     if is_server then
       if LIB == 'ox' then
         if not ensure_lib_object(create_callback, 'Lib') then return end
@@ -243,7 +247,7 @@ local bridge do
   ---@param cb function The callback to call when the event is triggered
   ---@param ... any The arguments to pass to the callback
   local function trigger_callback(player, name, cb, ...)
-    if not ensure_core_object(create_callback, 'Core') then return end
+    if FRAMEWORK == 'esx' or FRAMEWORK == 'qb' and not ensure_core_object(create_callback, 'Core') then return end
     if is_server then
       player = validate_source(player or source, trigger_callback, 'player')
       if LIB == 'ox' then
@@ -265,6 +269,8 @@ local bridge do
       end
     end
   end
+
+  --------------------- SERVER ---------------------
 
   return {
     _DATA = _DATA,
