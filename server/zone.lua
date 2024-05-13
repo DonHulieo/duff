@@ -112,12 +112,13 @@ local zone do
                   Wait(sleep)
                   coords = GetEntityCoords(ped)
                 end
-                Listeners[event].players[player_src] = nil
                 if entered then onExit(player_src, coords, true) end
               end
+              Listeners[event].players[player_src] = nil
             end)
           end
         end
+        Players = GetPlayers()
       end
     end)
   end
