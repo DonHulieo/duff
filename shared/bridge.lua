@@ -1,9 +1,8 @@
 ---@class bridge
----@field _DATA {FRAMEWORK: string, LIB: string?, INVENTORY: string?, EVENTS: {LOAD: string?, UNLOAD: string?, JOBDATA: string?, PLAYERDATA: string?, UPDATEOBJECT: string}}
+---@field _DATA {FRAMEWORK: string?, LIB: string?, INVENTORY: string?, EVENTS: {LOAD: string?, UNLOAD: string?, JOBDATA: string?, PLAYERDATA: string?, UPDATEOBJECT: string?}, ITEMS: {[string]: {name: string, label: string, weight: number, useable: boolean, unique: boolean}}?}
 ---@field getframework fun(): string
 ---@field getlib fun(): string
 ---@field getinventory fun(): string
----@field getevents fun(): table
 ---@field getcore fun(): table
 ---@field getplayer fun(player: number|string?): table
 ---@field getidentifier fun(player: number|string?): string
@@ -11,11 +10,17 @@
 ---@field isplayerdowned fun(player: number|string?): boolean
 ---@field createcallback fun(name: string, cb: function)
 ---@field triggercallback fun(player: number|string?, name: string, cb: function, ...: any)
+---@field getallitems fun(): {[string]: {name: string, label: string, weight: number, useable: boolean, unique: boolean}}?
+---@field getitem fun(name: string): {name: string, label: string, weight: number, usable: boolean, unique: boolean}?
+---@field createusableitem fun(name: string, cb: fun(src: number|string))
+---@field additem fun(player: number|string?, item: string, amount: number): boolean?
+---@field removeitem fun(player: number|string?, item: string, amount: number): boolean?
 local bridge do
   local get_resource_state = GetResourceState
   local Frameworks = {['es_extended'] = 'esx', ['qb-core'] = 'qb'}
   local Inventories = {['ox_inventory'] = 'ox'}
   local Libs = {['ox_lib'] = 'ox'}
+  local Targets = {['ox_target'] = 'ox', ['qb_target'] = 'qb'}
   local check_type = require('shared.debug').checktype
   local is_server = IsDuplicityVersion() == 1
 
@@ -24,16 +29,55 @@ local bridge do
   ---@param resource string
   ---@return boolean
   local function is_resource_present(resource)
-    return get_resource_state(resource) ~= 'missing' and get_resource_state(resource) ~= 'unknown'
+    local state = get_resource_state(resource)
+    return state ~= 'missing' and state ~= 'unknown'
   end
 
-  ---@param table table
-  ---@param fn function
+  ---@param table table<any, any>|any?
+  ---@param fn fun(key: any, value: any?): boolean
   ---@return any value
   local function for_each(table, fn)
+    table = type(table) == 'table' and table or {table}
+    if not table then return end
     for key, value in pairs(table) do
-      if fn(key) then return value end
+      if fn(key, value) then return value end
     end
+  end
+
+  ---@param table table<any, any>|any?
+  ---@param value any
+  ---@return any?
+  local function get_key(table, value)
+    local key = nil
+    table = type(table) == 'table' and table or {table}
+    if not table then return end
+    for k, v in pairs(table) do
+      if v == value then key = k break end
+    end
+    return key
+  end
+
+  ---@param table {[string]: {resource: string, method: string?}}
+  ---@param export_type string
+  ---@return any?
+  local function consume_export(table, export_type)
+    if not table or not table[export_type] then return end
+    local export = table[export_type]
+    return export.method and exports[export.resource][export.method]() or exports[export.resource]
+  end
+
+  ---@param array1 any[]|any
+  ---@param array2 any[]|any
+  ---@return any[]|any
+  local function merge_arrays(array1, array2)
+    if not array1 then return end
+    if not array2 then return array1 end
+    array1 = type(array1) == 'table' and array1 or {array1}
+    array2 = type(array2) == 'table' and array2 or {array2}
+    for i = 1, #array2 do
+      array1[#array1 + 1] = array2[i]
+    end
+    return array1
   end
 
   --------------------- SHARED ---------------------
@@ -41,7 +85,12 @@ local bridge do
   local FRAMEWORK = for_each(Frameworks, is_resource_present) --[[@as string?]]
   local INVENTORY = for_each(Inventories, is_resource_present) or FRAMEWORK --[[@as string?]]
   local LIB = for_each(Libs, is_resource_present) --[[@as string?]]
-  local Core, Lib, PlayerData = nil, nil, nil
+  local TARGET = for_each(Targets, is_resource_present) --[[@as string?]]
+  local EXPORTS = {
+    CORE = {['esx'] = 'getSharedObject', ['qb'] = 'GetCoreObject'},
+    INV = {['ox'] = 'ox_inventory'},
+    TARGET = {['ox'] = 'ox_target', ['qb'] = 'qb-target'}
+  }
   local EVENTS = {
     LOAD = {['esx'] = 'esx:playerLoaded', ['qb'] = 'QBCore:Client:OnPlayerLoaded'},
     UNLOAD = {['esx'] = 'esx:onPlayerLogout', ['qb'] = 'QBCore:Client:OnPlayerUnload'},
@@ -49,6 +98,15 @@ local bridge do
     PLAYERDATA = {['esx'] = 'esx:setPlayerData', ['qb'] = 'QBCore:Player:SetPlayerData'},
     OBJECTUPDATE = {['qb'] = not is_server and 'QBCore:Client:UpdateObject' or 'QBCore:Server:UpdateObject'}
   }
+
+  local NO_METHODS = {['INV'] = 'ox', ['TARGET'] = {'ox', 'qb'}}
+  EXPORTS = {
+    CORE = {resource = get_key(Frameworks, FRAMEWORK), method = not for_each(NO_METHODS.CORE, function(_, value) return value ~= FRAMEWORK end) and EXPORTS.CORE[FRAMEWORK] or nil},
+    INV = {resource = get_key(Inventories, INVENTORY), method = not for_each(NO_METHODS.INV, function(_, value) return value ~= INVENTORY end) and EXPORTS.INV[INVENTORY] or nil},
+    TARGET = {resource = get_key(Targets, TARGET), method = not for_each(NO_METHODS.TARGET, function(_, value) return value ~= TARGET end) and EXPORTS.TARGET[TARGET] or nil}
+  }
+  local Core, Lib, Inv = consume_export(EXPORTS, 'CORE') --[[@as QBCore|table?]], consume_export(EXPORTS, 'LIB'), consume_export(EXPORTS, 'INV') --[[@as ox_inventory|table?]]
+  local PlayerData = nil
 
   ---@return string?
   local function get_framework()
@@ -60,19 +118,16 @@ local bridge do
     return INVENTORY
   end
 
-  ---@return QBCore|es_extended?
+  ---@return QBCore|table?
   local function get_core_object()
+    if not FRAMEWORK then return end
     if Core then return Core end
-    if FRAMEWORK == 'esx' then
-      ---@alias es_extended table
-      Core = exports.es_extended:getSharedObject() --[[@as es_extended]]
-    elseif FRAMEWORK == 'qb' then
-      Core = exports['qb-core']:GetCoreObject() --[[@as QBCore]]
-    end
+    Core = consume_export(EXPORTS, 'CORE')
     return Core
   end
 
   local function get_lib_object()
+    if not LIB then return end
     if Lib then return Lib end
     if LIB == 'ox' then
       Lib = lib
@@ -80,14 +135,14 @@ local bridge do
     return Lib
   end
 
-  ---@param player number|string?
+  ---@param player integer|string?
   ---@param fn function
   ---@param arg string|number?
-  ---@return number|string?
+  ---@return integer?
   local function validate_source(player, fn, arg)
     player = player or source
-    if check_type(player, {'number', 'string'}, fn, arg) then return end
-    return player
+    if not check_type(player, {'number', 'string'}, fn, arg) then return end
+    return type(player) ~= 'number' and tonumber(player) or player
   end
 
   ---@param fn function
@@ -98,112 +153,119 @@ local bridge do
     return check_type(Core, 'table', fn, arg)
   end
 
-  ---@param player number|string?
+  ---@param player integer|string?
   ---@return table? PlayerData
   local function get_player_data(player)
-    if not ensure_core_object(get_player_data, 1) then return end
+    if not ensure_core_object(get_player_data, 1) then return end ---@cast Core -?
     if is_server then
       player = validate_source(player or source, get_player_data, 'player')
       if FRAMEWORK == 'esx' then
-        return Core?.GetPlayerFromId(player)
+        return Core.GetPlayerFromId(player)
       elseif FRAMEWORK == 'qb' then
-        return Core?.Functions.GetPlayer(player)
+        return Core.Functions.GetPlayer(player)
       end
     else
+      if PlayerData then return PlayerData end
       if FRAMEWORK == 'esx' then
-        return Core?.GetPlayerData()
+        PlayerData = Core.GetPlayerData()
       elseif FRAMEWORK == 'qb' then
-        return Core?.Functions.GetPlayerData()
+        PlayerData = Core.Functions.GetPlayerData()
       end
+      return PlayerData
     end
   end
 
-  local _DATA = {FRAMEWORK = FRAMEWORK, LIB = LIB, INVENTORY = INVENTORY,
-    EVENTS = {
-      LOAD = not is_server and EVENTS.LOAD[FRAMEWORK] or nil,
-      UNLOAD = not is_server and EVENTS.UNLOAD[FRAMEWORK] or nil,
-      JOBDATA = not is_server and EVENTS.JOBDATA[FRAMEWORK] or nil,
-      PLAYERDATA = not is_server and EVENTS.PLAYERDATA[FRAMEWORK] or nil,
-      OBJECTUPDATE = EVENTS.OBJECTUPDATE[FRAMEWORK]
-    }
+  EVENTS = {
+    LOAD = not is_server and EVENTS.LOAD[FRAMEWORK] or nil,
+    UNLOAD = not is_server and EVENTS.UNLOAD[FRAMEWORK] or nil,
+    JOBDATA = not is_server and EVENTS.JOBDATA[FRAMEWORK] or nil,
+    PLAYERDATA = not is_server and EVENTS.PLAYERDATA[FRAMEWORK] or nil,
+    OBJECTUPDATE = EVENTS.OBJECTUPDATE[FRAMEWORK]
   }
 
-  for event_type, event in pairs(_DATA.EVENTS) do
-    if not event then goto continue end
-    RegisterNetEvent(event, function(...)
-      if event_type == 'LOAD' then
-        PlayerData = get_player_data()
-      elseif event_type == 'UNLOAD' then
-        PlayerData = nil
-      elseif event_type == 'JOBDATA' then
-        if not PlayerData then return end
-        PlayerData.job = ...
-      elseif event_type == 'PLAYERDATA' then
-        PlayerData = ...
-      elseif event_type == 'OBJECTUPDATE' then
-        if not validate_source(source, RegisterNetEvent, 'source') then return end
-        Core = get_core_object()
-      end
-    end)
-    ::continue::
+  for event_type, event in pairs(EVENTS) do
+    if event then
+      RegisterNetEvent(event, function(...)
+        if event_type == 'LOAD' then
+          PlayerData = get_player_data()
+        elseif event_type == 'UNLOAD' then
+          PlayerData = nil
+        elseif event_type == 'JOBDATA' then
+          if not PlayerData then return end
+          PlayerData.job = ...
+        elseif event_type == 'PLAYERDATA' then
+          PlayerData = ...
+        elseif event_type == 'OBJECTUPDATE' then
+          if not validate_source(source, RegisterNetEvent, 'source') then return end
+          Core = get_core_object()
+        end
+      end)
+    end
   end
 
-  ---@param player number|string? The source of the player
+  ---@param player integer|string?
+  ---@param fn function
+  ---@param arg string|number?
+  ---@return table|boolean?
+  local function ensure_player_data(player, fn, arg)
+    local player_data = get_player_data(is_server and validate_source(player or source, fn, 'player') or nil)
+    if not is_server and not PlayerData then PlayerData = player_data end
+    return check_type(not is_server and PlayerData or player_data, 'table', fn, arg) and player_data
+  end
+
+  ---@param player integer|string? The source of the player
   ---@return string? identifier The identifier of the player
   local function get_player_identifier(player)
+    local player_data = ensure_player_data(player or source, get_player_identifier, 'player') ---@cast player_data -?
     if is_server then
-      local player_data = get_player_data(validate_source(player or source, get_player_identifier, 'player'))
       if FRAMEWORK == 'esx' then
-        return player_data?.getIdentifier()
+        return player_data.getIdentifier()
       elseif FRAMEWORK == 'qb' then
-        return player_data?.PlayerData.citizenid
+        return player_data.PlayerData.citizenid
       end
     else
-      PlayerData = PlayerData or get_player_data()
       if FRAMEWORK == 'esx' then
-        return PlayerData?.identifier
+        return player_data.identifier
       elseif FRAMEWORK == 'qb' then
-        return PlayerData?.citizenid
+        return player_data.citizenid
       end
     end
   end
 
-  ---@param player number|string?
+  ---@param player integer|string?
   ---@return table? JobData
   local function get_job_data(player)
+    local player_data = ensure_player_data(player or source, get_job_data, 'player') ---@cast player_data -?
     if is_server then
-      local player_data = get_player_data(validate_source(player or source, get_job_data, 'player'))
       if FRAMEWORK == 'esx' then
-        return player_data?.getJob()
+        return player_data.getJob()
       elseif FRAMEWORK == 'qb' then
-        return player_data?.PlayerData.job
+        return player_data.PlayerData.job
       end
     else
-      PlayerData = PlayerData or get_player_data()
       if FRAMEWORK == 'esx' then
-        return PlayerData?.job
+        return player_data.job
       elseif FRAMEWORK == 'qb' then
-        return PlayerData?.job
+        return player_data.job
       end
     end
   end
 
-  ---@param player number|string?
+  ---@param player integer|string?
   ---@return boolean? isDowned
   local function is_player_downed(player)
+    local player_data = ensure_player_data(player or source, is_player_downed, 'player') ---@cast player_data -?
     if is_server then
-      local player_data = get_player_data(validate_source(player or source, is_player_downed, 'player'))
       if FRAMEWORK == 'esx' then
-        return player_data?.getMeta('dead') or false
+        return player_data.getMeta('dead') or false
       elseif FRAMEWORK == 'qb' then
-        return player_data?.PlayerData.metadata['inlaststand'] or player_data?.PlayerData.metadata['isdead'] or false
+        return player_data.PlayerData.metadata['inlaststand'] or player_data.PlayerData.metadata['isdead'] or false
       end
     else
-      PlayerData = PlayerData or get_player_data()
       if FRAMEWORK == 'esx' then
-        return PlayerData?.dead or false
+        return player_data.dead or false
       elseif FRAMEWORK == 'qb' then
-        return PlayerData?.metadata?['inlaststand'] or PlayerData?.metadata?['isdead'] or false
+        return player_data.metadata['inlaststand'] or player_data.metadata['isdead'] or false
       end
     end
     return false
@@ -220,64 +282,277 @@ local bridge do
   ---@param name string The name of the callback
   ---@param cb function The callback to call when the event is triggered
   local function create_callback(name, cb, ...)
-    if FRAMEWORK == 'esx' or FRAMEWORK == 'qb' and not ensure_core_object(create_callback, 'Core') then return end
+    if not ensure_core_object(create_callback, 'Core') then return end ---@cast Core -?
     if is_server then
       if LIB == 'ox' then
-        if not ensure_lib_object(create_callback, 'Lib') then return end
-        Lib?.callback.register(name, cb)
+        if not ensure_lib_object(create_callback, 'Lib') then return end ---@cast Lib -?
+        Lib.callback.register(name, cb)
       elseif FRAMEWORK == 'esx' then
-        Core?.RegisterServerCallback(name, cb, ...)
+        Core.RegisterServerCallback(name, cb, ...)
       elseif FRAMEWORK == 'qb' then
-        Core?.Functions.CreateCallback(name, cb)
+        Core.Functions.CreateCallback(name, cb)
       end
     else
       if LIB == 'ox' then
-        if not ensure_lib_object(create_callback, 'Lib') then return end
-        Lib?.callback.register(name, cb)
+        if not ensure_lib_object(create_callback, 'Lib') then return end ---@cast Lib -?
+        Lib.callback.register(name, cb)
       elseif FRAMEWORK == 'esx' then
-        Core?.RegisterClientCallback(name, cb)
+        Core.RegisterClientCallback(name, cb)
       elseif FRAMEWORK == 'qb' then
-        Core?.Functions.CreateClientCallback(name, cb)
+        Core.Functions.CreateClientCallback(name, cb)
       end
     end
   end
 
-  ---@param player number|string? The source of the player if triggering a Client Callback
+  ---@param player integer|string? The source of the player if triggering a Client Callback
   ---@param name string The name of the callback to trigger
   ---@param cb function The callback to call when the event is triggered
   ---@param ... any The arguments to pass to the callback
   local function trigger_callback(player, name, cb, ...)
-    if FRAMEWORK == 'esx' or FRAMEWORK == 'qb' and not ensure_core_object(create_callback, 'Core') then return end
+    if not ensure_core_object(create_callback, 'Core') then return end ---@cast Core -?
     if is_server then
-      player = validate_source(player or source, trigger_callback, 'player')
+      if not ensure_player_data(source, trigger_callback, 'source') then return end
+      player = validate_source(player or source, trigger_callback, 'player') ---@cast player -?
       if LIB == 'ox' then
-        if not ensure_lib_object(trigger_callback, 'Lib') then return end
-        return Lib?.callback(name, player, cb, ...)
+        if not ensure_lib_object(trigger_callback, 'Lib') then return end ---@cast Lib -?
+        return Lib.callback(name, player, cb, ...)
       elseif FRAMEWORK == 'esx' then
-        return Core?.TriggerClientCallback(player, name, cb, ...)
+        return Core.TriggerClientCallback(player, name, cb, ...)
       elseif FRAMEWORK == 'qb' then
-        return Core?.Functions.TriggerClientCallback(name, player, cb, ...)
+        return Core.Functions.TriggerClientCallback(name, player, cb, ...)
       end
     else
       if LIB == 'ox' then
-        if not ensure_lib_object(trigger_callback, 'Lib') then return end
-        return Lib?.callback(name, false, cb, ...)
+        if not ensure_lib_object(trigger_callback, 'Lib') then return end ---@cast Lib -?
+        return Lib.callback(name, false, cb, ...)
       elseif FRAMEWORK == 'esx' then
-        return Core?.TriggerServerCallback(name, cb, ...)
+        return Core.TriggerServerCallback(name, cb, ...)
       elseif FRAMEWORK == 'qb' then
-        return Core?.Functions.TriggerCallback(name, cb, ...)
+        return Core.Functions.TriggerCallback(name, cb, ...)
       end
     end
   end
 
+  ---@return ox_inventory|table?
+  local function get_inv_object()
+    if not INVENTORY or INVENTORY == FRAMEWORK then return end
+    if Inv then return Inv end
+    Inv = consume_export(EXPORTS, 'INV')
+    return Inv
+  end
+
+  ---@param fn function
+  ---@param arg string|number?
+  ---@return boolean?, string?
+  local function ensure_inv_object(fn, arg)
+    if not Inv and INVENTORY ~= FRAMEWORK then
+      Inv = get_inv_object()
+    elseif INVENTORY == FRAMEWORK then
+      if ensure_core_object(fn, arg) then Inv = {} end
+    end
+    return check_type(Inv, 'table', fn, arg)
+  end
+
   --------------------- SERVER ---------------------
 
-  return {
-    _DATA = _DATA,
+  local Items = nil
+
+  ---@return {[string]: {name: string, label: string, weight: number, useable: boolean, unique: boolean}}?
+  local function get_all_items()
+    if not is_server then return end
+    if not ensure_inv_object(get_all_items, 'Inventory') then return end
+    ---@cast Inv -?
+    ---@cast Core -?
+    if Items then return Items end
+    if not Items then Items = {} end
+    local found_items = nil
+    if INVENTORY == 'ox' then
+      found_items = Inv:Items()
+      if not found_items then return end
+      for name, data in pairs(found_items) do
+        local client_data, server_data = data.client, data.server
+        local useable = not data.consume and (client_data?.status or client_data?.useTime or client_data?.export or server_data?.export) or data.consume == 1
+        Items[name] = {name = name, label = data.label, weight = data.weight or 0, useable = useable, unique = data.stack == nil and true or data.stack}
+      end
+    elseif INVENTORY == 'esx' then
+      found_items = MySQL.Async.fetchAll('SELECT * FROM items')
+      if not found_items then return end
+      for _, item in ipairs(found_items) do
+        local name = item.name
+        Items[name] = {name = name, label = item.label, weight = item.weight, useable = Core.GetUsableItems()[name] ~= nil, unique = item.rare}
+      end
+    elseif INVENTORY == 'qb' then
+      found_items = Core.Shared.Items
+      for name, item in pairs(found_items) do
+        Items[name] = {name = name,label = item.label, weight = item.weight, useable = item.useable, unique = item.unique}
+      end
+    end
+    return Items
+  end
+
+  ---@param fn function
+  ---@param arg string|number?
+  ---@return boolean?, string?
+  local function ensure_items_object(fn, arg)
+    if not Items then Items = get_all_items() end
+    return check_type(Items, 'table', fn, arg)
+  end
+
+  ---@param name string The name of the item
+  ---@return {name: string, label: string, weight: number, usable: boolean, unique: boolean}? item_data
+  local function get_item(name)
+    if not is_server or not name then return end
+    if not ensure_inv_object(get_item, 'Inventory') then return end ---@cast Inv -?
+    if not ensure_items_object(get_item, 'Items') then return end ---@cast Items -?
+    return Items[name]
+  end
+
+  ---@param name string The name of the usable item
+  ---@param cb fun(src: number|string) The callback to call when the item is used
+  local function create_usable_item(name, cb)
+    if not is_server then return end
+    if not ensure_inv_object(create_usable_item, 'Inventory') then return end
+    ---@cast Inv -?
+    ---@cast Core -?
+    if not ensure_items_object(create_usable_item, 'Items') then return end ---@cast Items -?
+    if not get_item(name) then return end
+    if INVENTORY == 'ox' then
+      exports(name, function(event, _, inventory)
+        if event ~= 'usingItem' then return end
+        cb(inventory.id)
+      end)
+    elseif INVENTORY == 'esx' then
+      Core.RegisterUsableItem(name, cb)
+    elseif INVENTORY == 'qb' then
+      Core.Functions.CreateUseableItem(name, cb)
+    end
+  end
+
+  ---@param player integer|string? The source of the player
+  ---@param item string The item to add
+  ---@param amount number The amount to add
+  ---@return boolean?
+  local function add_item(player, item, amount)
+    if not is_server then return end
+    if not ensure_inv_object(add_item, 'Inventory') then return end ---@cast Inv -?
+    if not ensure_items_object(add_item, 'Items') then return end ---@cast Items -?
+    player = validate_source(player or source, add_item, 'player') ---@cast player -?
+    local player_data = ensure_player_data(player, add_item, 'player') ---@cast player_data -?
+    if not get_item(item) then return end
+    if INVENTORY == 'ox' then
+      if not Inv:CanCarryItem(player, item, amount) then return false end
+      return Inv:AddItem(player, item, amount) and true or false
+    elseif INVENTORY == 'esx' then
+      if not player_data.canCarryItem(item, amount) then return false end
+      player_data.addInventoryItem(item, amount)
+      return player_data.hasItem(item, amount)
+    elseif INVENTORY == 'qb' then
+      return player_data.Functions.AddItem(item, amount)
+    end
+  end
+
+  ---@param player integer|string? The source of the player
+  ---@param item string The item to remove
+  ---@param amount number The amount to remove
+  ---@return boolean?
+  local function remove_item(player, item, amount)
+    if not is_server then return end
+    if not ensure_inv_object(remove_item, 'Inventory') then return end ---@cast Inv -?
+    if not ensure_items_object(remove_item, 'Items') then return end
+    player = validate_source(player or source, remove_item, 'player') ---@cast player -?
+    local player_data = ensure_player_data(player, add_item, 'player') ---@cast player_data -?
+    if not get_item(item) then return end
+    if INVENTORY == 'ox' then
+      return Inv:RemoveItem(player, item, amount)
+    elseif INVENTORY == 'esx' then
+      player_data.removeInventoryItem(item, amount)
+      return not player_data.hasItem(item, amount)
+    elseif INVENTORY == 'qb' then
+      return player_data.Functions.RemoveItem(item, amount)
+    end
+  end
+
+  --------------------- CLIENT ---------------------
+
+  local Target = not is_server and consume_export(EXPORTS, 'TARGET') --[[@as ox_target|table?]]
+
+  ---@param fn function
+  ---@param arg string|number?
+  local function ensure_target_object(fn, arg)
+    if is_server then return end
+    if not Target then Target = consume_export(EXPORTS, 'TARGET') end
+    return check_type(Target, 'table', fn, arg)
+  end
+
+  ---@param entities integer|integer[] The entity or entities to add a target to
+  ---@param options {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: fun(entity: integer, distance: number)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?}
+  ---@return boolean?
+  local function add_local_entity(entities, options)
+    if is_server then return end
+    if not ensure_target_object(add_local_entity, 'Target') then return end ---@cast Target -?
+    if not check_type(entities, {'number', 'table'}, add_local_entity, 'entities') then return end
+    if not check_type(options, 'table', add_local_entity, 'options') then return end
+    if not check_type(options.label, 'string', add_local_entity, 'options.label') then return end
+    if not check_type(options.icon, 'string', add_local_entity, 'options.icon') then return end
+    if TARGET == 'ox' then
+      Target:addLocalEntity(entities, {
+        {
+          name = options.name,
+          label = options.label,
+          icon = options.icon,
+          distance = options.distance or 2.5,
+          items = options.item,
+          canInteract = options.canInteract,
+          onSelect = options.onSelect,
+          event = options.event_type == 'client' and options.event or nil,
+          serverEvent = options.event_type == 'server' and options.event or nil,
+          command = options.event_type == 'command' and options.event or nil,
+          groups = merge_arrays(options.jobs, options.gangs)
+        }
+      })
+    elseif TARGET == 'qb' then
+      Target:AddTargetEntity(entities, {
+        options = {
+          {
+            type = options.event_type,
+            event = options.event,
+            icon = options.icon,
+            label = options.label,
+            item = options.item,
+            canInteract = options.canInteract,
+            action = options.onSelect,
+            job = options.jobs,
+            gang = options.gangs
+          }
+        },
+        distance = options.distance or 2.5
+      })
+    end
+  end
+
+  ---@param entities integer|integer[] The entity or entities to remove a target from
+  ---@param targets string|string[]? The target or targets to remove
+  local function remove_local_entity(entities, targets)
+    if is_server then return end
+    if not ensure_target_object(remove_local_entity, 'Target') then return end ---@cast Target -?
+    if not check_type(entities, {'number', 'table'}, remove_local_entity, 'entities') then return end
+    if not check_type(targets, {'string', 'table', 'nil'}, remove_local_entity, 'targets') then return end
+    if TARGET == 'ox' then
+      Target:removeLocalEntity(entities, targets)
+    elseif TARGET == 'qb' then
+      Target:RemoveTargetEntity(entities, targets)
+    end
+  end
+
+  --------------------- OBJECT ---------------------
+
+  bridge = {
+    _DATA = {FRAMEWORK = FRAMEWORK, LIB = LIB, INVENTORY = INVENTORY, EXPORTS = EXPORTS, EVENTS = EVENTS},
     getframework = get_framework,
     getinventory = get_inventory,
     getcore = get_core_object,
     getlib = get_lib_object,
+    getinv = get_inv_object,
     getplayer = get_player_data,
     getidentifier = get_player_identifier,
     getjob = get_job_data,
@@ -285,4 +560,18 @@ local bridge do
     createcallback = create_callback,
     triggercallback = trigger_callback
   }
+
+  if is_server then
+    bridge['_DATA'].ITEMS = Items
+    bridge.getallitems = get_all_items
+    bridge.getitem = get_item
+    bridge.createusableitem = create_usable_item
+    bridge.additem = add_item
+    bridge.removeitem = remove_item
+  else
+    bridge.addlocalentity = add_local_entity
+    bridge.removelocalentity = remove_local_entity
+  end
+
+  return bridge
 end
