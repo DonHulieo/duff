@@ -12,11 +12,11 @@ local debug do
   ---@return string[]?  fn_chain The function call chain as a string array.
   local function get_fn_chain(level)
     local chain = {}
-    local info = get_info(level + 1, 'n')
+    local info = get_info(level, 'n')
     while info do
       chain[#chain + 1] = info.name
       level = level + 1
-      info = get_info(level + 1, 'n')
+      info = get_info(level, 'n')
     end
     return chain
   end
@@ -24,7 +24,7 @@ local debug do
   ---@param fn function  The function to find the level for.
   ---@return integer?  level The level of the function in the call stack, or nil if not found.
   local function get_fn_level(fn)
-    local level = 1
+    local level = 0
     local info = get_info(level, 'f')
     while info do
       if info.func == fn then
@@ -36,16 +36,16 @@ local debug do
   end
 
   ---@param fn function The Lua function to retrieve information for.
-  ---@return {name: string, source: string, line: integer}? info A table containing the name, source, and line number of the function, or nil if the information could not be retrieved.
+  ---@return {name: string, source: string, line: integer}?, integer? @A table containing the name, source, and line number of the function, or nil if the information could not be retrieved.
   local function get_fn_info(fn)
-    local level = get_fn_level(fn)
+    local level = get_fn_level(fn) - 1
     if level then
-      local info = get_info(level + 1, 'nS')
+      local info = get_info(level, 'nSl')
       return info and {
         name = info.name or 'unknown',
         source = info.short_src,
-        line = get_info(level + 2, 'l')?.currentline
-      }
+        line = info.currentline
+      }, level
     end
   end
 
@@ -68,9 +68,9 @@ local debug do
     if not equals and fn then
       local arg_no_type = type(arg_no)
       arg_no = (arg_no_type == 'number' or arg_no_type == 'nil') and '#'..arg_no and (arg_no or 1)..'' or arg_no
-      local info = get_fn_info(fn)
-      if not info then error('bad argument #3 to \'checktype\' (invalid function)', 0) end
-      error(info.source..':'..info.line..': bad argument '..arg_no..' to \''..info.name..'\' ('..table.concat(type_name, ', ')..' expected, got '..param_type..')', 0)
+      local info, level = get_fn_info(fn)
+      if not info then error('bad argument #3 to \'checktype\' (invalid function)', 6) end
+      error(info.source..':'..info.line..': bad argument '..arg_no..' to \''..info.name..'\' ('..table.concat(type_name, ', ')..' expected, got '..param_type..')', level)
     end
     return equals, param_type
   end
