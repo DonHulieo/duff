@@ -201,7 +201,7 @@ local array do
   end
 
   ---@param self array
-  ---@param fn function
+  ---@param fn fun(val: any, i: integer): boolean
   ---@param inPlace boolean?
   ---@return array
   local function filter(self, fn, inPlace)
@@ -215,7 +215,7 @@ local array do
     local res = new{}
     for i = 1, #self do
       local val = self[i]
-      if fn(val) then res[#res + 1] = val end
+      if fn(val, i) then res[#res + 1] = val end
     end
     return res
   end
