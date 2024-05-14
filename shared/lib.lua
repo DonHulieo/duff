@@ -107,9 +107,9 @@ function require(name)
   for k, v in pairs(module) do
     if type(v) == 'function' then
       module[k] = function(...)
-        local success, result = pcall(v, ...)
+        local success, result, any = pcall(v, ...)
         if success then
-          return result
+          return result, any and table.unpack(any)
         else
           error(result, 0)
         end

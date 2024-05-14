@@ -1,9 +1,9 @@
 ---@class blips
----@field getall fun(): integer[]
----@field onscreen fun(): integer[]
----@field bycoords fun(coords: vector3|vector3[], radius: number?): integer[]
----@field bysprite fun(sprite: integer): integer[]
----@field bytype fun(id_type: integer): integer[]
+---@field getall fun(): array
+---@field onscreen fun(): array
+---@field bycoords fun(coords: vector3|vector3[], radius: number?): array
+---@field bysprite fun(sprite: integer): array
+---@field bytype fun(id_type: integer): array
 ---@field getinfo fun(blip: integer): table
 ---@field remove fun(blips: integer|integer[])
 local blips do
@@ -14,7 +14,7 @@ local blips do
   local does_blip_exist = DoesBlipExist
   local get_closest = require('shared.vector').getclosest
 
-  ---@return array blips An array of all currently active blip handles
+  ---@return array blips_ids An array of all currently active blip handles
   local function get_all() -- Credits go to: [negbook](https://github.com/negbook/nbk_blips)
     local blips_ids = array.new{}
     for i = 0, 883 do -- 884 is the max number of default blips b3095, if you have custom blips you need to increase this number
@@ -39,11 +39,11 @@ local blips do
   ---@param radius number?
   ---@return array? blips An array of all currently active blip handles that are within the specified coordinates
   local function by_coords(coords, radius)
-    local bool, param_type = check_type(coords, {'vector3', 'table'}, by_coords, 1)
-    if not bool then return end
+    local _, param_type = check_type(coords, {'vector3', 'table'}, by_coords, 1)
     radius = radius or 1.0
     return get_all():filter(function(blip_id)
       local blip_coords = GetBlipCoords(blip_id)
+      param_type = type(coords)
       if param_type == 'vector3' then
         return #(coords - blip_coords) <= radius
       else
@@ -86,15 +86,13 @@ local blips do
     }
   end
 
-  ---@param blip_ids integer|integer[]
+  ---@param blip_ids integer|integer[]|array
   local function remove_blips(blip_ids)
-    local bool, param_type = check_type(blips, {'table', 'number'}, remove_blips, 1)
-    if not bool then return end
-    blip_ids = param_type == 'table' and array.new(blips--[[@as integer[]?]]) or array.new{blips}
+    if not blip_ids then return end
+    local _, param_type = check_type(blip_ids, {'table', 'number'}, remove_blips, 1)
+    blip_ids = blip_ids?.__type == 'array' and blip_ids or  param_type ~= 'table' and array.new{blip_ids} or array.new(blip_ids) ---@cast blip_ids -integer|-integer[]|+array
     SetThisScriptCanRemoveBlipsCreatedByAnyScript(true)
-    blip_ids:foreach(function(blip)
-      if does_blip_exist(blip) then RemoveBlip(blip) end
-    end)
+    blip_ids:foreach(RemoveBlip)
     SetThisScriptCanRemoveBlipsCreatedByAnyScript(false)
   end
 
