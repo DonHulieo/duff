@@ -108,12 +108,9 @@ function require(name)
   for k, v in pairs(module) do
     if type(v) == 'function' then
       module[k] = function(...)
-        local success, result, any = pcall(v, ...)
-        if success then
-          return result, type(any) == 'table' and unpack(any) or any
-        else
-          error(result, 0)
-        end
+        local results = {pcall(v, ...)}
+        if not results[1] then error(results[2], 0) end
+        return select(2, unpack(results))
       end
     end
   end
