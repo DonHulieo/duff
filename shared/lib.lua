@@ -1,6 +1,7 @@
 local _ = require
 local type, error = type, error
 local load_resource_file = LoadResourceFile
+local unpack = table.unpack or unpack
 package = {loaded = {}, path = {}, preload = {}}
 
 ---@enum file_ids
@@ -109,7 +110,7 @@ function require(name)
       module[k] = function(...)
         local success, result, any = pcall(v, ...)
         if success then
-          return result, any and table.unpack(any)
+          return result, type(any) == 'table' and unpack(any) or any
         else
           error(result, 0)
         end
