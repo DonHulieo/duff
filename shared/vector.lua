@@ -31,7 +31,7 @@ local vector do
     if not check_type(check, {'number', 'vector3', 'table'}, fn, 1) then return end
     local param_type = type(check)
     check = param_type == 'vector3' and check or param_type == 'number' and does_entity_exist(check) and get_coords(check) or convert_to_vector(check --[[@as table]], fn) --[[@as vector3]]
-    if not check or not check_type(check, 'vector3', fn, 1) then return end
+    if not check_type(check, 'vector3', fn, 1) then return end
     return check
   end
 
@@ -45,18 +45,19 @@ local vector do
   end
 
   ---@param check integer|vector3|{x: number, y: number, z: number}
-  ---@param tbl vector3[]|integer[]
+  ---@param tbl vector3[]|integer[]|array
   ---@param radius number?
-  ---@param excluding any[]?
+  ---@param excluding any|any[]|array?
   ---@return integer|vector3?, number?, array?
   local function get_closest(check, tbl, radius, excluding)
     local coords = ensure_vector3(check, get_closest) --[[@as vector3]]
     if not coords or not check_type(coords, 'vector3', get_closest, 1) then return end
-    tbl = type(tbl) == 'table' and array.new(tbl) or array.new{tbl}
+    tbl = tbl.__type == 'array' and tbl or type(tbl) == 'table' and array.new(tbl) or array.new{tbl}
     local closest, dist = nil, nil
+    excluding = excluding and (excluding.__type == 'array' and excluding or type(excluding) == 'table' and array.new(excluding) or array.new{excluding}) or excluding
     local closests = tbl:filter(function(found)
       local distance = #(coords - ensure_vector3(found, get_closest))
-      local contains = excluding and array.new(excluding):contains(nil, found)
+      local contains = excluding and excluding:contains(nil, found)
       if (not excluding or not contains) and (not dist or distance < dist) then closest, dist = found, distance end
       return (not excluding or not contains) and (radius and distance <= radius or distance == dist)
     end, true)
