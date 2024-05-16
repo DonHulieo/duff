@@ -6,46 +6,50 @@
 ---@field removesyncedscopeevent fun(event: string)
 local scope do
   local check_type = require('shared.debug').checktype
-  local tostring, table = tostring, table
+  local tostring, unpack = tostring, table.unpack or unpack
   local client_event, create_thread, wait = TriggerClientEvent, CreateThread, Wait
+  local current_resource = GetCurrentResourceName()
   local Scopes = {}
 
-  local function clearScopes(resource)
-    local bool = check_type(resource, 'string', clearScopes, 1)
-    if bool and resource ~= 'duf' then return end
+  local function clear_scopes(resource)
+    local bool = check_type(resource, 'string', clear_scopes, 1)
+    if not bool or resource ~= current_resource then return end
     Scopes = {}
   end
 
-  ---@param source number|integer
+  ---@param string any
+  ---@return string
+  local function ensure_string(string)
+    return type(string) ~= 'string' and tostring(string) or string
+  end
+
+  ---@param player number|integer
   ---@return {[string]: boolean}? Scope
-  local function get_player_scope(source) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
-    local bool = check_type(source, 'string', get_player_scope, 1)
-    if bool then return end
-    local src = not bool and tostring(source) or source
+  local function get_player_scope(player) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
+    local src = ensure_string(player or source)
+    if not check_type(src, 'string', get_player_scope, 1) then return end
     return Scopes[src]
   end
 
-  ---@param data table
+  ---@param data {for: string, player: string}
   local function on_entered_scope(data)
     local player, owner = data['player'], data['for']
-    Scopes[player] = Scopes[player] or {}
+    Scopes[owner] = Scopes[owner] or {}
     Scopes[owner][player] = true
   end
 
-  ---@param data table
+  ---@param data {for: string, player: string}
   local function on_exited_scope(data)
-    local playerLeaving, player = data['player'], data['for']
-    if not Scopes[player] then return end
-    Scopes[player][playerLeaving] = nil
+    local player, owner = data['player'], data['for']
+    if not Scopes[owner] then return end
+    Scopes[owner][player] = nil
   end
 
   local function on_dropped()
-    local src = source
+    local src = ensure_string(source)
     if not src then return end
     Scopes[src] = nil
-    for _, tbl in pairs(Scopes) do
-      if tbl[src] then tbl[src] = nil end
-    end
+    for _, tbl in pairs(Scopes) do tbl?[src] = nil end
   end
 
   ---@param event string
@@ -54,8 +58,8 @@ local scope do
   ---@return {[string]: boolean}? targets
   local function trigger_scope_event(event, owner, ...) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
     local targets = get_player_scope(owner)
-    client_event(event, owner, ...)
     if not targets then return end
+    client_event(event, owner, ...)
     for target, _ in pairs(targets) do client_event(event, target, ...) end
     return targets
   end
@@ -65,6 +69,7 @@ local scope do
   ---@param time integer?
   ---@param ... any
   local function create_synced_scope_event(event, owner, time, ...)
+    if not get_player_scope(owner) then return end
     local targets = trigger_scope_event(event, owner, ...)
     Scopes.Synced = Scopes.Synced or {}
     Scopes.Synced[event] = targets
@@ -77,7 +82,7 @@ local scope do
         targets = Scopes[owner]
         if targets then
           for target, _ in pairs(targets) do
-            if not Scopes.Synced[event][target] then client_event(event, target, table.unpack(args)) end
+            if not Scopes.Synced[event][target] then client_event(event, target, unpack(args)) end
           end
           Scopes.Synced[event] = targets
         end
@@ -91,7 +96,7 @@ local scope do
   end
 
   -------------------------------- INTERNAL HANDLERS --------------------------------
-  AddEventHandler('onResourceStop', clearScopes)
+  AddEventHandler('onResourceStop', clear_scopes)
   AddEventHandler('playerEnteredScope', on_entered_scope)
   AddEventHandler('playerLeftScope', on_exited_scope)
   AddEventHandler('playerDropped', on_dropped)
