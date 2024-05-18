@@ -68,12 +68,13 @@ local math do
     return current - time > limit
   end
 
-  return setmetatable({
-    between = between,
-    clamp = clamp,
-    round = round,
-    seedrng = seed_rng,
-    random = random,
-    timer = timer
-  }, {__index = _math})
+  math = _math --[[@as math]]
+  math.between = between
+  math.clamp = clamp
+  math.round = round
+  math.seedrng = seed_rng
+  math.random = random
+  math.timer = timer
+
+  return math
 end
