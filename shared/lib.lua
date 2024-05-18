@@ -2,7 +2,7 @@ local _ = require
 local type, error = type, error
 local load_resource_file = LoadResourceFile
 ---@diagnostic disable-next-line: deprecated
-local unpack = table.unpack or unpack
+local unpack = unpack or table.unpack
 package = {loaded = {}, path = {}, preload = {}}
 
 ---@enum file_ids
