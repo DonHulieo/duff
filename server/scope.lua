@@ -6,6 +6,7 @@
 ---@field removesyncedscopeevent fun(event: string)
 local scope do
   local check_type = require('shared.debug').checktype
+  ---@diagnostic disable-next-line: deprecated
   local tostring, unpack = tostring, table.unpack or unpack
   local client_event, create_thread, wait = TriggerClientEvent, CreateThread, Wait
   local current_resource = GetCurrentResourceName()
