@@ -1,6 +1,6 @@
 ---@class vector
 ---@field tabletovector fun(tbl: {x: number, y: number, z: number?, w: number?}): vector2|vector3|vector4? Check if the table is a vector and convert it to a vector @shared
----@field getclosest fun(check: integer|vector3|{x: number, y: number, z: number}, tbl: vector3[]|integer[], radius: number?, excluding: any[]?): integer|vector3?, number?, array? Finds the closest vector3 in a table of vector3s @shared
+---@field getclosest fun(check: integer|vector3|{x: number, y: number, z: number}, tbl: vector3[]|integer[], radius: number?, excluding: any[]?): integer|vector3?, number?, array? Finds the closest vector3 from an array of vector3s @shared
 ---@field getentitymatrix fun(entity: integer): vector3?, vector3?, vector3?, vector3? Get the forward, right, up, and position of an entity @server
 ---@field getentityforward fun(entity: integer): vector3? Get the forward vector of an entity @server
 ---@field getentityright fun(entity: integer): vector3? Get the right vector of an entity @shared
