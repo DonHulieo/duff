@@ -7,7 +7,7 @@
 local scope do
   local check_type = require('shared.debug').checktype
   ---@diagnostic disable-next-line: deprecated
-  local tostring, unpack = tostring, table.unpack or unpack
+  local tostring, unpack = tostring, unpack or table.unpack
   local client_event, create_thread, wait = TriggerClientEvent, CreateThread, Wait
   local current_resource = GetCurrentResourceName()
   local Scopes = {}
@@ -50,7 +50,9 @@ local scope do
     local src = ensure_string(source)
     if not src then return end
     Scopes[src] = nil
-    for _, tbl in pairs(Scopes) do tbl?[src] = nil end
+    for _, tbl in pairs(Scopes) do
+      if tbl[src] then tbl[src] = nil end
+    end
   end
 
   ---@param event string
