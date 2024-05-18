@@ -49,6 +49,16 @@ local debug do
     end
   end
 
+  ---@param info {name: string, source: string, line: integer} The function information.
+  ---@param level integer The level in the call stack.
+  ---@param arg_no string|integer? The argument number being checked.
+  ---@param expected string|string[] The expected type of the parameter or error message.
+  ---@param got string? The actual type of the parameter.
+  local function raise_error(info, level, arg_no, expected, got)
+    expected = type(expected) == 'table' and table.concat(expected, ' or ') or expected
+    error(info.source..':'..info.line..': bad argument '..arg_no..' to \''..info.name..'\' '..got and '('..expected..' expected, got '..got..')' or '('..expected..') ', level)
+  end
+
   ---@param param any The parameter to check the type of.
   ---@param type_name string|string[] The expected type(s) of the parameter.
   ---@param fn function The function where the parameter is being checked.
@@ -69,8 +79,8 @@ local debug do
       local arg_no_type = type(arg_no)
       arg_no = (arg_no_type == 'number' or arg_no_type == 'nil') and '#'..arg_no and (arg_no or 1)..'' or arg_no
       local info, level = get_fn_info(fn)
-      if not info then error('bad argument #3 to \'checktype\' (invalid function)', 6) end
-      error(info.source..':'..info.line..': bad argument '..arg_no..' to \''..info.name..'\' ('..table.concat(type_name, ', ')..' expected, got '..param_type..')', level)
+      if not info then error('bad argument #3 to \'checktype\' (invalid function)', level) end
+      if level then raise_error(info, level, arg_no, type_name, param_type) end
     end
     return equals, param_type
   end
@@ -79,6 +89,7 @@ local debug do
     getfuncchain = get_fn_chain,
     getfunclevel = get_fn_level,
     getfuncinfo = get_fn_info,
+    raiseerror = raise_error,
     checktype = check_type
   }
 end
