@@ -15,7 +15,6 @@ local locale do
   local FORMAT_CHARS = {c = 1, d = 1, E = 1, e = 1, f = 1, g = 1, G = 1, i = 1, o = 1, u = 1, X = 1, x = 1, s = 1, q = 1, ['%'] = 1}
   local default_locale = GetConvar('locale', 'en')
   local dialect = default_locale:gsub('-.+', '')
-  local region = default_locale:gsub('%a%a%-', '')
   local storage = {}
 
   ---@param fn function
@@ -177,7 +176,7 @@ local locale do
   ---@param file string? The file path.
   local function load_file(resource, file)
     resource = resource or GetInvokingResource()
-    file = not file and 'locales/'..dialect or file --[[@as string]]
+    file = file or ('locales/'..dialect) --[[@as string]]
     local translations = safe_load(resource, file) and load(load_resource_file(resource, file..'.lua'))
     if not translations then return end
     recursive_load(nil, translations())
