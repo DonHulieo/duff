@@ -232,6 +232,25 @@ local bridge do
     end
   end
 
+  ---@param player integer|string? The source of the player if calling from the server
+  ---@return string? name The name of the player
+  local function get_player_name(player)
+    local player_data = ensure_player_data(player or source, get_player_identifier, 'player') ---@cast player_data -?
+    if is_server then
+      if FRAMEWORK == 'esx' then
+        return player_data.getName()
+      elseif FRAMEWORK == 'qb' then
+        return player_data.PlayerData.charinfo.firstname..' '..player_data.PlayerData.charinfo.lastname
+      end
+    else
+      if FRAMEWORK == 'esx' then
+        return player_data.firstName..' '..player_data.lastName
+      elseif FRAMEWORK == 'qb' then
+        return player_data.charinfo.firstname..' '..player_data.charinfo.lastname
+      end
+    end
+  end
+
   ---@param player integer|string?
   ---@return table? JobData
   local function get_job_data(player)
@@ -384,7 +403,7 @@ local bridge do
     elseif INVENTORY == 'qb' then
       found_items = Core.Shared.Items
       for name, item in pairs(found_items) do
-        Items[name] = {name = name,label = item.label, weight = item.weight, useable = item.useable, unique = item.unique}
+        Items[name] = {name = name, label = item.label, weight = item.weight, useable = item.useable, unique = item.unique}
       end
     end
     return Items
@@ -555,6 +574,7 @@ local bridge do
     getinv = get_inv_object,
     getplayer = get_player_data,
     getidentifier = get_player_identifier,
+    getplayername = get_player_name,
     getjob = get_job_data,
     isplayerdowned = is_player_downed,
     createcallback = create_callback,
