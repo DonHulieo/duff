@@ -1,6 +1,7 @@
 local _ = require
 local type, error = type, error
 local load_resource_file = LoadResourceFile
+---@diagnostic disable-next-line: deprecated
 local unpack = table.unpack or unpack
 package = {loaded = {}, path = {}, preload = {}}
 
@@ -109,7 +110,8 @@ function require(name)
     if type(v) == 'function' then
       module[k] = function(...)
         local results = {pcall(v, ...)}
-        if not results[1] then error(results[2], 0) end
+        local success, err = results[1], results[2]
+        if not success then error(err, 0) end
         return select(2, unpack(results))
       end
     end
