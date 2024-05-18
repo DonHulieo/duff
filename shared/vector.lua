@@ -69,27 +69,7 @@ local vector do
     return closest, dist, closests
   end
 
-  local get_entity_matrix = not is_server and GetEntityMatrix
-
-  ---@param entity integer
-  ---@return vector3?
-  local function get_entity_right_vec(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
-    if is_server or not get_entity_matrix then return end
-    if not ensure_entity(entity, get_entity_right_vec) then return end
-    local _, right = get_entity_matrix(entity)
-    return right
-  end
-
-  ---@param entity integer
-  ---@return vector3?
-  local function get_entity_up_vec(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
-    if is_server or not get_entity_matrix then return end
-    if not ensure_entity(entity, get_entity_up_vec) then return end
-    local _, _, up = get_entity_matrix(entity)
-    return up
-  end
-
-  local get_rotation = is_server and GetEntityRotation
+  local get_rotation = GetEntityRotation
 
   ---@param entity integer
   ---@return vector3?, vector3?, vector3?, vector3?
@@ -104,8 +84,7 @@ local vector do
     matrix[2] = {-cos(x) * sin(z), cos(z) * cos(x), sin(x), 1}
     matrix[3] = {cos(z) * sin(y) + cos(y) * sin(z) * sin(x), sin(z) * sin(y) - cos(z) * cos(y) * sin(x), cos(x) * cos(y), 1}
     local coords = get_coords(entity)
-    x, y, z in coords
-    matrix[4] = {x, y, z - 1.0, 1}
+    matrix[4] = {coords.x, coords.y, coords.z - 1.0, 1}
     local forward = vector3(matrix[1][2], matrix[2][2], matrix[3][2])
     local right = vector3(matrix[1][1], matrix[2][1], matrix[3][1])
     local up = vector3(matrix[1][3], matrix[2][3], matrix[3][3])
@@ -113,12 +92,14 @@ local vector do
     return forward, right, up, pos
   end
 
+  local get_entity_matrix = GetEntityMatrix or sv_get_entity_matrix
+
   ---@param entity integer
   ---@return vector3?
   local function get_entity_forward_vec(entity)
     if not is_server then return end
     if not ensure_entity(entity, get_entity_forward_vec) then return end
-    local forward = sv_get_entity_matrix(entity)
+    local forward = get_entity_matrix(entity)
     return forward
   end
 
@@ -127,7 +108,7 @@ local vector do
   local function sv_get_entity_right_vec(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
     if not is_server then return end
     if not ensure_entity(entity, sv_get_entity_right_vec) then return end
-    local _, right = sv_get_entity_matrix(entity)
+    local _, right = get_entity_matrix(entity)
     return right
   end
 
@@ -136,7 +117,7 @@ local vector do
   local function sv_get_entity_up_vec(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
     if not is_server then return end
     if not ensure_entity(entity, sv_get_entity_up_vec) then return end
-    local _, _, up = sv_get_entity_matrix(entity)
+    local _, _, up = get_entity_matrix(entity)
     return up
   end
 
@@ -148,12 +129,30 @@ local vector do
   local function get_offset_entity_worldcoords(entity, offset_x, offset_y, offset_z) -- Credits go to: [draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297)
     if not is_server then return end
     if not ensure_entity(entity, get_offset_entity_worldcoords) then return end
-    local forward, right, up, pos = sv_get_entity_matrix(entity)
+    local forward, right, up, pos = get_entity_matrix(entity)
     if not forward or not right or not up or not pos then return end
     local x = offset_x * forward.x + offset_y * right.x + offset_z * up.x + pos.x
     local y = offset_x * forward.y + offset_y * right.y + offset_z * up.y + pos.y
     local z = offset_x * forward.z + offset_y * right.z + offset_z * up.z + pos.z
     return vector3(x, y, z)
+  end
+
+  ---@param entity integer
+  ---@return vector3?
+  local function get_entity_right_vec(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
+    if is_server then return end
+    if not ensure_entity(entity, get_entity_right_vec) then return end
+    local _, right = get_entity_matrix(entity)
+    return right
+  end
+
+  ---@param entity integer
+  ---@return vector3?
+  local function get_entity_up_vec(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
+    if is_server then return end
+    if not ensure_entity(entity, get_entity_up_vec) then return end
+    local _, _, up = get_entity_matrix(entity)
+    return up
   end
 
   --------------------- OBJECT ---------------------
@@ -164,7 +163,7 @@ local vector do
     vector.getentityright = get_entity_right_vec
     vector.getentityup = get_entity_up_vec
   else
-    vector.getentitymatrix = sv_get_entity_matrix
+    vector.getentitymatrix = get_entity_matrix
     vector.getentityforward = get_entity_forward_vec
     vector.getentityright = sv_get_entity_right_vec
     vector.getentityup = sv_get_entity_up_vec
