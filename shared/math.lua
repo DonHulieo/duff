@@ -1,5 +1,5 @@
 local _math = math
----@class math
+---@class math: mathlib
 ---@field between fun(val: number, min: number, max: number): boolean?
 ---@field clamp fun(val: number, min: number, max: number): number
 ---@field round fun(val: number, increment: integer?): integer
@@ -68,34 +68,12 @@ local math do
     return current - time > limit
   end
 
-  return {
-    abs = _math.abs,
-    acos = _math.acos,
-    asin = _math.asin,
-    atan = _math.atan,
-    ceil = _math.ceil,
-    cos = _math.cos,
-    deg = _math.deg,
-    exp = _math.exp,
-    floor = _math.floor,
-    fmod = _math.fmod,
-    huge = _math.huge,
-    log = _math.log,
-    max = _math.max,
-    min = _math.min,
-    modf = _math.modf,
-    pi = _math.pi,
-    rad = _math.rad,
-    sin = _math.sin,
-    sqrt = _math.sqrt,
-    tan = _math.tan,
-    _random = math_random,
-    randomseed = random_seed,
+  return setmetatable({
     between = between,
     clamp = clamp,
     round = round,
     seedrng = seed_rng,
     random = random,
     timer = timer
-  }
+  }, {__index = _math})
 end
