@@ -51,7 +51,7 @@ local function does_res_exist(resource)
 end
 
 local function find_paths()
-  local resLim = get_num_of_res - 1
+  local resLim = get_num_of_res() - 1
   for i = 0, resLim do
     local res = get_res_by_find_index(i)
     if res and does_res_exist(res) then init_paths(res) end
@@ -141,7 +141,7 @@ local function deinit_package(resource)
 end
 
 local function deinit_packages()
-  local resLim = get_num_of_res - 1
+  local resLim = get_num_of_res() - 1
   for i = 0, resLim do
     local res = get_res_by_find_index(i)
     if res and does_res_exist(res) then deinit_package(res) end
