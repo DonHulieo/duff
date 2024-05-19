@@ -1,6 +1,8 @@
 local _ = require
 local type, error = type, error
 local load_resource_file = LoadResourceFile
+local get_num_res_meta, get_res_meta, get_num_of_res = GetNumResourceMetadata, GetResourceMetadata, GetNumResources
+local get_res_by_find_index, get_res_state, get_invoking_res, get_current_res = GetResourceByFindIndex, GetResourceState, GetInvokingResource, GetCurrentResourceName
 ---@diagnostic disable-next-line: deprecated
 local unpack = unpack or table.unpack
 package = {loaded = {}, path = {}, preload = {}}
@@ -28,9 +30,9 @@ end
 
 ---@param resource string
 local function init_paths(resource)
-  local filLim = ensure_files(resource, GetNumResourceMetadata) - 1
+  local filLim = ensure_files(resource, get_num_res_meta) - 1
   for i = 0, filLim do
-    local file = ensure_files(resource, GetResourceMetadata, i) --[[@as string]]
+    local file = ensure_files(resource, get_res_meta, i) --[[@as string]]
     local name = file:match('^(.-)%.lua$') or file:match('^(.-)%*%*$')
     if name then
       local path = name:gsub('%.', '/')
@@ -42,11 +44,17 @@ local function init_paths(resource)
   end
 end
 
+---@param resource string
+---@return boolean
+local function does_res_exist(resource)
+  return get_res_state(resource) ~= 'missing' and get_res_state(resource) ~= 'unknown'
+end
+
 local function find_paths()
-  local resLim = GetNumResources() - 1
+  local resLim = get_num_of_res - 1
   for i = 0, resLim do
-    local res = GetResourceByFindIndex(i)
-    init_paths(res)
+    local res = get_res_by_find_index(i)
+    if res and does_res_exist(res) then init_paths(res) end
   end
 end
 
@@ -65,15 +73,14 @@ end
 local function find_path(name)
   local parts = {}
   for part in name:gmatch('[^.]+') do parts[#parts + 1] = part end
-  local resource_state = GetResourceState
   local resource, file = parts[1], ''
-  local is_resource = resource_state(resource) ~= 'missing' and resource_state(resource) ~= 'unknown'
+  local is_resource = does_res_exist(resource)
   local func
   if is_resource then
     file = table.concat(parts, '/', 2, #parts)
     func = test_path(resource, file)
   else
-    local sources = {GetInvokingResource(), GetCurrentResourceName()} -- This checks for the module (if named w/o resource name ie. shared.bridge) inside the invoking resource and the current resource respectively.
+    local sources = {get_invoking_res(), get_current_res()} -- This checks for the module (if named w/o resource name ie. shared.bridge) inside the invoking resource and the current resource respectively.
     file = table.concat(parts, '/')
     for i = 1, #sources do
       local source = sources[i]
@@ -122,6 +129,7 @@ end
 
 exports('require', require)
 
+---@param resource string
 local function deinit_package(resource)
   for name, path in pairs(package.path) do
     if path[1] == resource then
@@ -132,5 +140,13 @@ local function deinit_package(resource)
   end
 end
 
+local function deinit_packages()
+  local resLim = get_num_of_res - 1
+  for i = 0, resLim do
+    local res = get_res_by_find_index(i)
+    if res and does_res_exist(res) then deinit_package(res) end
+  end
+end
+
 AddEventHandler('onResourceStart', init_paths)
-AddEventHandler('onResourceStop', deinit_package)
+AddEventHandler('onResourceStop', deinit_packages)
