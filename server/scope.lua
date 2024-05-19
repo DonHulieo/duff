@@ -8,7 +8,9 @@ local scope do
   local check_type = require('shared.debug').checktype
   ---@diagnostic disable-next-line: deprecated
   local tostring, unpack = tostring, unpack or table.unpack
+  local timer = require('shared.math').timer
   local client_event, create_thread, wait = TriggerClientEvent, CreateThread, Wait
+  local game_timer = GetGameTimer
   local current_resource = GetCurrentResourceName()
   local Scopes = {}
 
@@ -29,6 +31,7 @@ local scope do
   local function get_player_scope(player) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
     local src = ensure_string(player or source)
     if not check_type(src, 'string', get_player_scope, 1) then return end
+    Scopes[src] = Scopes[src] or {}
     return Scopes[src]
   end
 
@@ -61,8 +64,8 @@ local scope do
   ---@return {[string]: boolean}? targets
   local function trigger_scope_event(event, owner, ...) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
     local targets = get_player_scope(owner)
-    if not targets then return end
     client_event(event, owner, ...)
+    if not targets then return end
     for target, _ in pairs(targets) do client_event(event, target, ...) end
     return targets
   end
@@ -70,17 +73,20 @@ local scope do
   ---@param event string
   ---@param owner number|integer
   ---@param time integer?
+  ---@param duration integer?
   ---@param ... any
-  local function create_synced_scope_event(event, owner, time, ...)
+  local function create_synced_scope_event(event, owner, time, duration, ...)
     if not get_player_scope(owner) then return end
     local targets = trigger_scope_event(event, owner, ...)
     Scopes.Synced = Scopes.Synced or {}
     Scopes.Synced[event] = targets
     local args = {...}
+    local event_start = game_timer()
     time = time or 1000
     create_thread(function()
       while Scopes.Synced[event] do
         wait(time)
+        if duration and timer(event_start, duration) then Scopes.Synced[event] = nil end
         if not Scopes.Synced[event] then break end
         targets = Scopes[owner]
         if targets then
