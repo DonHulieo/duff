@@ -1,5 +1,5 @@
 local _math = math
----@class math: mathlib
+---@class math
 ---@field between fun(val: number, min: number, max: number): boolean?
 ---@field clamp fun(val: number, min: number, max: number): number
 ---@field round fun(val: number, increment: integer?): integer
