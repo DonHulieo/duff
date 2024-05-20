@@ -38,10 +38,12 @@ local bridge do
   ---@return any value
   local function for_each(table, fn)
     table = type(table) == 'table' and table or {table}
-    if not table then return end
-    for key, value in pairs(table) do
-      if fn(key, value) then return value end
+    local value = nil
+    if not table then return value end
+    for k, v in pairs(table) do
+      if fn(k, v) then value = v break end
     end
+    return value
   end
 
   ---@param table table<any, any>|any?
@@ -50,7 +52,7 @@ local bridge do
   local function get_key(table, value)
     local key = nil
     table = type(table) == 'table' and table or {table}
-    if not table then return end
+    if not table then return key end
     for k, v in pairs(table) do
       if v == value then key = k break end
     end
@@ -74,9 +76,7 @@ local bridge do
     if not array2 then return array1 end
     array1 = type(array1) == 'table' and array1 or {array1}
     array2 = type(array2) == 'table' and array2 or {array2}
-    for i = 1, #array2 do
-      array1[#array1 + 1] = array2[i]
-    end
+    for i = 1, #array2 do array1[#array1 + 1] = array2[i] end
     return array1
   end
 
@@ -101,9 +101,9 @@ local bridge do
 
   local NO_METHODS = {['INV'] = 'ox', ['TARGET'] = {'ox', 'qb'}}
   EXPORTS = {
-    CORE = {resource = get_key(Frameworks, FRAMEWORK), method = not for_each(NO_METHODS.CORE, function(_, value) return value ~= FRAMEWORK end) and EXPORTS.CORE[FRAMEWORK] or nil},
-    INV = {resource = get_key(Inventories, INVENTORY), method = not for_each(NO_METHODS.INV, function(_, value) return value ~= INVENTORY end) and EXPORTS.INV[INVENTORY] or nil},
-    TARGET = {resource = get_key(Targets, TARGET), method = not for_each(NO_METHODS.TARGET, function(_, value) return value ~= TARGET end) and EXPORTS.TARGET[TARGET] or nil}
+    CORE = {resource = get_key(Frameworks, FRAMEWORK), method = for_each(NO_METHODS.CORE, function(_, value) return value == FRAMEWORK end) == nil and EXPORTS.CORE[FRAMEWORK] or nil},
+    INV = {resource = get_key(Inventories, INVENTORY), method = for_each(NO_METHODS.INV, function(_, value) return value == INVENTORY end) == nil and EXPORTS.INV[INVENTORY] or nil},
+    TARGET = {resource = get_key(Targets, TARGET), method = for_each(NO_METHODS.TARGET, function(_, value) return value == TARGET end) == nil and EXPORTS.TARGET[TARGET] or nil}
   }
   local Core, Lib, Inv = consume_export(EXPORTS, 'CORE') --[[@as QBCore|table?]], consume_export(EXPORTS, 'LIB'), consume_export(EXPORTS, 'INV') --[[@as ox_inventory|table?]]
   local PlayerData = nil
