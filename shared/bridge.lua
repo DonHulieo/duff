@@ -175,6 +175,36 @@ local bridge do
     end
   end
 
+  ---@enum job_types
+  local job_types = {['leo'] = {['police'] = true, ['fib'] = true, ['sheriff'] = true}, ['ems'] = {['ambulance'] = true, ['fire'] = true}}
+  local function convert_job_data(data)
+    if not data then return end
+    if FRAMEWORK == 'esx' then
+      local name = data.name
+      return {
+        name = name,
+        label = data.label,
+        grade = data.grade,
+        grade_name = data.grade_name,
+        grade_label = data.grade_label,
+        job_type = for_each(job_types, function(_, value) return value[name] end) or '',
+        salary = data.salary
+      }
+    elseif FRAMEWORK == 'qb' then
+      local name = data.name
+      local grade = data.grade
+      return {
+        name = name,
+        label = data.label,
+        grade = grade.level,
+        grade_name = grade.name,
+        grade_label = grade.name,
+        job_type = data.type or for_each(job_types, function(_, value) return value[name] end) or '',
+        salary = data.payment
+      }
+    end
+  end
+
   EVENTS = {
     LOAD = not is_server and EVENTS.LOAD[FRAMEWORK] or nil,
     UNLOAD = not is_server and EVENTS.UNLOAD[FRAMEWORK] or nil,
@@ -192,7 +222,7 @@ local bridge do
           PlayerData = nil
         elseif event_type == 'JOBDATA' then
           if not PlayerData then return end
-          PlayerData.job = ...
+          PlayerData.job = convert_job_data(...)
         elseif event_type == 'PLAYERDATA' then
           PlayerData = ...
         elseif event_type == 'OBJECTUPDATE' then
@@ -252,22 +282,79 @@ local bridge do
   end
 
   ---@param player integer|string?
-  ---@return table? JobData
+  ---@return {name: string, label: string, grade: number, grade_name: string, grade_label: string, job_type: string, salary: number}? job_data
   local function get_job_data(player)
     local player_data = ensure_player_data(player or source, get_job_data, 'player') ---@cast player_data -?
+    local found_data = nil
     if is_server then
       if FRAMEWORK == 'esx' then
-        return player_data.getJob()
+        found_data = player_data.getJob()
+        if not found_data then return end
+        return convert_job_data(found_data)
       elseif FRAMEWORK == 'qb' then
-        return player_data.PlayerData.job
+        found_data = player_data.PlayerData.job
+        if not found_data then return end
+        return convert_job_data(found_data)
       end
     else
       if FRAMEWORK == 'esx' then
-        return player_data.job
+        found_data = player_data.job
+        if not found_data then return end
+        return convert_job_data(found_data)
       elseif FRAMEWORK == 'qb' then
-        return player_data.job
+        found_data = player_data.job
+        if not found_data then return end
+        return convert_job_data(found_data)
       end
     end
+  end
+
+  ---@param player integer|string?
+  ---@return {name: string, label: string, grade: number, grade_name: string}? gang_data
+  local function get_gang_data(player)
+    local player_data = ensure_player_data(player or source or nil, get_gang_data, 'player') ---@cast player_data -?
+    if is_server then
+      if FRAMEWORK == 'qb' then
+        local found_data = player_data.PlayerData.gang
+        if not found_data then return end
+        local grade = found_data.grade
+        return {
+          name = found_data.name,
+          label = found_data.label,
+          grade = grade.level,
+          grade_name = grade.name
+        }
+      end
+    else
+      if FRAMEWORK == 'qb' then
+        local found_data = player_data.gang
+        if not found_data then return end
+        local grade = found_data.grade
+        return {
+          name = found_data.name,
+          label = found_data.label,
+          grade = grade.level,
+          grade_name = grade.name
+        }
+      end
+    end
+  end
+
+  ---@param player integer|string?
+  ---@param groups string|string[]
+  ---@return boolean? has_group
+  local function does_player_have_group(player, groups)
+    local job_data = get_job_data(player or source or nil) ---@cast job_data -?
+    local gang_data = get_gang_data(player or source or nil) ---@cast gang_data -?
+    if not job_data and not gang_data then return end
+    if not check_type(groups, {'string', 'table'}, does_player_have_group, 'groups') then return end
+    groups = type(groups) == 'table' and groups or {groups}
+    for i = 1, #groups do
+      local group = groups[i]
+      if job_data.name == group or job_data.label == group or job_data.job_type == group then return true end
+      if gang_data and (gang_data.name == group or gang_data.label == group) then return true end
+    end
+    return false
   end
 
   ---@param player integer|string?
@@ -576,6 +663,7 @@ local bridge do
     getidentifier = get_player_identifier,
     getplayername = get_player_name,
     getjob = get_job_data,
+    doesplayerhavegroup = does_player_have_group,
     isplayerdowned = is_player_downed,
     createcallback = create_callback,
     triggercallback = trigger_callback
