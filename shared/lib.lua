@@ -1,10 +1,10 @@
 local _ = require
-local type, error = type, error
 local load_resource_file = LoadResourceFile
 local get_num_res_meta, get_res_meta, get_num_of_res = GetNumResourceMetadata, GetResourceMetadata, GetNumResources
 local get_res_by_find_index, get_res_state, get_invoking_res, get_current_res = GetResourceByFindIndex, GetResourceState, GetInvokingResource, GetCurrentResourceName
 ---@diagnostic disable-next-line: deprecated
-local unpack = unpack or table.unpack
+local pcall, load, table, select, unpack = pcall, load, table, select, unpack or table.unpack
+local type, error = type, error
 package = {loaded = {}, path = {}, preload = {}}
 
 ---@enum file_ids
@@ -58,12 +58,17 @@ local function find_paths()
   end
 end
 
-find_paths() -- Find As Many Paths As Possible On Startup
+---@param resource string
+local function init_packages(resource)
+  if resource ~= 'duff' then return end
+  find_paths()
+end
 
 ---@param resource string
 ---@param file string
 ---@return function|table|boolean path
 local function test_path(resource, file)
+  if not resource or not file then return false end
   local loaded, func = safe_load(resource, file)
   return loaded and func or false
 end
@@ -101,18 +106,9 @@ local function find_path(name)
   end
 end
 
----@param name string @The name of the module to require. This can be a path, or a module name. If a path is provided, it must be relative to the resource root.
+---@param module {[string]: any}
 ---@return {[string]: any} module
-function require(name)
-  local param_type = type(name)
-  if param_type ~= 'string' then error('bad argument #1 to \'require\' (string expected, got ' ..param_type.. ')', 1) end
-  local path = find_path(name)
-  if not path then error('bad argument #1 to \'require\' (invalid path)', 1) end
-  if package.loaded[name] then return package.loaded[name] end
-  if not package.preload[path] then error('bad argument #1 to \'require\' (no file found)', 1) end
-  local loaded, module = pcall(package.preload[path])
-  if not loaded then error('bad argument #1 to \'require\' (error loading file) \n' ..module, 1)
-  elseif not module then module = package.preload[path] end
+local function safe_load_module(module)
   for k, v in pairs(module) do
     if type(v) == 'function' then
       module[k] = function(...)
@@ -123,8 +119,24 @@ function require(name)
       end
     end
   end
+  return module
+end
+
+---@param name string @The name of the module to require. This can be a path, or a module name. If a path is provided, it must be relative to the resource root.
+---@return {[string]: any} module
+function require(name)
+  local param_type = type(name)
+  if param_type ~= 'string' then error('bad argument #1 to \'require\' (string expected, got ' ..param_type.. ')', 1) end
+  local path = find_path(name)
+  if not path then error('bad argument #1 to \'require\' (invalid path)', 1) end
+  if package.loaded[path] then return package.loaded[path] end
+  if not package.preload[path] then error('bad argument #1 to \'require\' (no file found)', 1) end
+  local loaded, module = pcall(package.preload[path])
+  if not loaded then error('bad argument #1 to \'require\' (error loading file) \n' ..module, 1)
+  elseif not module then module = package.preload[path] end
+  module = safe_load_module(module)
   package.loaded[name] = module
-  return package.loaded[name]
+  return module
 end
 
 exports('require', require)
@@ -133,20 +145,14 @@ exports('require', require)
 local function deinit_package(resource)
   for name, path in pairs(package.path) do
     if path[1] == resource then
-      package.path[name] = nil
-      package.preload[name] = nil
       package.loaded[name] = nil
+      package.preload[name] = nil
+      package.path[name] = nil
+      Wait(0)
     end
   end
 end
 
-local function deinit_packages()
-  local resLim = get_num_of_res() - 1
-  for i = 0, resLim do
-    local res = get_res_by_find_index(i)
-    if res and does_res_exist(res) then deinit_package(res) end
-  end
-end
-
-AddEventHandler('onResourceStart', init_paths)
-AddEventHandler('onResourceStop', deinit_packages)
+AddEventHandler('onResourceStarting', init_paths)
+AddEventHandler('onResourceStart', init_packages)
+AddEventHandler('onResourceStop', deinit_package)
