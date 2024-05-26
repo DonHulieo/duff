@@ -7,8 +7,8 @@
 ---@field removezoneevent fun(event: string)
 local zone do
   local ZONES = json.decode(LoadResourceFile('duf', 'data/zones.json'))
-  local check_type = require('shared.debug').checktype
-  local convert_to_vec = require('shared.vector').tabletovector
+  local check_type = require('duff.shared.debug').checktype
+  local convert_to_vec = require('duff.shared.vector').tabletovector
   local Listeners = {}
 
   ---@param index integer

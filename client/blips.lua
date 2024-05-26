@@ -8,11 +8,11 @@
 ---@field remove fun(blips: integer|integer[])
 local blips do
   local require = require
-  ---@module 'duf.shared.array'
-  local array = require 'shared.array'
-  local check_type = require('shared.debug').checktype
+  ---@module 'duff.shared.array'
+  local array = require 'duff.shared.array'
+  local check_type = require('duff.shared.debug').checktype
   local does_blip_exist = DoesBlipExist
-  local get_closest = require('shared.vector').getclosest
+  local get_closest = require('duff.shared.vector').getclosest
 
   ---@return array blips_ids An array of all currently active blip handles
   local function get_all() -- Credits go to: [negbook](https://github.com/negbook/nbk_blips)
@@ -90,7 +90,7 @@ local blips do
   local function remove_blips(blip_ids)
     if not blip_ids then return end
     local _, param_type = check_type(blip_ids, {'table', 'number'}, remove_blips, 1)
-    blip_ids = blip_ids?.__type == 'array' and blip_ids or  param_type ~= 'table' and array.new{blip_ids} or array.new(blip_ids) ---@cast blip_ids -integer|-integer[]|+array
+    blip_ids = blip_ids?.__type == 'array' and blip_ids or param_type == 'table' and array.new(blip_ids --[[@as table]]) or array.new{blip_ids} ---@cast blip_ids -integer|-integer[]|+array
     SetThisScriptCanRemoveBlipsCreatedByAnyScript(true)
     blip_ids:foreach(RemoveBlip)
     SetThisScriptCanRemoveBlipsCreatedByAnyScript(false)

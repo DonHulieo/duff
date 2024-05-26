@@ -10,12 +10,12 @@ local vector do
   local type, error = type, error
   local does_entity_exist, get_coords = DoesEntityExist, GetEntityCoords
   local require = require
-  ---@module 'shared.debug'
-  local debug = require 'shared.debug'
+  ---@module 'duff.shared.debug'
+  local debug = require 'duff.shared.debug'
   local get_fn_info, raise_error, check_type = debug.getfuncinfo, debug.raiseerror, debug.checktype
   local math, vector3 = math, vector3
-  ---@module 'duf.shared.array'
-  local array = require 'shared.array'
+  ---@module 'duff.shared.array'
+  local array = require 'duff.shared.array'
   local is_server = IsDuplicityVersion() == 1
   local rad, cos, sin = math.rad, math.cos, math.sin
 

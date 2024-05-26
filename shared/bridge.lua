@@ -21,7 +21,7 @@ local bridge do
   local Inventories = {['ox_inventory'] = 'ox'}
   local Libs = {['ox_lib'] = 'ox'}
   local Targets = {['ox_target'] = 'ox', ['qb_target'] = 'qb'}
-  local check_type = require('shared.debug').checktype
+  local check_type = require('duff.shared.debug').checktype
   local is_server = IsDuplicityVersion() == 1
 
   --------------------- INTERNAL ---------------------
@@ -344,14 +344,14 @@ local bridge do
   ---@param groups string|string[]
   ---@return boolean? has_group
   local function does_player_have_group(player, groups)
-    local job_data = get_job_data(player or source or nil) ---@cast job_data -?
-    local gang_data = get_gang_data(player or source or nil) ---@cast gang_data -?
+    local job_data = get_job_data(player or source or nil)
+    local gang_data = get_gang_data(player or source or nil)
     if not job_data and not gang_data then return end
     if not check_type(groups, {'string', 'table'}, does_player_have_group, 'groups') then return end
     groups = type(groups) == 'table' and groups or {groups}
     for i = 1, #groups do
       local group = groups[i]
-      if job_data.name == group or job_data.label == group or job_data.job_type == group then return true end
+      if job_data and (job_data.name == group or job_data.label == group or job_data.job_type == group) then return true end
       if gang_data and (gang_data.name == group or gang_data.label == group) then return true end
     end
     return false

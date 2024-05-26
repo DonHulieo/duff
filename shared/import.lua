@@ -14,27 +14,26 @@
 ---@field vector vector
 ---@field zone zone
 duff = {}
-local resource = 'duff'
-local version = GetResourceMetadata(resource, 'version', 0)
-local url = GetResourceMetadata(resource, 'url', 0)
-local des = GetResourceMetadata(resource, 'description', 0)
-local require = GetCurrentResourceName() ~= resource and function(path) return exports.duff:require(path) end or require
+local version = GetResourceMetadata('duff', 'version', 0)
+local url = GetResourceMetadata('duff', 'url', 0)
+local des = GetResourceMetadata('duff', 'description', 0)
+local require = GetCurrentResourceName() ~= 'duff' and function(path) return exports.duff:require(path) end or require
 local is_server = IsDuplicityVersion() == 1
 duff._VERSION = version
 duff._URL = url
 duff._DESCRIPTION = des
 duff.require = require
-duff.array = require 'shared.array'
-duff.bridge = require 'shared.bridge'
-duff.locale = require 'shared.locale'
-duff.math = require 'shared.math'
-duff.vector = require 'shared.vector'
+duff.array = require 'duff.shared.array'
+duff.bridge = require 'duff.shared.bridge'
+duff.locale = require 'duff.shared.locale'
+duff.math = require 'duff.shared.math'
+duff.vector = require 'duff.shared.vector'
 if not is_server then
-  duff.blips = require 'client.blips'
-  duff.pools = require 'client.pools'
-  duff.streaming = require 'client.streaming'
+  duff.blips = require 'duff.client.blips'
+  duff.pools = require 'duff.client.pools'
+  duff.streaming = require 'duff.client.streaming'
 else
-  duff.scope = require 'server.scope'
-  duff.zone = require 'server.zone'
+  duff.scope = require 'duff.server.scope'
+  duff.zone = require 'duff.server.zone'
 end
 return duff

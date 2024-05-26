@@ -6,9 +6,9 @@
 ---@field t fun(key: string, data: table): string Translates a key with optional data.
 local locale do
   local require = require
-  local check_type = require('shared.debug').checktype
-  ---@module 'shared.array'
-  local array = require 'shared.array'
+  local check_type = require('duff.shared.debug').checktype
+  ---@module 'duff.shared.array'
+  local array = require 'duff.shared.array'
   local unpack = table.unpack
   local tostring = tostring
   local load_resource_file = LoadResourceFile

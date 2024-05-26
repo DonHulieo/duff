@@ -8,7 +8,7 @@ local _math = math
 ---@field timer fun(time: integer, limit: integer): boolean
 local math do
   local require = require
-  local check_type = require('shared.debug').checktype
+  local check_type = require('duff.shared.debug').checktype
   local math_floor = _math.floor
   local random_seed, math_random = _math.randomseed, _math.random
   local tonumber, tostring = tonumber, tostring

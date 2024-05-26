@@ -7,9 +7,9 @@
 ---@field loadptfx fun(fx: string, isAsync: boolean?): boolean?
 local streaming do
   local require = require
-  local timer = require('shared.math').timer
+  local timer = require('duff.shared.math').timer
   local type, error, tostring = type, error, tostring
-  local check_type = require('shared.debug').checktype
+  local check_type = require('duff.shared.debug').checktype
   local promise, table = promise, table
   local await, wait, create_thread = Citizen.Await, Wait, CreateThread
   local game_timer, in_cd, joaat, valid = GetGameTimer, IsModelInCdimage, joaat, IsModelValid

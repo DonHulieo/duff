@@ -9,11 +9,11 @@
 ---@field getclosestpickup fun(coords: vector3|integer?, hash: string|number?, radius: number?, excluding: integer[]|string[]|number[]): integer?, number?, array?
 local pools do
   local require = require
-  ---@module 'duf.shared.array'
-  local array = require 'shared.array'
+  ---@module 'duff.shared.array'
+  local array = require 'duff.shared.array'
   local type = type
   local get_pool, does_entity_exist, get_coords = GetGamePool, DoesEntityExist, GetEntityCoords
-  local get_closest = require('shared.vector').getclosest
+  local get_closest = require('duff.shared.vector').getclosest
 
   ---@param ped_type integer?
   ---@return array

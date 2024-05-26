@@ -5,10 +5,10 @@
 ---@field createsyncedscopeevent fun(event: string, owner: number|integer, time: integer?, ...: any)
 ---@field removesyncedscopeevent fun(event: string)
 local scope do
-  local check_type = require('shared.debug').checktype
+  local check_type = require('duff.shared.debug').checktype
   ---@diagnostic disable-next-line: deprecated
   local tostring, unpack = tostring, unpack or table.unpack
-  local timer = require('shared.math').timer
+  local timer = require('duff.shared.math').timer
   local client_event, create_thread, wait = TriggerClientEvent, CreateThread, Wait
   local game_timer = GetGameTimer
   local current_resource = GetCurrentResourceName()

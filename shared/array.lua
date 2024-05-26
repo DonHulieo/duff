@@ -31,8 +31,8 @@ local array do
   array.sort = table.sort
   array.concat = table.concat
   local min = math.min
-  ---@module 'shared.debug'
-  local debug = require 'shared.debug'
+  ---@module 'duff.shared.debug'
+  local debug = require 'duff.shared.debug'
   local check_type = debug.checktype
 
   ---@param tbl table
