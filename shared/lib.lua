@@ -154,5 +154,7 @@ local function deinit_package(resource)
 end
 
 AddEventHandler('onResourceStarting', init_paths)
+AddEventHandler('onClientResourceStart', init_paths)
 AddEventHandler('onResourceStart', init_packages)
 AddEventHandler('onResourceStop', deinit_package)
+AddEventHandler('onClientResourceStop', deinit_package)
