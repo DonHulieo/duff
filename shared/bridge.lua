@@ -74,8 +74,7 @@ local bridge do
   local function merge_arrays(array1, array2)
     if not array1 then return end
     if not array2 then return array1 end
-    array1 = type(array1) == 'table' and array1 or {array1}
-    array2 = type(array2) == 'table' and array2 or {array2}
+    array1, array2 = type(array1) == 'table' and array1 or {array1}, type(array2) == 'table' and array2 or {array2}
     for i = 1, #array2 do array1[#array1 + 1] = array2[i] end
     return array1
   end
@@ -98,7 +97,6 @@ local bridge do
     PLAYERDATA = {['esx'] = 'esx:setPlayerData', ['qb'] = 'QBCore:Player:SetPlayerData'},
     OBJECTUPDATE = {['qb'] = not is_server and 'QBCore:Client:UpdateObject' or 'QBCore:Server:UpdateObject'}
   }
-
   local NO_METHODS = {['INV'] = 'ox', ['TARGET'] = {'ox', 'qb'}}
   EXPORTS = {
     CORE = {resource = get_key(Frameworks, FRAMEWORK), method = for_each(NO_METHODS.CORE, function(_, value) return value == FRAMEWORK end) == nil and EXPORTS.CORE[FRAMEWORK] or nil},
@@ -121,8 +119,7 @@ local bridge do
   ---@return QBCore|table?
   local function get_core_object()
     if not FRAMEWORK then return end
-    if Core then return Core end
-    Core = consume_export(EXPORTS, 'CORE')
+    Core = not Core and consume_export(EXPORTS, 'CORE') or Core
     return Core
   end
 
