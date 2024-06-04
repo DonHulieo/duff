@@ -158,3 +158,5 @@ AddEventHandler('onClientResourceStart', init_paths)
 AddEventHandler('onResourceStart', init_packages)
 AddEventHandler('onResourceStop', deinit_package)
 AddEventHandler('onClientResourceStop', deinit_package)
+
+if IsDuplicityVersion() == 1 then SetConvarReplicated('locale', GetConvar('locale', 'en')) end

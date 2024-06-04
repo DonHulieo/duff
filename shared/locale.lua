@@ -3,7 +3,7 @@
 ---@field load fun(context: string?, data: table) Loads a table of translations.
 ---@field loadfile fun(resource: string?, file: string?) Loads a file of translations.
 ---@field translate fun(key: string, data: table?): string Translates a key with optional data.
----@field t fun(key: string, data: table): string Translates a key with optional data.
+---@field t fun(key: string, data: table?): string Translates a key with optional data.
 local locale do
   local require = require
   local check_type = require('duff.shared.debug').checktype
@@ -179,7 +179,7 @@ local locale do
     file = file or ('locales/'..dialect) --[[@as string]]
     local translations = safe_load(resource, file) and load(load_resource_file(resource, file..'.lua'))
     if not translations then return end
-    recursive_load(nil, translations())
+    recursive_load(file:match('locales/(%w+)') or 'translations', translations())
   end
 
   ---@param key string
@@ -188,7 +188,7 @@ local locale do
   local function translate(key, data)
     assert_string(translate, key, 'key')
     data = data or {}
-    if #storage == 0 then load_file() end
+    if not next(storage) then load_file() end
     local used_locale = data.locale or default_locale
     local result = fallbacks(used_locale, dialect)
     for i = 1, #result do
