@@ -77,7 +77,7 @@ local vector do
     if not is_server or not get_rotation then return end
     if not ensure_entity(entity, sv_get_entity_matrix) then return end
     local rot = get_rotation(entity)
-    local x, y, z in rot
+    local x, y, z = rot.x, rot.y, rot.z
     x, y, z = rad(x), rad(y), rad(z)
     local matrix = {{}, {}, {}, {}}
     matrix[1] = {cos(z) * cos(y) - sin(z) * sin(x) * sin(y), cos(y) * sin(z) + cos(z) * sin(x) * sin(y), -cos(x) * sin(y), 1}

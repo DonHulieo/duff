@@ -168,12 +168,7 @@ array is a class for the creation and manipulation of consecutive integer indexe
 ---@module 'duff.shared.array'
 local array = exports.duff:require 'duff.shared.array'
 
--- Using the `require` export on the duff object
----@module 'duff.shared.import'
-local duff = exports.duff:require 'duff.shared.import'
--- Attaching the array object to a local variable (Lua 5.4+)
-local array in duff
--- Attaching the array object to a local variable
+-- Attaching array to a local variable from the duff object
 local array = duff.array
 ```
 
@@ -468,12 +463,7 @@ The module automatically uses the servers' convars to determine locale , both di
 ---@module 'duff.shared.locale'
 local locale = exports.duff:require 'duff.shared.locale'
 
--- Using the `require` export on the duff object
----@module 'duff.shared.import'
-local duff = exports.duff:require 'duff.shared.import'
--- Attaching the locale object to a local variable (Lua 5.4+)
-local locale in duff
--- Attaching the locale object to a local variable
+-- Attaching the locale to a local variable from the duff object
 local locale = duff.locale
 ```
 
@@ -574,12 +564,7 @@ math is an object containing some useful math functions. Most notably, it contai
 ---@module 'duff.shared.math'
 local math = exports.duff:require 'duff.shared.math'
 
--- Using the `require` export on the duff object
----@module 'duff.shared.import'
-local duff = exports.duff:require 'duff.shared.import'
--- Attaching the math object to a local variable (Lua 5.4+)
-local math in duff
--- Attaching the math object to a local variable
+-- Attaching the math to a local variable from the duff object
 local math = duff.math
 ```
 
@@ -648,12 +633,7 @@ function math.timer(time, limit)
 ---@module 'duff.shared.vector'
 local vector = exports.duff:require 'duff.shared.vector'
 
--- Using the `require` export on the duff object
----@module 'duff.shared.import'
-local duff = exports.duff:require 'duff.shared.import'
--- Attaching the vector object to a local variable (Lua 5.4+)
-local vector in duff
--- Attaching the vector object to a local variable
+-- Attaching the vector to a local variable from the duff object
 local vector = duff.vector
 ```
 
@@ -738,12 +718,7 @@ function vector.getoffsetfromentityinworldcoords(entity, offsetX, offsetY, offse
 ---@module 'duff.client.blips'
 local blips = exports.duff:require 'duff.client.blips'
 
--- Using the `require` export on the duff object
----@module 'duff.shared.import'
-local duff = exports.duff:require 'duff.shared.import'
--- Attaching the blips object to a local variable (Lua 5.4+)
-local blips in duff
--- Attaching the blips object to a local variable
+-- Attaching the blips to a local variable from the duff object
 local blips = duff.blips
 ```
 
@@ -804,12 +779,7 @@ function blips.remove(blips)
 ---@module 'duff.client.pools'
 local pools = exports.duff:require 'duff.client.pools'
 
--- Using the `require` export on the duff object
----@module 'duff.shared.import'
-local duff = exports.duff:require 'duff.shared.import'
--- Attaching the pools object to a local variable (Lua 5.4+)
-local pools in duff
--- Attaching the pools object to a local variable
+-- Attaching the pools to a local variable from the duff object
 local pools = duff.pools
 ```
 
@@ -895,12 +865,7 @@ function pools.getclosestpickup(coords, hash, radius, ignore)
 ---@module 'duff.client.streaming'
 local streaming = exports.duff:require 'duff.client.streaming'
 
--- Using the `require` export on the duff object
----@module 'duff.shared.import'
-local duff = exports.duff:require 'duff.shared.import'
--- Attaching the streaming object to a local variable (Lua 5.4+)
-local streaming in duff
--- Attaching the streaming object to a local variable
+-- Attaching the streaming to a local variable from the duff object
 local streaming = duff.streaming
 ```
 
@@ -969,12 +934,7 @@ function streaming.loadptfx(fx, isAsync)
 ---@module 'duff.server.scope'
 local scope = exports.duff:require 'duff.server.scope'
 
--- Using the `require` export on the duff object
----@module 'duff.shared.import'
-local duff = exports.duff:require 'duff.shared.import'
--- Attaching the scope object to a local variable (Lua 5.4+)
-local scope in duff
--- Attaching the scope object to a local variable
+-- Attaching the scope to a local variable from the duff object
 local scope = duff.scope
 ```
 
@@ -1024,12 +984,7 @@ function scope.removesyncedscopeevent(event)
 ---@module 'duff.server.zone'
 local zone = exports.duff:require 'duff.server.zone'
 
--- Using the `require` export on the duff object
----@module 'duff.shared.import'
-local duff = exports.duff:require 'duff.shared.import'
--- Attaching the zone object to a local variable (Lua 5.4+)
-local zone in duff
--- Attaching the zone object to a local variable
+-- Attaching the zone to a local variable from the duff object
 local zone = duff.zone
 ```
 

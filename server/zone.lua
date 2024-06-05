@@ -16,7 +16,7 @@ local zone do
   ---@return boolean
   local function check_bounds(index, coords)
     local bounds = ZONES[index].Bounds
-    local x, y, z in coords
+    local x, y, z = coords.x, coords.y, coords.z
     for i = 1, #bounds do
       local min, max = bounds[i].Minimum, bounds[i].Maximum
       local xMin, yMin, zMin, xMax, yMax, zMax = min.X, min.Y, min.Z, max.X, max.Y, max.Z
