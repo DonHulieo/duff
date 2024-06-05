@@ -5,12 +5,27 @@ Don's Utility Functions for FiveM
 ## Description
 
 Has you're script gone up the *[duff](https://www.urbandictionary.com/define.php?term=Up%20The%20Duff)*?
-Well, this is the solution for you! This is a collection of *optimised utility functions* that are exports for you to use in your scripts.
+Well, this is the solution for you! This is a collection of *optimised utility modules* for FiveM, to be imported and used in your scripts. It's designed to be lightweight, and easy to use, with a focus on performance and efficiency.
+
+## Features
+
+- **Require:** Emulates Lua's default require function, using package.path, package.preload and package.loaded. Also precaches all modules labled as `file` in the `fxmanifest.lua` and any modules that are imported using the `require` function.
+- **Array:** A class for the creation and manipulation of consecutive integer indexed arrays, providing a number of Functional Programming methods.
+- **Bridge:** Provides common functions between different frameworks and libraries for use in creating cross-framework scripts.
+- **Locale:** Contains functions for localisation and translation, based on the i18n.lua library by kikito.
+- **Math:** Contains some useful math functions, including a `seedrng` function which generates a random seed based on the current time, and an improvement to the default lua `random` function.
+- **Vector:** Contains some useful vector functions, including a `getclosest` function which finds the closest vector3 in an array to a given vector3.
+- **Blips:** Contains functions for managing blips, including `getall`, `onscreen`, `bycoords`, `bysprite`, `bytype`, `getinfo` and `remove`.
+- **Pools:** Contains functions for managing entity pools, including `getpeds`, `getvehicles`, `getobjects`, `getpickups`, `getclosestped`, `getclosestvehicle`, `getclosestobject` and `getclosestpickup`.
+- **Streaming:** Contains functions for managing streaming, including `loadanimdict`, `loadanimset`, `loadcollision`, `loadipl`, `loadmodel` and `loadptfx`.
+- **Scope:** Contains functions for managing scope, including `getplayerscope`, `triggerscopeevent`, `createsyncedscopeevent` and `removesyncedscopeevent`.
+- **Zone:** Contains functions for management of map zones similar to PolyZone but is server-side only, including `contains`, `getzone`, `getzonename`, `getzoneindex`, `addzoneevent` and `removezoneevent`.
 
 ## Table of Contents
 
 - [duff](#duff)
   - [Description](#description)
+  - [Features](#features)
   - [Table of Contents](#table-of-contents)
   - [Credits](#credits)
   - [Installation](#installation)
@@ -131,7 +146,8 @@ Well, this is the solution for you! This is a collection of *optimised utility f
     - [Support](#support)
     - [Changelog](#changelog)
 
-<!-- [x] Document Various Function Calls -->
+<!-- [x] Update #Description & Add #Features -->
+<!-- [ ] Add descriptions to Methods & Notes Needed -->
 
 ## Credits
 
