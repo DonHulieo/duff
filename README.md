@@ -30,6 +30,7 @@ Well, this is the solution for you! This is a collection of *optimised utility f
       - [poparray](#poparray)
       - [contains (array)](#contains-array)
       - [copy](#copy)
+      - [find](#find)
       - [foldleft](#foldleft)
       - [foldright](#foldright)
       - [setenum](#setenum)
@@ -37,12 +38,30 @@ Well, this is the solution for you! This is a collection of *optimised utility f
       - [filter](#filter)
       - [foreach](#foreach)
       - [reverse](#reverse)
-    - [debug](#debug)
-      - [Importing the debug Module](#importing-the-debug-module)
-      - [getfuncchain](#getfuncchain)
-      - [getfunclevel](#getfunclevel)
-      - [getfuncinfo](#getfuncinfo)
-      - [checktype](#checktype)
+    - [bridge](#bridge)
+      - [Importing the bridge Module](#importing-the-bridge-module)
+      - [\_DATA](#_data)
+      - [Shared Functions](#shared-functions)
+        - [getcore](#getcore)
+        - [getlib](#getlib)
+        - [getinv](#getinv)
+        - [getplayer](#getplayer)
+        - [getidentifier](#getidentifier)
+        - [getplayername](#getplayername)
+        - [getjob](#getjob)
+        - [doesplayerhavegroup](#doesplayerhavegroup)
+        - [isplayerdowned](#isplayerdowned)
+        - [createcallback](#createcallback)
+        - [triggercallback](#triggercallback)
+      - [Server Functions](#server-functions)
+        - [getallitems](#getallitems)
+        - [getitem](#getitem)
+        - [createuseableitem](#createuseableitem)
+        - [additem](#additem)
+        - [removeitem](#removeitem)
+      - [Client Functions](#client-functions)
+        - [addlocalentity](#addlocalentity)
+        - [removelocalentity](#removelocalentity)
     - [locale](#locale)
       - [Importing the locale Module](#importing-the-locale-module)
       - [set](#set)
@@ -59,12 +78,12 @@ Well, this is the solution for you! This is a collection of *optimised utility f
       - [timer](#timer)
     - [vector](#vector)
       - [Importing the vector Module](#importing-the-vector-module)
-      - [Shared Functions](#shared-functions)
+      - [Shared Functions (math)](#shared-functions-math)
         - [tabletovector](#tabletovector)
         - [getclosest](#getclosest)
         - [getentityright](#getentityright)
         - [getentityup](#getentityup)
-      - [Server Functions](#server-functions)
+      - [Server Functions (math)](#server-functions-math)
         - [getentitymatrix](#getentitymatrix)
         - [getentityforward](#getentityforward)
         - [getoffsetfromentityinworldcoords](#getoffsetfromentityinworldcoords)
@@ -74,6 +93,7 @@ Well, this is the solution for you! This is a collection of *optimised utility f
       - [onscreen](#onscreen)
       - [bycoords](#bycoords)
       - [bysprite](#bysprite)
+      - [bytype](#bytype)
       - [getinfo](#getinfo)
       - [remove](#remove)
     - [pools](#pools)
@@ -177,7 +197,7 @@ local array = duff.array
 Creates a new array.
 
 ```lua
----@param list any[]
+---@param list any[]?
 ---@return array
 local tbl = array.new(list)
 ```
@@ -304,6 +324,17 @@ Creates a shallow copy of the array.
 function array.copy(self)
 ```
 
+#### find
+
+Searches for the first element that satisfies a given condition and returns its index.
+
+```lua
+---@param self array
+---@param func fun(val: any, i: integer): boolean
+---@return integer?
+function array.find(self, func)
+```
+
 #### foldleft
 
 Applies a function to each element from left to right, accumulating a result.
@@ -381,61 +412,231 @@ Reverses the order of elements.
 function array.reverse(self, length)
 ```
 
-### debug
+### bridge
 
-debug is an internal class mainly used to ensure error handling and debugging is done correctly. It provides a number of methods to help with this.
+bridge is a class that provides common functions between different frameworks and libraries for use in creating cross-framework scripts. It currently has limited scope, managing player job/gang data, retreiving the core framework and some exposed methods between comon Inventory and Target scripts.
 
-#### Importing the debug Module
-
-The module can __only__ be imported using the `require` export.
+#### Importing the bridge Module
 
 ```lua
 -- Using the `require` export
----@module 'duff.shared.debug'
-local debug = exports.duff:require 'duff.shared.debug'
+---@module 'duff.shared.bridge'
+local bridge = exports.duff:require 'duff.shared.bridge'
+
+-- Attaching the bridge to a local variable from the duff object
+local bridge = duff.bridge
 ```
 
-#### getfuncchain
+#### _DATA
 
-Retrieves the function call chain at the specified level.
+The `_DATA` table is used to store common data for the bridge class.
 
 ```lua
----@param level integer @The level of the stack to get the function chain from.
----@return string[]? func_chain @The function chain as a string array.
-function debug.getfuncchain(level)
+---@class _DATA
+---@field FRAMEWORK 'esx'|'qb'?
+---@field INVENTORY 'ox'?
+---@field LIB 'ox'?
+---@field EVENTS {LOAD: string?, UNLOAD: string?, JOBDATA: string?, PLAYERDATA: string?, UPDATEOBJECT: string?}
+---@field EXPORTS {CORE: {resource: string, method: string}, INV: {resource: string, method: string}, TARG: {resource: string, method: string}}
+---@field ITEMS {[string]: {name: string, label: string, weight: number, useable: boolean, unique: boolean}}? 
 ```
 
-#### getfunclevel
+- The `FRAMEWORK` field is used to store the name of the core framework being used.
+- The `INVENTORY` field is used to store the name of the inventory framework being used.
+- The `LIB` field is used to store the name of the library being used.
+- The `EVENTS` table is used to store common event names, with the `LOAD`, `UNLOAD`, `JOBDATA` and `PLAYERDATA` being available on the client side, and the `UPDATEOBJECT` being a shared element.
+- The `EXPORTS` table is used to store common exports.
+- The `ITEMS` table is only available on the server side, and is used to store item data for use in the inventory system.
 
-Retrieves the level of the specified function in the call stack.
+#### Shared Functions
+
+##### getcore
+
+Retrieves the core framework being used.
 
 ```lua
----@param func fn @The function to get the level of.
----@return integer? level @The level of the function in the call stack, or nil if the function was not found.
-function debug.getfunclevel(func)
+---@return table? framework
+function bridge.getcore()
 ```
 
-#### getfuncinfo
+##### getlib
 
-Retrieves information about the specified function.
+Retrieves the library being used.
 
 ```lua
----@param func fn @The function to get information about.
----@return {name: string, source: string, line: integer}? info @A table containing the name, source, and line number of the function, or nil if the information could not be retrieved.function.
-function debug.getfuncinfo(func)
+---@return table? lib
+function bridge.getlib()
 ```
 
-#### checktype
+##### getinv
 
-Checks if the parameter matches the expected type(s).
+Retrieves the inventory framework being used.
 
 ```lua
----@param param any @The parameter to check the type of.
----@param type_name string|string[] @The expected type(s) of the parameter.
----@param fn function @The function where the parameter is being checked.
----@param arg_no integer|string? @The argument number or name being checked.
----@return boolean? type_valid, string param_type @Returns true if the parameter type matches the expected type, or false if it does not. Also returns the actual type of the parameter.
-local function check_type(param, type_name, fn, arg_no)
+---@return table? inv
+function bridge.getinv()
+```
+
+##### getplayer
+
+Retrieves the player data.
+
+```lua
+---@param player integer|string?
+---@return table? player_data
+function bridge.getplayer(player)
+```
+
+##### getidentifier
+
+Retrieves the player identifier.
+
+```lua
+---@param player integer|string?
+---@return string? identifier
+function bridge.getidentifier(player)
+```
+
+##### getplayername
+
+Retrieves the player name.
+
+```lua
+---@param player integer|string?
+---@return string? name
+function bridge.getplayername(player)
+```
+
+##### getjob
+
+Retrieves the player job data.
+
+```lua
+---@param player integer|string?
+---@return {name: string, label: string, grade: number, grade_name: string, grade_label: string, job_type: string, salary: number}? job_data
+function bridge.getjob(player)
+```
+
+##### doesplayerhavegroup
+
+Checks if the player has a specific group (either job or gang).
+
+```lua
+---@param player integer|string?
+---@param groups string|string[]
+---@return boolean?
+function bridge.doesplayerhavegroup(player, groups)
+```
+
+##### isplayerdowned
+
+Checks if the player is downed.
+
+```lua
+---@param player integer|string?
+---@return boolean?
+function bridge.isplayerdowned(player)
+```
+
+##### createcallback
+
+Creates a callback function.
+
+```lua
+---@param name string
+---@param callback function
+function bridge.createcallback(name, callback)
+```
+
+##### triggercallback
+
+Triggers a callback function.
+
+```lua
+---@param player integer|string?
+---@param name string
+---@param callback function
+---@param ... any
+---@return any?
+function bridge.triggercallback(player, name, callback, ...)
+```
+
+**Note:** When triggering client callbacks, `player` is the source you wish to trigger the callback on, otherwise it can be left as `nil`.
+
+#### Server Functions
+
+##### getallitems
+
+Retrieves all items.
+
+```lua
+---@return {[string]: {name: string, label: string, weight: number, useable: boolean, unique: boolean}}?
+function bridge.getallitems()
+```
+
+##### getitem
+
+Retrieves a specific item.
+
+```lua
+---@param item string
+---@return {name: string, label: string, weight: number, useable: boolean, unique: boolean}?
+function bridge.getitem(item)
+```
+
+##### createuseableitem
+
+Creates a useable item.
+
+```lua
+---@param name string
+---@param callback fun(player: integer|string)
+function bridge.createuseableitem(name, callback)
+```
+
+##### additem
+
+Adds an item to the player inventory.
+
+```lua
+---@param player integer|string?
+---@param item string
+---@param amount integer
+---@return boolean? success
+function bridge.additem(player, item, amount)
+```
+
+##### removeitem
+
+Removes an item from the player inventory.
+
+```lua
+---@param player integer|string?
+---@param item string
+---@param amount integer
+---@return boolean? success
+function bridge.removeitem(player, item, amount)
+```
+
+#### Client Functions
+
+##### addlocalentity
+
+Adds a local target entity.
+
+```lua
+---@param entities integer|integer[]
+---@param options {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: fun(entity: number, distance: number)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]}
+function bridge.addlocalentity(entities, options)
+```
+
+##### removelocalentity
+
+Removes a local target entity.
+
+```lua
+---@param entities integer|integer[]
+function bridge.removelocalentity(entities)
 ```
 
 ### locale
@@ -637,7 +838,7 @@ local vector = exports.duff:require 'duff.shared.vector'
 local vector = duff.vector
 ```
 
-#### Shared Functions
+#### Shared Functions (math)
 
 ##### tabletovector
 
@@ -678,7 +879,7 @@ function vector.getentityright(entity)
 function vector.getentityup(entity)
 ```
 
-#### Server Functions
+#### Server Functions (math)
 
 ##### getentitymatrix
 
@@ -753,11 +954,19 @@ function blips.bycoords(coords, radius)
 function blips.bysprite(sprite)
 ```
 
+#### bytype
+
+```lua
+---@param type integer
+---@return array? blips
+function blips.bytype(type)
+```
+
 #### getinfo
   
 ```lua
 ---@param blip integer
----@return table? blip_info
+---@return {alpha: integer, coords: vector3, colour: integer, display: integer, fade: boolean, hud_colour: integer, type: integer, rotation: number, is_shortrange: boolean}? blip_info
 function blips.getinfo(blip)
 ```
 
@@ -962,8 +1171,9 @@ function scope.triggerscopeevent(event, source, ...)
 ---@param event string
 ---@param source number|integer
 ---@param timer integer?
+---@param duration integer?
 ---@param ... any
-function scope.createsyncedscopeevent(event, source, timer, ...)
+function scope.createsyncedscopeevent(event, source, timer, duration, ...)
 ```
 
 #### removesyncedscopeevent

@@ -4,7 +4,7 @@
 ---@field new fun(self: any[]?): array Creates a new array.
 ---@field insert fun(self: array, index: integer, value: any): array Inserts an element at the specified index.
 ---@field remove fun(self: array, index: integer): any? Removes and returns the element at the specified index.
----@field sort fun(self: array, fn: function): array Sorts the elements of the array.
+---@field sort fun(self: array, fn: fun(a: any, b: any): boolean): array Sorts the elements of the array.
 ---@field concat fun(self: array, sep: string): string Concatenates all elements of the array with an optional separator.
 ---@field isarray fun(tbl: any[]): boolean? Checks if a table is an array.
 ---@field push fun(self: array, arg: any?, ...: any?): array Adds one or more elements to the end of the array.
@@ -14,14 +14,14 @@
 ---@field pop fun(self: array, index: integer?): any?, array? Removes and returns the element at the specified index.
 ---@field poparray fun(self: array, index: integer?): array Removes and returns a new array containing the elements from the specified index to the end of the array.
 ---@field contains fun(self: array, key: integer?, value: any?): boolean? Checks if the array contains a specific element or key or key-value pair.
----@field find fun(self: array, fn: function): integer? Searches for the first element that satisfies a given condition and returns its index.
+---@field find fun(self: array, fn: fun(val: any, i: integer): boolean): integer? Searches for the first element that satisfies a given condition and returns its index.
 ---@field copy fun(self: array): array Creates a shallow copy of the array.
 ---@field foldleft fun(self: array, fn: function, arg: any?): array Applies a function to each element from left to right, accumulating a result.
 ---@field foldright fun(self: array, fn: function, arg: any?): array Applies a function to each element from right to left, accumulating a result.
 ---@field setenum fun(self: array?): enum: array Creates a read-only array that can be used for enumeration.
----@field map fun(self: array, fn: function, inPlace: boolean?): array Applies a function to each element and returns a new array with the results.
----@field filter fun(self: array, fn: function, inPlace: boolean?): array Returns a new array containing only the elements that satisfy a given condition.
----@field foreach fun(self: array, fn: function) Executes a function for each element across the array.
+---@field map fun(self: array, fn: function, in_place: boolean?): array Applies a function to each element and returns a new array with the results.
+---@field filter fun(self: array, fn: function, in_place: boolean?): array Returns a new array containing only the elements that satisfy a given condition.
+---@field foreach fun(self: array, fn: fun(val: any, i: integer)) Executes a function for each element across the array.
 ---@field reverse fun(self: array, length: integer?): array Reverses the order of elements.
 local array do
   local table = table
@@ -144,15 +144,6 @@ local array do
   end
 
   ---@param self array
-  ---@param fn function
-  ---@return integer?
-  local function find(self, fn)
-    for i = 1, #self do
-      if fn(self[i], i) then return i end
-    end
-  end
-
-  ---@param self array
   ---@return array
   local function copy(self)
     local res = new{}
@@ -161,7 +152,16 @@ local array do
   end
 
   ---@param self array
-  ---@param fn function
+  ---@param fn fun(val: any, i: integer): boolean
+  ---@return integer?
+  local function find(self, fn)
+    for i = 1, #self do
+      if fn(self[i], i) then return i end
+    end
+  end
+
+  ---@param self array
+  ---@param fn fun(acc: any, val: any): any
   ---@param arg any?
   ---@return array
   local function fold_left(self, fn, arg)
@@ -172,7 +172,7 @@ local array do
   end
 
   ---@param self array
-  ---@param fn function
+  ---@param fn fun(acc: any, val: any): any
   ---@param arg any?
   ---@return array
   local function fold_right(self, fn, arg)
@@ -191,21 +191,21 @@ local array do
   end
 
   ---@param self array
-  ---@param fn function
-  ---@param inPlace boolean?
+  ---@param fn fun(val: any): any
+  ---@param in_place boolean?
   ---@return array
-  local function map(self, fn, inPlace)
-    local res = inPlace and self or new{}
+  local function map(self, fn, in_place)
+    local res = in_place and self or new{}
     for i = 1, #self do res[i] = fn(self[i]) end
     return res
   end
 
   ---@param self array
   ---@param fn fun(val: any, i: integer): boolean
-  ---@param inPlace boolean?
+  ---@param in_place boolean?
   ---@return array
-  local function filter(self, fn, inPlace)
-    if inPlace then
+  local function filter(self, fn, in_place)
+    if in_place then
       local i = 1
       while i <= #self do
         if not fn(self[i], i) then array.remove(self, i) else i += 1 end
@@ -221,7 +221,7 @@ local array do
   end
 
   ---@param self array
-  ---@param fn function
+  ---@param fn fun(val: any, i: integer)
   local function for_each(self, fn)
     for i = 1, #self do fn(self[i], i) end
   end

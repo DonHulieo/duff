@@ -4,17 +4,21 @@
 ---@field getlib fun(): string
 ---@field getinventory fun(): string
 ---@field getcore fun(): table
----@field getplayer fun(player: number|string?): table
----@field getidentifier fun(player: number|string?): string
----@field getjob fun(player: number|string?): table
----@field isplayerdowned fun(player: number|string?): boolean
+---@field getplayer fun(player: integer|string?): table
+---@field getidentifier fun(player: integer|string?): string
+---@field getplayername fun(player: integer|string?): string
+---@field getjob fun(player: integer|string?): {name: string, label: string, grade: number, grade_name: string, grade_label: string, job_type: string, salary: number}?
+---@field doesplayerhavegroup fun(player: integer|string?, groups: string|string[]): boolean?
+---@field isplayerdowned fun(player: integer|string?): boolean
 ---@field createcallback fun(name: string, cb: function)
----@field triggercallback fun(player: number|string?, name: string, cb: function, ...: any)
+---@field triggercallback fun(player: integer|string?, name: string, cb: function, ...: any): any?
 ---@field getallitems fun(): {[string]: {name: string, label: string, weight: number, useable: boolean, unique: boolean}}?
 ---@field getitem fun(name: string): {name: string, label: string, weight: number, usable: boolean, unique: boolean}?
----@field createusableitem fun(name: string, cb: fun(src: number|string))
----@field additem fun(player: number|string?, item: string, amount: number): boolean?
----@field removeitem fun(player: number|string?, item: string, amount: number): boolean?
+---@field createuseableitem fun(name: string, cb: fun(src: number|string))
+---@field additem fun(player: integer|string?, item: string, amount: integer): boolean?
+---@field removeitem fun(player: integer|string?, item: string, amount: integer): boolean?
+---@field addlocalentity fun(entities: integer|integer[], options: {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: fun(entity: number, distance: number)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]})
+---@field removelocalentity fun(entities: integer|integer[], targets: string|string[]?)
 local bridge do
   local get_resource_state = GetResourceState
   local Frameworks = {['es_extended'] = 'esx', ['qb-core'] = 'qb'}
@@ -81,14 +85,14 @@ local bridge do
 
   --------------------- SHARED ---------------------
 
-  local FRAMEWORK = for_each(Frameworks, is_resource_present) --[[@as string?]]
+  local FRAMEWORK = for_each(Frameworks, is_resource_present) --[[@as 'esx'|'qb'?]]
   local INVENTORY = for_each(Inventories, is_resource_present) or FRAMEWORK --[[@as string?]]
   local LIB = for_each(Libs, is_resource_present) --[[@as string?]]
   local TARGET = for_each(Targets, is_resource_present) --[[@as string?]]
   local EXPORTS = {
     CORE = {['esx'] = 'getSharedObject', ['qb'] = 'GetCoreObject'},
     INV = {['ox'] = 'ox_inventory'},
-    TARGET = {['ox'] = 'ox_target', ['qb'] = 'qb-target'}
+    TARG = {['ox'] = 'ox_target', ['qb'] = 'qb-target'}
   }
   local EVENTS = {
     LOAD = {['esx'] = 'esx:playerLoaded', ['qb'] = 'QBCore:Client:OnPlayerLoaded'},
@@ -101,7 +105,7 @@ local bridge do
   EXPORTS = {
     CORE = {resource = get_key(Frameworks, FRAMEWORK), method = for_each(NO_METHODS.CORE, function(_, value) return value == FRAMEWORK end) == nil and EXPORTS.CORE[FRAMEWORK] or nil},
     INV = {resource = get_key(Inventories, INVENTORY), method = for_each(NO_METHODS.INV, function(_, value) return value == INVENTORY end) == nil and EXPORTS.INV[INVENTORY] or nil},
-    TARGET = {resource = get_key(Targets, TARGET), method = for_each(NO_METHODS.TARGET, function(_, value) return value == TARGET end) == nil and EXPORTS.TARGET[TARGET] or nil}
+    TARG = {resource = get_key(Targets, TARGET), method = for_each(NO_METHODS.TARGET, function(_, value) return value == TARGET end) == nil and EXPORTS.TARG[TARGET] or nil}
   }
   local Core, Lib, Inv = consume_export(EXPORTS, 'CORE') --[[@as QBCore|table?]], consume_export(EXPORTS, 'LIB'), consume_export(EXPORTS, 'INV') --[[@as ox_inventory|table?]]
   local PlayerData = nil
@@ -512,12 +516,12 @@ local bridge do
 
   ---@param name string The name of the usable item
   ---@param cb fun(src: number|string) The callback to call when the item is used
-  local function create_usable_item(name, cb)
+  local function create_useable_item(name, cb)
     if not is_server then return end
-    if not ensure_inv_object(create_usable_item, 'Inventory') then return end
+    if not ensure_inv_object(create_useable_item, 'Inventory') then return end
     ---@cast Inv -?
     ---@cast Core -?
-    if not ensure_items_object(create_usable_item, 'Items') then return end ---@cast Items -?
+    if not ensure_items_object(create_useable_item, 'Items') then return end ---@cast Items -?
     if not get_item(name) then return end
     if INVENTORY == 'ox' then
       exports(name, function(event, _, inventory)
@@ -589,7 +593,6 @@ local bridge do
 
   ---@param entities integer|integer[] The entity or entities to add a target to
   ---@param options {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: fun(entity: integer, distance: number)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?}
-  ---@return boolean?
   local function add_local_entity(entities, options)
     if is_server then return end
     if not ensure_target_object(add_local_entity, 'Target') then return end ---@cast Target -?
@@ -670,7 +673,7 @@ local bridge do
     bridge['_DATA'].ITEMS = Items
     bridge.getallitems = get_all_items
     bridge.getitem = get_item
-    bridge.createusableitem = create_usable_item
+    bridge.createuseableitem = create_useable_item
     bridge.additem = add_item
     bridge.removeitem = remove_item
   else

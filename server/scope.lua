@@ -2,7 +2,7 @@
 ---@field Scopes {[string]: {[string]: boolean}, Synced: {[string]: {[string]: boolean}}}?
 ---@field getplayerscope fun(source: number|integer): {[string]: boolean}?
 ---@field triggerscopeevent fun(event: string, owner: number|integer, ...: any): {[string]: boolean}?
----@field createsyncedscopeevent fun(event: string, owner: number|integer, time: integer?, ...: any)
+---@field createsyncedscopeevent fun(event: string, owner: number|integer, time: integer?, duration: integer?, ...: any)
 ---@field removesyncedscopeevent fun(event: string)
 local scope do
   local check_type = require('duff.shared.debug').checktype

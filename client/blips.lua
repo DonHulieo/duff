@@ -4,7 +4,7 @@
 ---@field bycoords fun(coords: vector3|vector3[], radius: number?): array
 ---@field bysprite fun(sprite: integer): array
 ---@field bytype fun(id_type: integer): array
----@field getinfo fun(blip: integer): table
+---@field getinfo fun(blip: integer): {alpha: integer, coords: vector3, colour: integer, display: integer, fade: boolean, hud_colour: integer, type: integer, rotation: number, is_shortrange: boolean}?
 ---@field remove fun(blips: integer|integer[])
 local blips do
   local require = require
@@ -70,7 +70,7 @@ local blips do
   end
 
   ---@param blip integer
-  ---@return table? blip_info
+  ---@return {alpha: integer, coords: vector3, colour: integer, display: integer, fade: boolean, hud_colour: integer, type: integer, rotation: number, is_shortrange: boolean}? info
   local function get_info(blip)
     if not check_type(blip, 'number', get_info, 1) or not does_blip_exist(blip) then return end
     return {
@@ -82,7 +82,7 @@ local blips do
       hud_colour = GetBlipHudColour(blip),
       type = GetBlipInfoIdType(blip),
       rotation = GetBlipRotation(blip),
-      is_shortrange = IsBlipShortRange(blip),
+      is_shortrange = IsBlipShortRange(blip) == 1,
     }
   end
 
