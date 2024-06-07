@@ -6,7 +6,7 @@
 ---@field addzoneevent fun(event: string, zone_id: vector3|{x: number, y: number, z: number}|string, onEnter: fun(player: string, coords: vector3), onExit: fun(player: string, coords: vector3, disconnected: boolean?), time: integer?, player: string?)
 ---@field removezoneevent fun(event: string)
 local zone do
-  local ZONES = json.decode(LoadResourceFile('duf', 'data/zones.json'))
+  local ZONES = json.decode(LoadResourceFile('duff', 'data/zones.json'))
   local check_type = require('duff.shared.debug').checktype
   local convert_to_vec = require('duff.shared.vector').tabletovector
   local Listeners = {}
