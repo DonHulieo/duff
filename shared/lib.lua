@@ -36,10 +36,11 @@ local function init_paths(resource)
     local name = file:match('^(.-)%.lua$') or file:match('^(.-)%*%*$')
     if name then
       local path = name:gsub('%.', '/')
+      local loaded, func = safe_load(resource, path)
+      if not loaded then return end
       name = resource..':'..name
       package.path[name] = {resource, path}
-      local loaded, func = safe_load(resource, path)
-      if loaded then package.preload[name] = func end
+      package.preload[name] = func
     end
   end
 end
