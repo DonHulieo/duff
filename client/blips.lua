@@ -90,7 +90,7 @@ local blips do
   local function remove_blips(blip_ids)
     if not blip_ids then return end
     local _, param_type = check_type(blip_ids, {'table', 'number'}, remove_blips, 1)
-    blip_ids = blip_ids?.__type == 'array' and blip_ids or param_type == 'table' and array.new(blip_ids --[[@as table]]) or array.new{blip_ids} ---@cast blip_ids -integer|-integer[]|+array
+    blip_ids = param_type == 'number' and array.new{blip_ids} or not array.isarray(blip_ids --[[@as array|any[]=]]) and array.new(blip_ids --[[@as any[]=]]) or blip_ids ---@cast blip_ids -integer|-integer[]
     SetThisScriptCanRemoveBlipsCreatedByAnyScript(true)
     blip_ids:foreach(RemoveBlip)
     SetThisScriptCanRemoveBlipsCreatedByAnyScript(false)
