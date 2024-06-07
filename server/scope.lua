@@ -9,7 +9,7 @@ local scope do
   ---@diagnostic disable-next-line: deprecated
   local tostring, unpack = tostring, unpack or table.unpack
   local timer = require('duff.shared.math').timer
-  local client_event, create_thread, wait = TriggerClientEvent, CreateThread, Wait
+  local client_event, create_thread, wait = TriggerLatentClientEvent, CreateThread, Wait
   local game_timer = GetGameTimer
   local current_resource = GetCurrentResourceName()
   local Scopes = {}
@@ -64,9 +64,9 @@ local scope do
   ---@return {[string]: boolean}? targets
   local function trigger_scope_event(event, owner, ...) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
     local targets = get_player_scope(owner)
-    client_event(event, owner, ...)
+    client_event(event, owner, 50000, ...)
     if not targets then return end
-    for target, _ in pairs(targets) do client_event(event, target, ...) end
+    for target, _ in pairs(targets) do client_event(event, target, 50000, ...) end
     return targets
   end
 
@@ -91,7 +91,7 @@ local scope do
         targets = Scopes[owner]
         if targets then
           for target, _ in pairs(targets) do
-            if not Scopes.Synced[event][target] then client_event(event, target, unpack(args)) end
+            if not Scopes.Synced[event][target] then client_event(event, target, 50000, unpack(args)) end
           end
           Scopes.Synced[event] = targets
         end
