@@ -22,7 +22,7 @@
 local bridge do
   local get_resource_state = GetResourceState
   local Frameworks = {['es_extended'] = 'esx', ['qb-core'] = 'qb'}
-  local Inventories = {['ox_inventory'] = 'ox'}
+  local Inventories = {['ox_inventory'] = 'ox', ['qb-inventory'] = 'qb'}
   local Libs = {['ox_lib'] = 'ox'}
   local Targets = {['ox_target'] = 'ox', ['qb_target'] = 'qb'}
   local check_type = require('duff.shared.debug').checktype
@@ -91,7 +91,7 @@ local bridge do
   local TARGET = for_each(Targets, is_resource_present) --[[@as string?]]
   local EXPORTS = {
     CORE = {['esx'] = 'getSharedObject', ['qb'] = 'GetCoreObject'},
-    INV = {['ox'] = 'ox_inventory'},
+    INV = {['ox'] = 'ox_inventory', ['qb'] = 'qb-inventory'},
     TARG = {['ox'] = 'ox_target', ['qb'] = 'qb-target'}
   }
   local EVENTS = {
@@ -101,7 +101,7 @@ local bridge do
     PLAYERDATA = {['esx'] = 'esx:setPlayerData', ['qb'] = 'QBCore:Player:SetPlayerData'},
     OBJECTUPDATE = {['qb'] = not is_server and 'QBCore:Client:UpdateObject' or 'QBCore:Server:UpdateObject'}
   }
-  local NO_METHODS = {['INV'] = 'ox', ['TARGET'] = {'ox', 'qb'}}
+  local NO_METHODS = {['INV'] = {'ox', 'qb'}, ['TARGET'] = {'ox', 'qb'}}
   EXPORTS = {
     CORE = {resource = get_key(Frameworks, FRAMEWORK), method = for_each(NO_METHODS.CORE, function(_, value) return value == FRAMEWORK end) == nil and EXPORTS.CORE[FRAMEWORK] or nil},
     INV = {resource = get_key(Inventories, INVENTORY), method = for_each(NO_METHODS.INV, function(_, value) return value == INVENTORY end) == nil and EXPORTS.INV[INVENTORY] or nil},
@@ -454,7 +454,7 @@ local bridge do
   local function ensure_inv_object(fn, arg)
     if not Inv and INVENTORY ~= FRAMEWORK then
       Inv = get_inv_object()
-    elseif INVENTORY == FRAMEWORK then
+    elseif INVENTORY == 'esx' then
       if ensure_core_object(fn, arg) then Inv = {} end
     end
     return check_type(Inv, 'table', fn, arg)
@@ -544,17 +544,17 @@ local bridge do
     if not ensure_inv_object(add_item, 'Inventory') then return end ---@cast Inv -?
     if not ensure_items_object(add_item, 'Items') then return end ---@cast Items -?
     player = validate_source(player or source, add_item, 'player') ---@cast player -?
-    local player_data = ensure_player_data(player, add_item, 'player') ---@cast player_data -?
     if not get_item(item) then return end
     if INVENTORY == 'ox' then
-      if not Inv:CanCarryItem(player, item, amount) then return false end
-      return Inv:AddItem(player, item, amount) and true or false
+      return Inv:CanCarryItem(player, item, amount) and Inv:AddItem(player, item, amount)
     elseif INVENTORY == 'esx' then
+      local player_data = ensure_player_data(player, add_item, 'player') ---@cast player_data -?
       if not player_data.canCarryItem(item, amount) then return false end
       player_data.addInventoryItem(item, amount)
       return player_data.hasItem(item, amount)
     elseif INVENTORY == 'qb' then
-      return player_data.Functions.AddItem(item, amount)
+      ---@diagnostic disable-next-line: param-type-mismatch
+      return Inv:CanAddItem(player, item, amount) and Inv:AddItem(player, item, amount, false, false, 'duff shared bridge added item:' ..item)
     end
   end
 
@@ -567,27 +567,28 @@ local bridge do
     if not ensure_inv_object(remove_item, 'Inventory') then return end ---@cast Inv -?
     if not ensure_items_object(remove_item, 'Items') then return end
     player = validate_source(player or source, remove_item, 'player') ---@cast player -?
-    local player_data = ensure_player_data(player, add_item, 'player') ---@cast player_data -?
     if not get_item(item) then return end
     if INVENTORY == 'ox' then
       return Inv:RemoveItem(player, item, amount)
     elseif INVENTORY == 'esx' then
+      local player_data = ensure_player_data(player, add_item, 'player') ---@cast player_data -?
       player_data.removeInventoryItem(item, amount)
       return not player_data.hasItem(item, amount)
     elseif INVENTORY == 'qb' then
-      return player_data.Functions.RemoveItem(item, amount)
+      ---@diagnostic disable-next-line: param-type-mismatch
+      return Inv:RemoveItem(player, item, amount, false, 'duff shared bridge removed item:' ..item)
     end
   end
 
   --------------------- CLIENT ---------------------
 
-  local Target = not is_server and consume_export(EXPORTS, 'TARGET') --[[@as ox_target|table?]]
+  local Target = not is_server and consume_export(EXPORTS, 'TARG') --[[@as ox_target|table?]]
 
   ---@param fn function
   ---@param arg string|number?
   local function ensure_target_object(fn, arg)
     if is_server then return end
-    if not Target then Target = consume_export(EXPORTS, 'TARGET') end
+    if not Target then Target = consume_export(EXPORTS, 'TARG') end
     return check_type(Target, 'table', fn, arg)
   end
 
