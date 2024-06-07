@@ -179,7 +179,7 @@ local locale do
     file = file or ('locales/'..dialect) --[[@as string]]
     local translations = safe_load(resource, file) and load(load_resource_file(resource, file..'.lua'))
     if not translations then return end
-    recursive_load(file:match('locales/(%w+)') or 'translations', translations())
+    recursive_load(nil, translations())
   end
 
   ---@param key string
