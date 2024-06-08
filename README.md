@@ -168,6 +168,7 @@ Well, this is the solution for you! This is a collection of *optimised utility m
 - Extract the contents of the zip file into your resources folder, into a folder which starts after your framework and any script this is a dependency for, or;
 - Ensure the script in your `server.cfg` after your framework and any script this is a dependency for.
 - If using `ox_lib`, ensure `'@ox_lib/init.lua'` is uncommented in your `fxmanifest.lua` file.
+- If using es_extended and not using `ox_inventory`, ensure `server_script '@oxmysql/lib/MySQL.lua'` is uncommented in your `fxmanifest.lua` file.
 
 ## Documentation
 

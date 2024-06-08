@@ -166,7 +166,7 @@ local bridge do
         return Core.Functions.GetPlayer(player)
       end
     else
-      if PlayerData then return PlayerData end
+      if PlayerData and type(PlayerData) == 'table' then return PlayerData end
       if FRAMEWORK == 'esx' then
         PlayerData = Core.GetPlayerData()
       elseif FRAMEWORK == 'qb' then
@@ -452,10 +452,12 @@ local bridge do
   ---@param arg string|number?
   ---@return boolean?, string?
   local function ensure_inv_object(fn, arg)
-    if not Inv and INVENTORY ~= FRAMEWORK then
-      Inv = get_inv_object()
-    elseif INVENTORY == 'esx' then
-      if ensure_core_object(fn, arg) then Inv = {} end
+    if not Inv then
+      if INVENTORY ~= 'esx' then
+        Inv = get_inv_object()
+      else
+        if ensure_core_object(fn, arg) then Inv = {} end
+      end
     end
     return check_type(Inv, 'table', fn, arg)
   end
@@ -482,12 +484,13 @@ local bridge do
         Items[name] = {name = name, label = data.label, weight = data.weight or 0, useable = useable, unique = data.stack == nil and true or data.stack}
       end
     elseif INVENTORY == 'esx' then
-      found_items = MySQL.Async.fetchAll('SELECT * FROM items')
-      if not found_items then return end
-      for _, item in ipairs(found_items) do
-        local name = item.name
-        Items[name] = {name = name, label = item.label, weight = item.weight, useable = Core.GetUsableItems()[name] ~= nil, unique = item.rare}
-      end
+      MySQL.Async.fetchAll('SELECT * FROM items', {}, function(result)
+        if not result then return end
+        for _, item in ipairs(result) do
+          local name = item.name
+          Items[name] = {name = name, label = item.label, weight = item.weight, useable = Core.GetUsableItems()[name] ~= nil, unique = item.rare}
+        end
+      end)
     elseif INVENTORY == 'qb' then
       found_items = Core.Shared.Items
       for name, item in pairs(found_items) do
