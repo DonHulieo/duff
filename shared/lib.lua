@@ -5,6 +5,7 @@ local get_res_by_find_index, get_res_state, get_invoking_res, get_current_res = 
 ---@diagnostic disable-next-line: deprecated
 local pcall, load, table, select, unpack = pcall, load, table, select, unpack or table.unpack
 local type, error = type, error
+local is_server = IsDuplicityVersion() == 1
 package = {loaded = {}, path = {}, preload = {}}
 
 ---@enum file_ids
@@ -57,12 +58,6 @@ local function find_paths()
     local res = get_res_by_find_index(i)
     if res and does_res_exist(res) then init_paths(res) end
   end
-end
-
----@param resource string
-local function init_packages(resource)
-  if resource ~= 'duff' then return end
-  find_paths()
 end
 
 ---@param resource string
@@ -144,6 +139,8 @@ exports('require', require)
 
 ---@param resource string
 local function deinit_package(resource)
+  if not resource then return end
+  if resource == 'duff' then package.loaded = {} package.preload = {} package.path = {} return end
   for name, path in pairs(package.path) do
     if path[1] == resource then
       package.loaded[name] = nil
@@ -154,10 +151,51 @@ local function deinit_package(resource)
   end
 end
 
+---@param resource string?
+---@param version string?
+---@param git string?
+---@param repo string?
+---@return promise? version_check @A promise that resolves with the resource and version if an update is available, or rejects with an error message.
+local function check_resource_version(resource, version, git, repo)
+  if not is_server then return end
+  resource = resource or get_invoking_res()
+  version = version or get_res_meta(resource, 'version', 0)
+  local version_check = promise.new()
+  if not version then version_check:reject(('^1Unable to determine current resource version for `%s` ^0'):format(resource)) return version_check end
+  version = version:match('%d+%.%d+%.%d+')
+  PerformHttpRequest(('https://api.github.com/repos/%s/%s/releases/latest'):format(git, repo or resource), function(status, response)
+    local reject = ('^1Unable to check for updates for `%s` ^0'):format(resource)
+    if status ~= 200 then version_check:reject(reject) return end
+    response = json.decode(response)
+    if response.prerelease then version_check:reject(reject) return end
+    local latest = response.tag_name:match('%d+%.%d+%.%d+')
+    if not latest then version_check:reject(reject) return
+    elseif latest == version then version_check:reject(('^2`%s` is running latest version.^0'):format(resource)) return end
+    local cv, lv = version:gsub('%D', ''), latest:gsub('%D', '')
+    if cv < lv then version_check:resolve({resource = resource, version = version}) end
+  end, 'GET')
+  return version_check
+end
+
+---@param resource string
+local function init_duff(resource)
+  if resource ~= 'duff' then return end
+  find_paths()
+  if not is_server then return end
+  SetTimeout(2000, function()
+    local version = get_res_meta('duff', 'version', 0)
+    check_resource_version('duff', version, 'donhulieo'):next(function(data)
+      print(('^3[duff]^7 - ^1An update is available for `%s` (current version: %s)\r\n^3[duff]^7 - ^5Please download the latest version from the github release page.^7'):format(data.resource, data.version))
+    end, function(err)
+      print('^3[duff]^7 - '..(err or '^1Unable to Check for Updates.^7'))
+    end)
+  end)
+end
+
 AddEventHandler('onResourceStarting', init_paths)
 AddEventHandler('onClientResourceStart', init_paths)
-AddEventHandler('onResourceStart', init_packages)
+AddEventHandler('onResourceStart', init_duff)
 AddEventHandler('onResourceStop', deinit_package)
 AddEventHandler('onClientResourceStop', deinit_package)
 
-if IsDuplicityVersion() == 1 then SetConvarReplicated('locale', GetConvar('locale', 'en')) end
+if is_server then exports('checkversion', check_resource_version); SetConvarReplicated('locale', GetConvar('locale', 'en')) end
