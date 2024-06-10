@@ -31,6 +31,7 @@ Well, this is the solution for you! This is a collection of *optimised utility m
   - [Installation](#installation)
   - [Documentation](#documentation)
     - [Require](#require)
+    - [Check Version](#check-version)
     - [Importing the duff Object](#importing-the-duff-object)
     - [array](#array)
       - [Importing the array Module](#importing-the-array-module)
@@ -177,10 +178,47 @@ Well, this is the solution for you! This is a collection of *optimised utility m
 Require is a function that allows you to import modules, emulating Lua Default require function, using package.path, package.preload and package.loaded. It also precaches all modules labled as `file` in the `fxmanifest.lua` file and any modules that are imported using the `require` function.
 
 ```lua
+-- Using the `require` export
 ---@param path string @The name of the module to require. This can be a path, or a module name. If a path is provided, it must be relative to the resource root.
 ---@return {[string]: any} module
 exports.duff:require(path)
+
+-- Using '@duff/shared/import.lua' in your `fxmanifest.lua`
+duff.require(path)
 ```
+
+### Check Version
+
+Checks a resource's version against the latest released version on GitHub.
+
+```lua
+---@param resource string? @The resource name to check the version of or the invoking resource if nil.
+---@param version string? @The version to check against or the current version if nil.
+---@param github string @The GitHub profile to check the version.
+---@param repository string? @The GitHub repository to check the version or the invoking resource if nil.
+---@return promise @A promise that resolves with the resource and version if an update is available, or rejects with an error message.
+exports.duff:checkversion(resource, version, github, repository)
+
+-- Using '@duff/shared/import.lua' in your `fxmanifest.lua`
+duff.checkversion(resource, version, github, repository)
+```
+
+The promise resolves with the resource and version if an update is available, or rejects with an error message.
+
+```lua
+---@type data {resource: string, version: string}
+---@type error string|'^1Unable to determine current resource version for `%s` ^0'|'^1Unable to check for updates for `%s` ^0'|'^2`%s` is running latest version.^0'
+duff.checkversion('duff', '1.0.0', 'donhulieo', 'duff'):next(function(data)
+  print('An update is available for ' .. data.resource .. ' (' .. data.version .. ')')
+end, function(error)
+  print('An error occured: ' .. error)
+end)
+```
+
+- There are three error messages that can be returned;
+  - `'^1Unable to determine current resource version for \` resource `\ ^0'` | If the current version can not be determined.
+  - `'^1Unable to check for updates for \` resource `\ ^0'` | If the github repository can not be found.
+  - `'^2\` resource `\ is running latest version.^0'` | If the resource is up to date.
 
 ### Importing the duff Object
 
