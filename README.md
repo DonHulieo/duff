@@ -1312,5 +1312,6 @@ function zone.removezoneevent(event)
 
 ### Changelog
 
+- v1.0.2 - Squashed bug where `bridge.getplayer` would return `string` for ESX users, changed `server.scope` to use Latent Events & added `checkversion` export & method.
 - v1.0.1 - Updated `shared.bridge` to use `qb-inventory`'s updated exports.
 - v1.0.0 - Initial Release.
