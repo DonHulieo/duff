@@ -7,11 +7,11 @@ local _math = math
 ---@field isint fun(val: number): boolean returns true if `val` is an integer.
 ---@field ispos fun(val: number): boolean returns true if `val` is positive.
 ---@field round fun(val: number, increment: integer?): integer `val` rounded to the nearest integer. <br> `increment` if provided, rounds to the nearest multiple of `increment`.
----@field seedrng fun(): integer? Seeds the random number generator with a unique seed based on the current time.
----@field random fun(m: integer , n: integer?): integer? `m` Minimum or Maximum (from 1). <br> `n` Maximum if m and n are provided. <br> returns a random number between `m` and `n`.
----@field timer fun(time: integer, limit: integer): boolean Checks if `time` has exceeded `limit` in milliseconds.
+---@field seedrng fun(): integer? seeds the random number generator with a unique seed based on the current time.
+---@field random fun(m: integer , n: integer?): integer? `m` minimum or maximum (from 1). <br> `n` maximum if m and n are provided. <br> returns a random number between `m` and `n`.
+---@field timer fun(time: integer, limit: integer): boolean checks if `time` has exceeded `limit` in milliseconds.
 ---@field tofloat fun(num: integer, den: integer): number `num` is the numerator. <br> `den` is the denominator. <br> returns the rational number as a float.
----@field toint fun(val: number): integer Converts a float to integer following the round half away from zero rule. <br> e.g. `1.5 -> 2`, `-1.5 -> -2` <br> [Rounding Half Toward Zero](https://en.wikipedia.org/wiki/Rounding#Rounding_half_toward_zero)
+---@field toint fun(val: number): integer converts a float to integer following the round half away from zero rule. <br> e.g. `1.5 -> 2`, `-1.5 -> -2` <br> [Rounding Half Toward Zero](https://en.wikipedia.org/wiki/Rounding#Rounding_half_toward_zero)
 ---@field toratio fun(float: number, precision: number?): integer, integer `float` is the float to convert. <br> `precision` is the maximum error allowed in the conversion. <br> returns the float as a rational number.
 local math do
   local require = require
