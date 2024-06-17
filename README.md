@@ -88,10 +88,17 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [Importing the math Module](#importing-the-math-module)
       - [between](#between)
       - [clamp](#clamp)
+      - [gcd](#gcd)
+      - [ishalf](#ishalf)
+      - [isint](#isint)
+      - [ispos](#ispos)
       - [round](#round)
       - [seedrng](#seedrng)
       - [random](#random)
       - [timer](#timer)
+      - [tofloat](#tofloat)
+      - [toint](#toint)
+      - [toratio](#toratio)
     - [vector](#vector)
       - [Importing the vector Module](#importing-the-vector-module)
       - [Shared Functions (math)](#shared-functions-math)
@@ -814,6 +821,8 @@ function locale.translate(key, data)
 
 math is an object containing some useful math functions. Most notably, it contains a `seedrng` function which generates a random seed based on the current time, and a `random` function which generates a random number between two values which should be an improvement over the default Lua pseudo-random number generator.
 
+It also imports the default Lua math functions, so you can use it as a drop-in replacement for the default math library.
+
 #### Importing the math Module
 
 ```lua
@@ -827,41 +836,121 @@ local math = duff.math
 
 #### between
 
+Checks if a value is between two other values.
+
 ```lua
 ---@param val number
 ---@param min number
 ---@param max number
----@return boolean?
+---@return boolean? is_between
 function math.between(val, min, max)
 ```
 
+- `val` - The value to check.
+- `min` - The minimum value.
+- `max` - The maximum value.
+- `returns: boolean` - Whether the value is between the minimum and maximum values.
+
 #### clamp
+
+Clamps a value between two other values.
 
 ```lua
 ---@param value number
 ---@param min number
 ---@param max number
----@return number
+---@return number clamped
 function math.clamp(value, min, max)
 ```
+
+- `value` - The value to clamp.
+- `min` - The minimum value.
+- `max` - The maximum value.
+- `returns: number` - The clamped value.
+
+#### gcd
+
+Calculates the greatest common divisor of two numbers.
+
+```lua
+---@param num integer
+---@param den integer
+---@return integer gcd
+function math.gcd(num, den)
+```
+
+- `num` - The numerator.
+- `den` - The denominator.
+- `returns: integer` - The greatest common divisor.
+
+#### ishalf
+
+Checks if a number is a half, 1.5, 2.5, etc.
+
+```lua
+---@param value number
+---@return boolean? is_half
+function math.ishalf(value)
+```
+
+- `value` - The value to check.
+- `returns: boolean` - Whether the value is a half.
+
+#### isint
+
+Checks if a number is an integer.
+
+```lua
+---@param value integer|number 
+---@return boolean? is_int
+function math.isint(value)
+```
+
+- `value` - The value to check.
+- `returns: boolean` - Whether the value is an integer.
+
+#### ispos
+
+Checks if a number is positive.
+
+```lua
+---@param value number
+---@return boolean? is_positive
+function math.ispos(value)
+```
+
+- `value` - The value to check.
+- `returns: boolean` - Whether the value is positive.
 
 #### round
 
 ```lua
 ---@param value number
 ---@param increment integer?
----@return integer
+---@return number|integer?
 function math.round(value, increment)
 ```
 
+- `value` - The value to round.
+- `increment` - The increment to round to or `nil`.
+- `returns: number|integer`
+  - returns the closest integer round from zero if `increment` is `nil`, otherwise;
+  - returns the closest integer round to the increment.
+
 #### seedrng
+
+Generates a random seed based on the current time.
   
 ```lua
----@return integer?
+---@return integer? seed
 function math.seedrng()
 ```
 
+- `returns: integer` - The random seed.
+
 #### random
+
+Generates a random number between two values.
 
 ```lua
 ---@param min integer
@@ -870,14 +959,74 @@ function math.seedrng()
 function math.random(min, max)
 ```
 
+- `min` - The minimum value.
+- `max` - The maximum value or `nil`.
+- `returns: integer`
+  - returns a random number between `min` and `max` if `max` is not `nil`, otherwise;
+  - returns a random number between `0` and `min`.
+
 #### timer
+
+Checks if `time` has passed a certain `limit` in milliseconds.
 
 ```lua
 ---@param time integer
----@param limit integer?
----@return boolean
+---@param limit integer
+---@return boolean has_excceeded
 function math.timer(time, limit)
 ```
+
+- `time` - The time to check in milliseconds.
+- `limit` - The limit to check against in milliseconds.
+- `returns: boolean` - Whether the time has exceeded the limit.
+
+#### tofloat
+
+Converts a number to a float.
+
+```lua
+---@param num integer
+---@param den integer?
+---@return number float
+function math.tofloat(num, den)
+```
+
+- `num` - The numerator.
+- `den` - The denominator or `nil`.
+- `returns: number`
+  - returns the float value of `num` if `den` is `nil`, otherwise;
+  - returns the float value of the rational number.
+
+#### toint
+
+Converts a number to an integer, following the round half away from zero rule. Eg. `1.5 -> 2, -1.5 -> -2`
+[Reference](https://en.wikipedia.org/wiki/Rounding#Rounding_half_toward_zero)
+
+```lua
+---@param value number
+---@return integer int
+function math.toint(value)
+```
+
+- `value` - The value to convert.
+- `returns: integer` - The integer value.
+
+#### toratio
+
+Converts a float to its rational form.
+
+```lua
+---@param value number
+---@param precision number?
+---@return integer num, integer den
+function math.toratio(value, precision)
+```
+
+- `value` - The value to convert.
+- `precision`
+  - The maximum error allowed in the conversion, otherwise;
+  - `1e-10 | 0.0000000001` is used.
+- `returns: integer, integer` - The rational number.
 
 ### vector
 
