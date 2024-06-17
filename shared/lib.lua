@@ -130,7 +130,7 @@ function require(name)
   local loaded, module = pcall(package.preload[path])
   if not loaded then error('bad argument #1 to \'require\' (error loading file) \n' ..module, 1)
   elseif not module then module = package.preload[path] end
-  module = safe_load_module(module)
+  module = type(module) == 'table' and safe_load_module(module) or module
   package.loaded[name] = module
   return module
 end
