@@ -10,7 +10,7 @@ Well, this is the solution for you! This is a collection of *optimised utility m
 ## Features
 
 - **Require:** Emulates Lua's default require function, using package.path, package.preload and package.loaded. Also precaches all modules labled as `file` in the `fxmanifest.lua` and any modules that are imported using the `require` function.
-- **Array:** A class for the creation and manipulation of consecutive integer indexed arrays, providing a number of Functional Programming methods.
+- **Array:** A module for the creation and manipulation of consecutive integer indexed arrays, providing a number of Functional Programming methods.
 - **Bridge:** Provides common functions between different frameworks and libraries for use in creating cross-framework scripts.
 - **Locale:** Contains functions for localisation and translation, based on the i18n.lua library by kikito.
 - **Math:** Contains some useful math functions, including a `seedrng` function which generates a random seed based on the current time, and an improvement to the default lua `random` function.
@@ -35,7 +35,6 @@ Well, this is the solution for you! This is a collection of *optimised utility m
     - [Importing the duff Object](#importing-the-duff-object)
     - [array](#array)
       - [Importing the array Module](#importing-the-array-module)
-      - [Creating an array](#creating-an-array)
       - [Internal Methods](#internal-methods)
       - [isarray](#isarray)
       - [push](#push)
@@ -261,225 +260,318 @@ local array = exports.duff:require 'duff.shared.array'
 local array = duff.array
 ```
 
-#### Creating an array
-
-Creates a new array.
-
-```lua
----@param list any[]?
----@return array
-local tbl = array.new(list)
-```
-
 #### Internal Methods
 
+The following are Lua's default table functions that are exposed in the array module. You can find more information on these functions in the [Lua 5.4 Reference Manual](https://www.lua.org/manual/5.4/manual.html#6.6).
+
 ```lua
----@param self array
----@param pos integer
+---@param list any[] 
+---@param index integer
 ---@param value any
-function array.insert(self, pos, value)
+function array.insert(list, index, value)
+```
 
----@param self array
----@param pos integer?
-function array.remove(self, pos)
+- `list` - The array to insert the value into.
+- `index` - The index to insert the value at.
+- `value` - The value to insert.
 
----@param self array
+```lua
+---@param list any[]
+---@param index integer?
+---@return any?
+function array.remove(list, index)
+```
+
+- `list` - The array to remove the value from.
+- `index` - The index to remove.
+- `returns: any` - The removed value.
+
+```lua
+---@param list any[]
 ---@param compare fun(a: any, b: any): boolean
-function array.sort(self, compare)
+---@return any[] sorted_list
+function array.sort(list, compare)
+```
 
----@param self array
+- `list` - The array to sort.
+- `compare` - The comparison function.
+- `returns: any[]` - The sorted array.
+
+```lua
+---@param list any[]
 ---@param sep any?
 ---@param i integer?
 ---@param j integer?
-function array.concat(self, sep, i, j)
+---@return string concat_list
+function array.concat(list, sep, i, j)
 ```
+
+- `list` - The array to concatenate.
+- `sep` - The separator.
+- `i` - The start index.
+- `j` - The end index.
+- `returns: string` - The concatenated array.
 
 #### isarray
 
 Checks if a table is an array.
 
 ```lua
----@param tbl any[]|array
----@return boolean?
+---@param list any[]
+---@return boolean? is_array
 function array.isarray(tbl)
 ```
 
+- `list` - The table to check.
+- `returns: boolean` - Whether the table is an array.
+
 #### push
 
-Adds one or more elements to the end of the array.
+Pushes one or more elements to the end of the array.
 
 ```lua
----@param self array
+---@param list any[]
 ---@param arg any?
 ---@param ... any?
----@return array
-function array.push(self, arg, ...)
+---@return any[] list
+function array.push(list, arg, ...)
 ```
+
+- `list` - The array to add the elements to.
+- `arg` - The first element to add.
+- `...` - The rest of the elements to add.
+- `returns: any[]` - The array with the added elements.
 
 #### pusharray
 
-Adds all elements from a table to the end of the array.
+Pushes all elements from a list to the end of the array.
 
 ```lua
----@param self array
 ---@param list any[]
----@return array
-function array.pusharray(self, list)
+---@param to_push any[]
+---@return any[] list
+function array.pusharray(list, to_push)
 ```
+
+- `list` - The array to add the elements to.
+- `to_push` - The array of elements to add.
+- `returns: any[]` - The array with the added elements.
 
 #### peek
   
 Returns the element at the specified index without removing it.
 
 ```lua
----@param self array
+---@param list any[]
 ---@param index integer?
----@return any
-function array.peek(self, index)
+---@return any value
+function array.peek(list, index)
 ```
+
+- `list` - The array to get the element from.
+- `index` - The index of the element.
+- `returns: any` - The element at the specified index.
 
 #### peekarray
 
-Returns a new array containing the elements from the specified index to the end of the array.
+Returns a new list containing the elements from the specified index to the end of the array.
 
 ```lua
----@param self array
+---@param list any[]
 ---@param index integer?
----@return any[]
-function array.peekarray(self, index)
+---@return any[] peek_list
+function array.peekarray(list, index)
 ```
+
+- `list` - The array to get the elements from.
+- `index` - The index of the element.
+- `returns: any[]` - The new list containing the elements.
 
 #### pop
 
 Removes and returns the element at the specified index.
 
 ```lua
----@param self array
+---@param list any[]
 ---@param index integer?
----@return any?, array?
-function array.pop(self, index)
+---@return any? value, any[]? list
+function array.pop(list, index)
 ```
+
+- `list` - The array to remove the element from.
+- `index` - The index of the element.
+- `returns: any` - The removed element.
 
 #### poparray
 
 Removes and returns a new array containing the elements from the specified index to the end of the array.
 
 ```lua
----@param self array
+---@param list any[]
 ---@param index integer?
----@return array
-function array.poparray(self, index)
+---@return any[]? pop_list
+function array.poparray(list, index)
 ```
+
+- `list` - The array to remove the elements from.
+- `index` - The index of the element.
+- `returns: any[]` - The new array containing the elements.
 
 #### contains (array)
 
-Checks if the array contains a specific element or key or key-value pair.
+Checks if the array contains a specific element, key or key-value pair.
 
 ```lua
----@param self array
+---@param list any[]
 ---@param key integer?
 ---@param value any?
----@return boolean?
-function array.contains(self, key, value)
+---@return boolean? contains
+function array.contains(list, key, value)
 ```
+
+- `list` - The array to check.
+- `key` - The key to check for.
+- `value` - The value to check for.
+- `returns: boolean` - Whether the array contains the element.
 
 #### copy
 
 Creates a shallow copy of the array.
 
 ```lua
----@param self array
----@return array
-function array.copy(self)
+---@param list any[]
+---@return any[] copy_list
+function array.copy(list)
 ```
+
+- `list` - The array to copy.
+- `returns: any[]` - The copied array.
 
 #### find
 
 Searches for the first element that satisfies a given condition and returns its index.
 
 ```lua
----@param self array
+---@param list any[]
 ---@param func fun(val: any, i: integer): boolean
----@return integer?
-function array.find(self, func)
+---@return integer? index
+function array.find(list, func)
 ```
+
+- `list` - The array to search.
+- `func` - The condition to satisfy.
+- `returns: integer` - The index of the element.
 
 #### foldleft
 
-Applies a function to each element from left to right, accumulating a result.
+Applies a function to each element from left to right, accumulating and returning the result.
 
 ```lua
----@param self array
+---@param list any[]
 ---@param func fun(acc: any, val: any): any
 ---@param arg any?
-function array.foldleft(self, func, arg)
+---@return any result
+function array.foldleft(list, func, arg)
 ```
+
+- `list` - The array to apply the function to.
+- `func` - The function to apply.
+- `arg` - The initial value.
+- `returns: any` - The accumulated result.
 
 #### foldright
 
-Applies a function to each element from right to left, accumulating a result.
+Applies a function to each element from right to left, accumulating and returning the result.
 
 ```lua
----@param self array
+---@param list any[]
 ---@param func fun(acc: any, val: any): any
 ---@param arg any?
+---@return any result
 function array.foldright(self, func, arg)
 ```
+
+- `list` - The array to apply the function to.
+- `func` - The function to apply.
+- `arg` - The initial value.
+- `returns: any` - The accumulated result.
 
 #### setenum
 
 Creates a read-only array that can be used for enumeration.
 
 ```lua
----@param self array
----@return array enum
-function array.setenum(self)
+---@param list any[]
+---@return any[] enum_list
+function array.setenum(list)
 ```
+
+- `list` - The array to enumerate.
+- `returns: any[]` - The read-only array.
 
 #### map
 
 Applies a function to each element and returns a new array with the results.
 
 ```lua
----@param self array
+---@param list any[]
 ---@param func fun(val: any): any
----@param inPlace boolean?
----@return array
-function array.map(self, func, inPlace)
+---@param in_place boolean?
+---@return any[] mapped_list
+function array.map(list, func, in_place)
 ```
+
+- `list` - The array to apply the function to.
+- `func` - The function to apply.
+- `in_place` - Whether to modify the original array or return a new one.
+- `returns: any[]` - The mapped array.
 
 #### filter
 
 Returns a new array containing only the elements that satisfy a given condition.
 
 ```lua
----@param self array
+---@param list any[]
 ---@param func fun(val: any, i: integer): boolean
----@param inPlace boolean?
----@return array
-function array.filter(self, func, inPlace)
+---@param in_place boolean?
+---@return any[] filtered_list
+function array.filter(list, func, in_place)
 ```
+
+- `list` - The array to filter.
+- `func` - The condition to satisfy.
+- `in_place` - Whether to modify the original array or return a new one.
+- `returns: any[]` - The filtered array.
 
 #### foreach
 
-Executes a function for each element across the array.
+Iterates over each element in the array and applies a function.
 
 ```lua
----@param self array
+---@param list any[]
 ---@param func fun(val: any, i: integer)
-function array.foreach(self, func)
+---@param reverse boolean?
+function array.foreach(list, func, reverse)
 ```
+
+- `list` - The array to iterate over.
+- `func` - The function to apply.
+- `reverse` - Whether to iterate in reverse order or not.
 
 #### reverse
 
-Reverses the order of elements.
+Reverses the order of elements in place.
 
 ```lua
----@param self array
+---@param list any[]
 ---@param length integer?
----@return array
+---@return any[] reversed_list
 function array.reverse(self, length)
 ```
+
+- `list` - The array to reverse.
+- `length` - The length of the array.
+- `returns: any[]` - The reversed array.
 
 ### bm
 

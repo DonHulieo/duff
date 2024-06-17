@@ -1,36 +1,29 @@
 ---@class array
----@field private __actions table
----@field __type string
----@field new fun(self: any[]?): array Creates a new array.
----@field insert fun(self: array, index: integer, value: any): array Inserts an element at the specified index.
----@field remove fun(self: array, index: integer): any? Removes and returns the element at the specified index.
----@field sort fun(self: array, fn: fun(a: any, b: any): boolean): array Sorts the elements of the array.
----@field concat fun(self: array, sep: string): string Concatenates all elements of the array with an optional separator.
----@field isarray fun(tbl: any[]): boolean? Checks if a table is an array.
----@field push fun(self: array, arg: any?, ...: any?): array Adds one or more elements to the end of the array.
----@field pusharray fun(self: array, tbl: any[]): array Adds all elements from a table to the end of the array.
----@field peek fun(self: array, index: integer?): any Returns the element at the specified index without removing it.
----@field peekarray fun(self: array, index: integer?): array Returns a new array containing the elements from the specified index to the end of the array.
----@field pop fun(self: array, index: integer?): any?, array? Removes and returns the element at the specified index.
----@field poparray fun(self: array, index: integer?): array Removes and returns a new array containing the elements from the specified index to the end of the array.
----@field contains fun(self: array, key: integer?, value: any?): boolean? Checks if the array contains a specific element or key or key-value pair.
----@field find fun(self: array, fn: fun(val: any, i: integer): boolean): integer? Searches for the first element that satisfies a given condition and returns its index.
----@field copy fun(self: array): array Creates a shallow copy of the array.
----@field foldleft fun(self: array, fn: function, arg: any?): array Applies a function to each element from left to right, accumulating a result.
----@field foldright fun(self: array, fn: function, arg: any?): array Applies a function to each element from right to left, accumulating a result.
----@field setenum fun(self: array?): enum: array Creates a read-only array that can be used for enumeration.
----@field map fun(self: array, fn: function, in_place: boolean?): array Applies a function to each element and returns a new array with the results.
----@field filter fun(self: array, fn: function, in_place: boolean?): array Returns a new array containing only the elements that satisfy a given condition.
----@field foreach fun(self: array, fn: fun(val: any, i: integer)) Executes a function for each element across the array.
----@field reverse fun(self: array, length: integer?): array Reverses the order of elements.
+---@field insert fun(list: any[], index: integer, value: any) inserts `value` into `list` at `index`. <br> This is lua's `table.insert` imported; [documentation](https://www.lua.org/manual/5.4/manual.html#pdf-table.insert).
+---@field remove fun(list: any[], index: integer): any? returns and removes the element at `index` from `list`. <br> This is lua's `table.remove` imported; [documentation](https://www.lua.org/manual/5.4/manual.html#pdf-table.remove).
+---@field sort fun(list: any[], fn: fun(a: any, b: any): boolean): any[] sorts the elements of `list` in place. <br> This is lua's `table.sort` imported; [documentation](https://www.lua.org/manual/5.4/manual.html#pdf-table.sort).
+---@field concat fun(list: any[], sep: string): string concatenates the elements of `list` with `sep` as the separator. <br> This is lua's `table.concat` imported; [documentation](https://www.lua.org/manual/5.4/manual.html#pdf-table.concat).
+---@field isarray fun(list: any[]): boolean? returns `true` if `list` is an array, `false` otherwise.
+---@field push fun(list: any[], arg: any?, ...: any?): any[] pushes one or more values to the end of `list`.
+---@field pusharray fun(list: any[], tbl: any[]): any[] pushes the elements of an array to the end of `list`.
+---@field peek fun(list: any[], index: integer?): any returns the element at `index` without removing it from `list`.
+---@field peekarray fun(list: any[], index: integer?): any[] returns an array of elements from the end of `list` up to `index`.
+---@field pop fun(list: any[], index: integer?): any?, any[]? returns and removes the element at `index` from `list`.
+---@field poparray fun(list: any[], index: integer?): any[] returns and removes an array of elements from the end of `list` up to `index`.
+---@field contains fun(list: any[], key: integer?, value: any?): boolean? returns `true` if `list` contains `key`, `value` or `key & value`, `false` otherwise.
+---@field find fun(list: any[], fn: fun(val: any, i: integer): boolean): integer? returns the index of the first element that satisfies `fn`.
+---@field copy fun(list: any[]): any[] returns a shallow copy of `list`.
+---@field foldleft fun(list: any[], fn: function, arg: any?): any[] reduces `list` to a single value by applying `fn` from left to right.
+---@field foldright fun(list: any[], fn: function, arg: any?): any[] reduces `list` to a single value by applying `fn` from right to left.
+---@field setenum fun(list: any[]?): enum: any[] returns `list` as a read-only array.
+---@field map fun(list: any[], fn: function, in_place: boolean?): any[] returns a new array with the results of applying `fn` to each element.
+---@field filter fun(list: any[], fn: function, in_place: boolean?): any[] returns a new array with the elements that satisfy `fn`.
+---@field foreach fun(list: any[], fn: function, reverse: boolean?) iterates over `list` and calls `fn` for each element.
+---@field reverse fun(list: any[], length: integer?): any[] reverses the elements of `list` in place.
 local array do
   local table = table
-  array = {__actions = {__index = array}, __type = 'array'}
-  array.insert = table.insert
-  array.remove = table.remove
-  array.sort = table.sort
-  array.concat = table.concat
-  local min = math.min
+  local table_insert, table_remove, table_sort, table_concat, table_type = table.insert, table.remove, table.sort, table.concat, table.type
+  local math_min = math.min
   ---@module 'duff.shared.debug'
   local debug = require 'duff.shared.debug'
   local check_type = debug.checktype
@@ -43,221 +36,215 @@ local array do
     return check_type(tbl, 'table', fn, arg_no)
   end
 
-  ---@param self any[]?
-  ---@return array
-  local function new(self)
-    self = self or {}
-    if not is_table(self, new, 1) then return self end
-    for k, v in pairs(array) do self[k] = v end
-    setmetatable(self, {__index = array.__actions, __type = 'array'})
-    return self
-  end
-
-  ---@param tbl any[]|array
-  ---@return boolean?
+  ---@param tbl any[]|table The table to check.
+  ---@return boolean? is_array Whether the table is an array.
   local function is_array(tbl)
     if not is_table(tbl, is_array, 1) then return end
-    return tbl.__type == 'array'
+    return table_type(tbl) == 'array'
   end
 
-  ---@param self array
-  ---@param arg any?
-  ---@param ... any?
-  ---@return array
-  local function push(self, arg, ...)
-    if not arg then return self end
-    self[#self + 1] = arg
+  ---@param list any[] The array to push to.
+  ---@param arg any? The value to push.
+  ---@param ... any? Additional values to push.
+  ---@return any[] list The array with the values pushed.
+  local function push(list, arg, ...)
+    if not arg then return list end
+    list[#list + 1] = arg
     if select('#', ...) > 0 then
       local args = {...}
-      for i = 1, #args do self[#self + 1] = args[i] end
+      for i = 1, #args do list[#list + 1] = args[i] end
     end
-    return self
+    return list
   end
 
-  ---@param self array
-  ---@param tbl any[]
-  ---@return array
-  local function push_array(self, tbl)
-    for i = 1, #tbl do self[#self + 1] = tbl[i] end
-    return self
+  ---@param list any[] The array to push to.
+  ---@param tbl any[] The array to push.
+  ---@return any[] list The array with the values pushed.
+  local function push_array(list, tbl)
+    for i = 1, #tbl do list[#list + 1] = tbl[i] end
+    return list
   end
 
-  ---@param self array
-  ---@param index integer?
-  ---@return any
-  local function peek(self, index)
+  ---@param list any[] The array to peek from.
+  ---@param index integer? The index to peek at.
+  ---@return any value The value at the specified index.
+  local function peek(list, index)
     index = index or 1
-    local len = #self
+    local len = #list
     if index <= 0 or index > len then return end
     local function do_peek(n, offset)
       if n <= 0 or offset >= len then return end
-      return self[len - offset], do_peek(n - 1, offset + 1)
+      return list[len - offset], do_peek(n - 1, offset + 1)
     end
     return do_peek(index, 0)
   end
 
-  ---@param self array
-  ---@param index integer?
-  ---@return any[]
-  local function peek_array(self, index)
+  ---@param list any[] The array to peek from.
+  ---@param index integer? The index to peek at.
+  ---@return any[] values The values at the specified index.
+  local function peek_array(list, index)
     index = index or 1
-    local res = new{}
-    local len = #self
-    for i = 1, min(index, len) do res[i] = self[len - i + 1] end
+    local len, res = #list, {}
+    for i = 1, math_min(index, len) do res[i] = list[len - i + 1] end
     return res
   end
 
-  ---@param self array
-  ---@param index integer?
-  ---@return any?, array?
-  local function pop(self, index)
+  ---@param list any[] The array to pop from.
+  ---@param index integer? The index to pop.
+  ---@return any? value, any[]? list The value at the specified index and the array with the value removed.
+  local function pop(list, index)
     index = index or 1
-    if index <= 0 or index > #self then return end
-    local value = self[index]
-    value = array.remove(self, index)
-    return value and value, value and pop(self, index - 1)
+    if index <= 0 or index > #list then return end
+    local value = list[index]
+    value = array.remove(list, index)
+    return value and value, value and pop(list, index - 1)
   end
 
-  ---@param self array
-  ---@param index integer?
-  ---@return array
-  local function pop_array(self, index)
+  ---@param list any[] The array to pop from.
+  ---@param index integer? The index to pop.
+  ---@return any[] values The values at the specified index.
+  local function pop_array(list, index)
     index = index or 1
-    local res = new{}
-    for i = 1, min(index, #self) do res[i] = array.remove(self, i) end
+    local res = {}
+    for i = 1, math_min(index, #list) do res[i] = array.remove(list, i) end
     return res
   end
 
-  ---@param self array
-  ---@param key integer?
-  ---@param value any?
-  ---@return boolean?
-  local function contains(self, key, value)
+  ---@param list any[] The array to search.
+  ---@param key integer? The key to check.
+  ---@param value any? The value to check.
+  ---@return boolean? contains Whether the array contains the key or value.
+  local function contains(list, key, value)
     if not key and not value then return end
     if not key and value then
-      for i = 1, #self do
-        if self[i] == value then return true end
+      for i = 1, #list do
+        if list[i] == value then return true end
       end
       return false
     end
-    return key and (not value and self[key] or self[key] == value)
+    return key and (not value and list[key] or list[key] == value)
   end
 
-  ---@param self array
-  ---@return array
-  local function copy(self)
-    local res = new{}
-    for i = 1, #self do res[i] = self[i] end
+  ---@param list any[] The array to copy.
+  ---@return any[] copy_list The copied array.
+  local function copy(list)
+    local res = {}
+    for i = 1, #list do res[i] = list[i] end
     return res
   end
 
-  ---@param self array
-  ---@param fn fun(val: any, i: integer): boolean
-  ---@return integer?
-  local function find(self, fn)
-    for i = 1, #self do
-      if fn(self[i], i) then return i end
+  ---@param list any[] The array to search.
+  ---@param fn fun(val: any, i: integer): boolean The function to search with.
+  ---@return integer? index The index of the first element that satisfies the condition.
+  local function find(list, fn)
+    for i = 1, #list do
+      if fn(list[i], i) then return i end
     end
   end
 
-  ---@param self array
-  ---@param fn fun(acc: any, val: any): any
-  ---@param arg any?
-  ---@return array
-  local function fold_left(self, fn, arg)
-    local res = self[1]
+  ---@param list any[] The array to fold.
+  ---@param fn fun(acc: any, val: any): any The function to fold with.
+  ---@param arg any? The initial value.
+  ---@return any res The reduced list.
+  local function fold_left(list, fn, arg)
+    local res = list[1]
     res = arg and fn(res, arg) or res
-    for i = 2, #self do res = fn(res, self[i]) end
+    for i = 2, #list do res = fn(res, list[i]) end
     return res
   end
 
-  ---@param self array
-  ---@param fn fun(acc: any, val: any): any
-  ---@param arg any?
-  ---@return array
-  local function fold_right(self, fn, arg)
-    local res = self[#self]
+  ---@param list any[] The array to fold.
+  ---@param fn fun(acc: any, val: any): any The function to fold with.
+  ---@param arg any? The initial value.
+  ---@return any res The reduced list.
+  local function fold_right(list, fn, arg)
+    local res = list[#list]
     res = arg and fn(res, arg) or res
-    for i = #self - 1, 1, -1 do res = fn(res, self[i]) end
+    for i = #list - 1, 1, -1 do res = fn(res, list[i]) end
     return res
   end
 
-  ---@param self array?
-  ---@return array enum
-  local function enum(self)
-    local res = self or {}
+  ---@param list any[]? The array to enumerate.
+  ---@return any[] enum The read-only array.
+  local function enum(list)
+    local res = list or {}
     setmetatable(res, {__newindex = function() error('attempt to modify a read-only table') end})
     return res
   end
 
-  ---@param self array
-  ---@param fn fun(val: any): any
-  ---@param in_place boolean?
-  ---@return array
-  local function map(self, fn, in_place)
-    local res = in_place and self or new{}
-    for i = 1, #self do res[i] = fn(self[i]) end
+  ---@param list any[] The array to map.
+  ---@param fn fun(val: any): any The function to map with.
+  ---@param in_place boolean? Whether to map in place.
+  ---@return any[] res The mapped array.
+  local function map(list, fn, in_place)
+    local res = in_place and list or {}
+    for i = 1, #list do res[i] = fn(list[i]) end
     return res
   end
 
-  ---@param self array
-  ---@param fn fun(val: any, i: integer): boolean
-  ---@param in_place boolean?
-  ---@return array
-  local function filter(self, fn, in_place)
+  ---@param list any[] The array to filter.
+  ---@param fn fun(val: any, i: integer): boolean The function to filter with.
+  ---@param in_place boolean? Whether to filter in place.
+  ---@return any[] res The filtered array.
+  local function filter(list, fn, in_place)
     if in_place then
       local i = 1
-      while i <= #self do
-        if not fn(self[i], i) then array.remove(self, i) else i += 1 end
+      while i <= #list do
+        if not fn(list[i], i) then array.remove(list, i) else i += 1 end
       end
-      return self
+      return list
     end
-    local res = new{}
-    for i = 1, #self do
-      local val = self[i]
+    local res = {}
+    for i = 1, #list do
+      local val = list[i]
       if fn(val, i) then res[#res + 1] = val end
     end
     return res
   end
 
-  ---@param self array
-  ---@param fn fun(val: any, i: integer)
-  local function for_each(self, fn)
-    for i = 1, #self do fn(self[i], i) end
+  ---@param list any[] The array to iterate over.
+  ---@param fn fun(val: any, i: integer) The function to call for each element.
+  ---@param reverse boolean? Whether to iterate in reverse.
+  local function for_each(list, fn, reverse)
+    local i, j, n = 1, #list, 1
+    if reverse then i, j, n = j, 1, -1 end
+    for k = i, j, n do fn(list[k], k) end
   end
 
-  ---@param self array
-  ---@param length integer?
-  ---@return array
-  local function reverse(self, length)
-    if length and length <= 1 or #self <= 1 then return self end
-    local i, j = 1, length and length or #self
+  ---@param list any[] The array to reverse.
+  ---@param length integer? The length to reverse.
+  ---@return any[] list The reversed array.
+  local function reverse(list, length)
+    if length and length <= 1 or #list <= 1 then return list end
+    local i, j = 1, length and length or #list
     while i < j do
-      self[i], self[j] = self[j], self[i]
-      i += 1
-      j -= 1
+      list[i], list[j] = list[j], list[i]
+      i += 1; j -= 1
     end
-    return self
+    return list
   end
 
-  array.new = new
-  array.isarray = is_array
-  array.push = push
-  array.pusharray = push_array
-  array.peek = peek
-  array.peekarray = peek_array
-  array.pop = pop
-  array.poparray = pop_array
-  array.contains = contains
-  array.find = find
-  array.copy = copy
-  array.foldleft = fold_left
-  array.foldright = fold_right
-  array.setenum = enum
-  array.map = map
-  array.filter = filter
-  array.foreach = for_each
-  array.reverse = reverse
-
-  return setmetatable(array, {__index = array.__actions})
+  return {
+    insert = table_insert,
+    remove = table_remove,
+    sort = table_sort,
+    concat = table_concat,
+    isarray = is_array,
+    push = push,
+    pusharray = push_array,
+    peek = peek,
+    peekarray = peek_array,
+    pop = pop,
+    poparray = pop_array,
+    contains = contains,
+    find = find,
+    copy = copy,
+    foldleft = fold_left,
+    foldright = fold_right,
+    setenum = enum,
+    map = map,
+    filter = filter,
+    foreach = for_each,
+    reverse = reverse
+  }
 end
