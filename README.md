@@ -54,6 +54,9 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [filter](#filter)
       - [foreach](#foreach)
       - [reverse](#reverse)
+    - [bm](#bm)
+      - [Importing bm](#importing-bm)
+      - [bm (function)](#bm-function)
     - [bridge](#bridge)
       - [Importing the bridge Module](#importing-the-bridge-module)
       - [\_DATA](#_data)
@@ -186,13 +189,16 @@ Require is a function that allows you to import modules, emulating Lua Default r
 
 ```lua
 -- Using the `require` export
----@param path string @The name of the module to require. This can be a path, or a module name. If a path is provided, it must be relative to the resource root.
----@return {[string]: any} module
+---@param path string
+---@return function|{[string]: any} module
 exports.duff:require(path)
 
 -- Using '@duff/shared/import.lua' in your `fxmanifest.lua`
 duff.require(path)
 ```
+
+- `path` - The name of the module in dot notation, or a path relative to the resource root.
+- `returns: function|{[string]: any}` - returns a function or the module as a dictionary of functions.
 
 ### Check Version
 
@@ -474,6 +480,33 @@ Reverses the order of elements.
 ---@return array
 function array.reverse(self, length)
 ```
+
+### bm
+
+bm is a function that allows you to benchmark the performance of a function, and returns the time taken to execute the function in milliseconds.
+
+#### Importing bm
+
+This module is not exposed in the duff object, and must be imported using the `require` function.
+
+```lua
+local bm = exports.duff:require 'duff.shared.bm'
+```
+
+#### bm (function)
+
+Benchmarks a `function` for `lim` iterations and returns the time taken to execute the function in milliseconds. Then prints the average time taken compared to other `functions`.
+
+This is based on this [benchmarking snippet](https://gist.github.com/thelindat/939fb0aef8b80a077f76f1a850b2a53d#file-benchmark-lua) by @thelindat.
+
+```lua
+---@param funcs {[string]: function}
+---@param lim integer
+function bm(funcs, lim)
+```
+
+- `funcs` - A table of functions to benchmark.
+- `lim` - The number of iterations to run the benchmark.
 
 ### bridge
 
