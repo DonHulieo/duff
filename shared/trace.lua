@@ -2,8 +2,8 @@
 ---@type fun(trace_type: string, ...: any) Prints a trace message to the console. <br> The trace message is prefixed with a color-coded type. <br> Based on [lume's trace function](https://github.com/rxi/lume/blob/master/README.md#lumetrace).
 local trace do
   local get_info = debug.getinfo
-  local require = require
-  local round = require('duff.shared.math').round
+
+  local function round(num, dec) return math.floor(num / dec + .5) * dec end
 
   ---@enum (key) trace_types
   local trace_types = {['error'] = '^1SCRIPT ERROR:', ['warn'] = '^3SCRIPT WARNING:', ['info'] = '^5SCRIPT INFO:', ['debug'] = '^7SCRIPT DEBUG:'}
