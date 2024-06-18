@@ -112,6 +112,9 @@ Well, this is the solution for you! This is a collection of *optimised utility m
         - [getentitymatrix](#getentitymatrix)
         - [getentityforward](#getentityforward)
         - [getoffsetfromentityinworldcoords](#getoffsetfromentityinworldcoords)
+    - [trace](#trace)
+      - [Importing trace](#importing-trace)
+      - [trace (function)](#trace-function)
     - [blips](#blips)
       - [Importing the blips Module](#importing-the-blips-module)
       - [getall](#getall)
@@ -1237,6 +1240,35 @@ function vector.getentityforward(entity)
 ---@return vector3?
 function vector.getoffsetfromentityinworldcoords(entity, offsetX, offsetY, offsetZ)
 ```
+
+### trace
+
+trace is a function that prints a message to the console with the file name, line number and passed arguments.
+
+#### Importing trace
+
+This module is not exposed in the duff object, and must be imported using the `require` function.
+
+```lua
+local trace = exports.duff:require 'duff.shared.trace'
+```
+
+#### trace (function)
+
+Prints a message to the console with the file name, line number and passed arguments.
+
+```lua
+---@param trace_type 'error'|'warn'|'info'|'debug'
+---@param ... any
+function trace(trace_type, ...)
+```
+
+- `trace_type` - The type of trace to print.
+  - `error` - Prefixes the message with `'SCRIPT ERROR:'` and prints in red.
+  - `warn` - Prefixes the message with `'SCRIPT WARNING:'` and prints in yellow.
+  - `info` - Prefixes the message with `'SCRIPT INFO:'` and prints in light blue.
+  - `debug` - Prefixes the message with `'SCRIPT DEBUG:'` and prints in white.
+- `...` - The arguments to print.
 
 ### blips
 
