@@ -176,6 +176,8 @@ Well, this is the solution for you! This is a collection of *optimised utility m
 - [DurtyFrees' Data Dumps](https://github.com/DurtyFree/gta-v-data-dumps)
 - [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
 - [kikito](https://github.com/kikito/i18n.lua/tree/master)
+- [thelindat](https://gist.github.com/thelindat/939fb0aef8b80a077f76f1a850b2a53d#file-benchmark-lua)
+- [lume](https://github.com/rxi/lume/blob/master/README.md#lumetrace)
 
 ## Installation
 
@@ -835,7 +837,7 @@ function bridge.removelocalentity(entities)
 
 ### locale
 
-locale is an object containing functions for localisation and translation. It's inspired by the i18n.lua library by kikito, and provides a simple way to manage translations in your FiveM scripts.
+locale is an object containing functions for localisation and translation. It's based on the i18n.lua library by kikito [ref](README.md#credits), and provides a simple way to manage translations in your FiveM scripts.
 
 *This is a shared module, and can be used on both the client, server and shared enviroment.*
 
@@ -1263,7 +1265,7 @@ function vector.getclosest(check, list, radius, ignore)
 
 ##### getentityright
 
-Returns the right vector of an entity.
+Returns the right vector of an entity. Based on FiveM and VenomXNL's `GetEntityRight` function, see [ref](README.md#credits).
 
 ```lua
 ---@param entity integer
@@ -1276,7 +1278,7 @@ function vector.getentityright(entity)
 
 ##### getentityup
 
-Returns the up vector of an entity.
+Returns the up vector of an entity. Based on FiveM and VenomXNL's `GetEntityUp` function, see [ref](README.md#credits).
 
 ```lua
 ---@param entity integer
@@ -1291,7 +1293,7 @@ function vector.getentityup(entity)
 
 ##### getentitymatrix
 
-Returns the matrix of an entity.
+Returns the matrix of an entity. The matrix is a table containing the forward, right, up and position vectors. Based on FiveM and draobrehtom's `GetEntityMatrix` function, see [ref](README.md#credits).
 
 ```lua
 ---@param entity integer
@@ -1317,7 +1319,7 @@ function vector.getentityforward(entity)
 
 ##### getoffsetfromentityinworldcoords
 
-Returns the offset from an entity in world coordinates.
+Returns the offset from an entity in world coordinates. Based on FiveM and draobrehtom's `GetOffsetFromEntityInWorldCoords` function, see [ref](README.md#credits).
 
 ```lua
 ---@param entity integer
@@ -1348,7 +1350,7 @@ local trace = exports.duff:require 'duff.shared.trace'
 
 #### trace (function)
 
-Prints a message to the console with the file name, line number and passed arguments.
+Prints a message to the console with the file name, line number and passed arguments. It's based on FiveM and Lume's `trace` functions, see [ref](README.md#credits).
 
 ```lua
 ---@param trace_type 'error'|'warn'|'info'|'debug'
