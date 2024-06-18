@@ -341,14 +341,14 @@ Pushes one or more elements to the end of the array.
 ---@param list any[]
 ---@param arg any?
 ---@param ... any?
----@return any[] list
+---@return any[]? list
 function array.push(list, arg, ...)
 ```
 
 - `list` - The array to add the elements to.
 - `arg` - The first element to add.
 - `...` - The rest of the elements to add.
-- `returns: any[]` - The array with the added elements.
+- `returns: any[]` - The array with the added elements, `nil` if `list` is not an array.
 
 #### pusharray
 
@@ -357,13 +357,13 @@ Pushes all elements from a list to the end of the array.
 ```lua
 ---@param list any[]
 ---@param to_push any[]
----@return any[] list
+---@return any[]? list
 function array.pusharray(list, to_push)
 ```
 
 - `list` - The array to add the elements to.
 - `to_push` - The array of elements to add.
-- `returns: any[]` - The array with the added elements.
+- `returns: any[]` - The array with the added elements, `nil` if `list` is not an array.
 
 #### peek
   
@@ -372,13 +372,13 @@ Returns the element at the specified index without removing it.
 ```lua
 ---@param list any[]
 ---@param index integer?
----@return any value
+---@return any? value
 function array.peek(list, index)
 ```
 
 - `list` - The array to get the element from.
 - `index` - The index of the element.
-- `returns: any` - The element at the specified index.
+- `returns: any` - The element at the specified index, `nil` if the index or `list` is invalid.
 
 #### peekarray
 
@@ -387,13 +387,13 @@ Returns a new list containing the elements from the specified index to the end o
 ```lua
 ---@param list any[]
 ---@param index integer?
----@return any[] peek_list
+---@return any[]? peek_list
 function array.peekarray(list, index)
 ```
 
 - `list` - The array to get the elements from.
 - `index` - The index of the element.
-- `returns: any[]` - The new list containing the elements.
+- `returns: any[]` - The new list containing the elements, `nil` if the index or `list` is invalid.
 
 #### pop
 
@@ -408,7 +408,7 @@ function array.pop(list, index)
 
 - `list` - The array to remove the element from.
 - `index` - The index of the element.
-- `returns: any` - The removed element.
+- `returns: any` - The removed element, `nil` if the index or `list` is invalid.
 
 #### poparray
 
@@ -423,7 +423,7 @@ function array.poparray(list, index)
 
 - `list` - The array to remove the elements from.
 - `index` - The index of the element.
-- `returns: any[]` - The new array containing the elements.
+- `returns: any[]` - The new array containing the elements, `nil` if the index or `list` is invalid.
 
 #### contains (array)
 
@@ -440,7 +440,7 @@ function array.contains(list, key, value)
 - `list` - The array to check.
 - `key` - The key to check for.
 - `value` - The value to check for.
-- `returns: boolean` - Whether the array contains the element.
+- `returns: boolean` - Whether the array contains the element, key or key-value pair.
 
 #### copy
 
@@ -448,12 +448,12 @@ Creates a shallow copy of the array.
 
 ```lua
 ---@param list any[]
----@return any[] copy_list
+---@return any[]? copy_list
 function array.copy(list)
 ```
 
 - `list` - The array to copy.
-- `returns: any[]` - The copied array.
+- `returns: any[]` - The copied array, `nil` if `list` is not an array.
 
 #### find
 
@@ -468,7 +468,7 @@ function array.find(list, func)
 
 - `list` - The array to search.
 - `func` - The condition to satisfy.
-- `returns: integer` - The index of the element.
+- `returns: integer` - The index of the element, `nil` if the element is not found or `list` is not an array.
 
 #### foldleft
 
@@ -478,14 +478,14 @@ Applies a function to each element from left to right, accumulating and returnin
 ---@param list any[]
 ---@param func fun(acc: any, val: any): any
 ---@param arg any?
----@return any result
+---@return any? result
 function array.foldleft(list, func, arg)
 ```
 
 - `list` - The array to apply the function to.
 - `func` - The function to apply.
 - `arg` - The initial value.
-- `returns: any` - The accumulated result.
+- `returns: any` - The accumulated result, `nil` if `list` or `fn` are invalid.
 
 #### foldright
 
@@ -495,14 +495,14 @@ Applies a function to each element from right to left, accumulating and returnin
 ---@param list any[]
 ---@param func fun(acc: any, val: any): any
 ---@param arg any?
----@return any result
+---@return any? result
 function array.foldright(self, func, arg)
 ```
 
 - `list` - The array to apply the function to.
 - `func` - The function to apply.
 - `arg` - The initial value.
-- `returns: any` - The accumulated result.
+- `returns: any` - The accumulated result, `nil` if the index or `list` is invalid.
 
 #### setenum
 
@@ -525,14 +525,14 @@ Applies a function to each element and returns a new array with the results.
 ---@param list any[]
 ---@param func fun(val: any): any
 ---@param in_place boolean?
----@return any[] mapped_list
+---@return any[]? mapped_list
 function array.map(list, func, in_place)
 ```
 
 - `list` - The array to apply the function to.
 - `func` - The function to apply.
 - `in_place` - Whether to modify the original array or return a new one.
-- `returns: any[]` - The mapped array.
+- `returns: any[]` - The mapped array, `nil` if the index or `list` is invalid.
 
 #### filter
 
@@ -542,14 +542,14 @@ Returns a new array containing only the elements that satisfy a given condition.
 ---@param list any[]
 ---@param func fun(val: any, i: integer): boolean
 ---@param in_place boolean?
----@return any[] filtered_list
+---@return any[]? filtered_list
 function array.filter(list, func, in_place)
 ```
 
 - `list` - The array to filter.
 - `func` - The condition to satisfy.
 - `in_place` - Whether to modify the original array or return a new one.
-- `returns: any[]` - The filtered array.
+- `returns: any[]` - The filtered array, `nil` if the index or `list` is invalid.
 
 #### foreach
 
@@ -564,7 +564,7 @@ function array.foreach(list, func, reverse)
 
 - `list` - The array to iterate over.
 - `func` - The function to apply.
-- `reverse` - Whether to iterate in reverse order or not.
+- `reverse` - Whether to iterate in reverse order or not, `nil` if the index or `list` is invalid.
 
 #### reverse
 
@@ -573,13 +573,13 @@ Reverses the order of elements in place.
 ```lua
 ---@param list any[]
 ---@param length integer?
----@return any[] reversed_list
+---@return any[]? reversed_list
 function array.reverse(self, length)
 ```
 
 - `list` - The array to reverse.
 - `length` - The length of the array.
-- `returns: any[]` - The reversed array.
+- `returns: any[]` - The reversed array, `nil` if `list` is invalid.
 
 ### bm
 
