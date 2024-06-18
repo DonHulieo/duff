@@ -101,10 +101,13 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [tofloat](#tofloat)
       - [toint](#toint)
       - [toratio](#toratio)
-    - [vector](#vector)
-      - [Importing the vector Module](#importing-the-vector-module)
+    - [vecmath](#vecmath)
+      - [Importing the vecmath Module](#importing-the-vecmath-module)
       - [Shared Functions (math)](#shared-functions-math)
-        - [tabletovector](#tabletovector)
+        - [isvec](#isvec)
+        - [tobin](#tobin)
+        - [frombin](#frombin)
+        - [tovec](#tovec)
         - [getclosest](#getclosest)
         - [getentityright](#getentityright)
         - [getentityup](#getentityup)
@@ -1156,90 +1159,180 @@ function math.toratio(value, precision)
   - `1e-10 | 0.0000000001` is used.
 - `returns: integer, integer` - The rational number.
 
-### vector
+### vecmath
 
 *This is a shared module, but has functions which are exclusive to their respective enviroments.*
 
-#### Importing the vector Module
+#### Importing the vecmath Module
 
 ```lua
 -- Using the `require` export
----@module 'duff.shared.vector'
-local vector = exports.duff:require 'duff.shared.vector'
+---@module 'duff.shared.vecmath'
+local vecmath = exports.duff:require 'duff.shared.vecmath'
 
--- Attaching the vector to a local variable from the duff object
-local vector = duff.vector
+-- Attaching the vecmath to a local variable from the duff object
+local vecmath = duff.vecmath
 ```
 
 #### Shared Functions (math)
 
-##### tabletovector
+##### isvec
 
-Checks if the table is a vector and converts it to a vector.
+Checks if a value is a vector.
 
 ```lua
----@param tbl {x: number, y: number, z: number?, w: number?}
----@return vector2|vector3|vector4
-function vector.tabletovector(tbl)
+---@param value any
+---@return boolean? is_vector
+function vecmath.isvec(value)
 ```
+
+- `value` - The value to check.
+- `returns: boolean` - Whether the value is a vector.
+
+##### tobin
+
+Converts a vector to a double-precision binary string.
+
+```lua
+---@param vec vector
+---@return string? bin
+function vecmath.tobin(vec)
+```
+
+- `vec` - The vector to convert.
+- `returns: string` - The binary string.
+
+##### frombin
+
+Converts a double-precision binary string to a vector.
+
+```lua
+---@param bin string
+---@return vector? vec
+function vecmath.frombin(bin)
+```
+
+- `bin` - The binary string to convert.
+- `returns: vector` - The vector.
+
+##### tovec
+
+Returns a vector from an entity or a table.
+
+```lua
+---@param value integer|vector|{x: number, y: number, z: number?, w: number?}|number[]
+---@return vector|integer vec
+function vector.tovec(value)
+```
+
+- `value` - The value to convert, can be;
+  - `integer` - The entity to get the position of.
+  - `table` - The table containing `x`, `y`, `z` and `w` keys.
+  - `number[]` - The array containing the values.
+- `returns: vector|integer` - `vector` if the value had a valid position, otherwise `0`.
 
 ##### getclosest
 
 Finds the closest vector3 in an array to a given vector3.
 
 ```lua
----@param check integer|vector3|{x: number, y: number, z: number}
----@param tbl vector3[]|integer[]
+---@param check integer|vector|{x: number, y: number, z: number?, w: number?}|number[]
+---@param tbl (integer|vector)[]
 ---@param radius number?
----@param excluding any[]?
+---@param excluding (integer|vector|{x: number, y: number, z: number?, w: number?}|number[])[]?
 ---@return integer|vector3?, number?, array?
 function vector.getclosest(check, list, radius, ignore)
 ```
 
+- `check` - The value to check, can be;
+  - `integer` - The entity to get the position of.
+  - `table` - The table containing `x`, `y`, `z` and `w` keys.
+  - `number[]` - The array containing the values.
+  - `vector` - The vector to check.
+- `tbl` - The array of values to check against, can be;
+  - `integer[]` - An array of entities.
+  - `vector[]` - An array of vectors.
+  - `table[]` - An array of tables containing `x`, `y`, `z` and `w` keys.
+  - `number[]` - An array of arrays containing the values.
+- `radius` - The radius to check within.
+- `excluding` - The array of values to ignore, can be;
+  - `integer[]` - An array of entities.
+  - `vector[]` - An array of vectors.
+  - `table[]` - An array of tables containing `x`, `y`, `z` and `w` keys.
+  - `number[]` - An array of arrays containing the values.
+
 ##### getentityright
+
+Returns the right vector of an entity.
 
 ```lua
 ---@param entity integer
----@return vector3?
+---@return vector3? right
 function vector.getentityright(entity)
 ```
 
+- `entity` - The entity to get the right vector of.
+- `returns: vector3` - The right vector.
+
 ##### getentityup
+
+Returns the up vector of an entity.
 
 ```lua
 ---@param entity integer
----@return vector3?
+---@return vector3? up
 function vector.getentityup(entity)
 ```
+
+- `entity` - The entity to get the up vector of.
+- `returns: vector3` - The up vector.
 
 #### Server Functions (math)
 
 ##### getentitymatrix
 
+Returns the matrix of an entity.
+
 ```lua
 ---@param entity integer
----@return vector3?, vector3?, vector3?, vector3?
+---@return vector3? forward, vector3? right, vector3? up, vector3? pos
 function vector.getentitymatrix(entity)
 ```
 
+- `entity` - The entity to get the matrix of.
+- `returns: vector3, vector3, vector3, vector3` - The forward, right, up and position vectors.
+
 ##### getentityforward
+
+Returns the forward vector of an entity.
 
 ```lua
 ---@param entity integer
----@return vector3?
+---@return vector3? forward
 function vector.getentityforward(entity)
 ```
 
+- `entity` - The entity to get the forward vector of.
+- `returns: vector3` - The forward vector.
+
 ##### getoffsetfromentityinworldcoords
+
+Returns the offset from an entity in world coordinates.
 
 ```lua
 ---@param entity integer
 ---@param offsetX number
 ---@param offsetY number
 ---@param offsetZ number
----@return vector3?
+---@return vector3? offset
 function vector.getoffsetfromentityinworldcoords(entity, offsetX, offsetY, offsetZ)
 ```
+
+- `entity` - The entity to get the offset from.
+- `offsetX` - The x offset.
+- `offsetY` - The y offset.
+- `offsetZ` - The z offset.
+- `returns: vector3` - The offset in world coordinates.
 
 ### trace
 
