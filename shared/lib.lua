@@ -102,35 +102,40 @@ local function find_path(name)
   end
 end
 
+---@param fn function
+---@return function
+local function wrap_fn(fn)
+  return function(...)
+    local results = {pcall(fn, ...)}
+    local success, err = results[1], results[2]
+    if not success then error(err, 0) end
+    return select(2, unpack(results))
+  end
+end
+
 ---@param module {[string]: any}
 ---@return {[string]: any} module
 local function safe_load_module(module)
   for k, v in pairs(module) do
-    if type(v) == 'function' then
-      module[k] = function(...)
-        local results = {pcall(v, ...)}
-        local success, err = results[1], results[2]
-        if not success then error(err, 0) end
-        return select(2, unpack(results))
-      end
-    end
+    if type(v) == 'function' then module[k] = wrap_fn(v) end
   end
   return module
 end
 
 ---@param name string @The name of the module to require. This can be a path, or a module name. If a path is provided, it must be relative to the resource root.
----@return {[string]: any} module
+---@return {[string]: any}|function module
 function require(name)
   local param_type = type(name)
-  if param_type ~= 'string' then error('bad argument #1 to \'require\' (string expected, got ' ..param_type.. ')', 1) end
+  if param_type ~= 'string' then error('bad argument #1 to \'require\' (string expected, got ' ..param_type.. ')', 2) end
   local path = find_path(name)
-  if not path then error('bad argument #1 to \'require\' (invalid path)', 1) end
+  if not path then error('bad argument #1 to \'require\' (invalid path)', 2) end
   if package.loaded[path] then return package.loaded[path] end
-  if not package.preload[path] then error('bad argument #1 to \'require\' (no file found)', 1) end
+  if not package.preload[path] then error('bad argument #1 to \'require\' (no file found)', 2) end
   local loaded, module = pcall(package.preload[path])
-  if not loaded then error('bad argument #1 to \'require\' (error loading file) \n' ..module, 1)
+  if not loaded then error('bad argument #1 to \'require\' (error loading file) \n' ..module, 2)
   elseif not module then module = package.preload[path] end
-  module = type(module) == 'table' and safe_load_module(module) or module
+  local mod_type = type(module)
+  module = mod_type == 'table' and safe_load_module(module) or mod_type == 'function' and wrap_fn(module) or module
   package.loaded[name] = module
   return module
 end
