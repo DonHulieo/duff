@@ -37,25 +37,25 @@ local vecmath do
   ---@return string? binary `value` converted to a binary string.
   local function to_binary(value)
     local vec_type = type(value)
-    if not vector_types[vec_type] then trace('error', 'bad argument #1 to \'tobin\' expected vector, got '..vec_type) return end
+    if not vector_types[vec_type] then trace('error', 'bad argument #1 to \'tobin\' (expected vector, got '..vec_type..')') return end
     return s_pack(vector_types[vec_type], t_unpack(value))
   end
 
   ---@enum (key) vector_res
   local vector_res = {[8] = 'd', [16] = 'dd', [24] = 'ddd', [32] = 'dddd'}
   ---@param value string The value to convert to a vector.
-  ---@return vector? vector `value` converted to a vector.
+  ---@return number|vector? vector `value` converted to a vector.
   local function from_binary(value)
     local len = #value
-    if not vector_res[len] then trace('error', 'bad argument #1 to \'frombin\' expected binary string, got '..type(value)) return end
-    return vector(s_unpack(vector_res[len], value))
+    if not len or not vector_res[len] then trace('error', 'bad argument #1 to \'frombin\' (expected binary string, got '..type(value)..')') return end
+    return vector(t_unpack({s_unpack(vector_res[len], value)}, 1, len / 8))
   end
 
   ---@param tbl {x: number, y: number, z: number?, w: number?}|number[] The table to convert to a vector. <br> Can be a table with `x`, `y`, `z`, and `w` keys or an array with the same values.
   ---@return number|vector2|vector3|vector4? vector `tbl` converted to a vector.
   local function tbl_to_vector(tbl) -- Original concept by: [Swkeep](https://github.com/swkeep).
     local param_type = type(tbl)
-    if param_type ~= 'table' then trace('error', 'bad argument #1 to \'tovec\' expected table, got '..param_type) return end
+    if param_type ~= 'table' then trace('error', 'bad argument #1 to \'tovec\' (expected table, got '..param_type..')') return end
     tbl = not tbl[1] and {tbl.x, tbl.y, tbl.z, tbl.w} or tbl
     return vector(t_unpack(tbl))
   end
@@ -63,7 +63,7 @@ local vecmath do
   ---@param entity integer The entity to retrieve the coordinates from.
   ---@return vector3|number? coords `coords` of the entity if it exists, otherwise `0`.
   local function ent_to_vector(entity)
-    if not math.isint(entity) then trace('error', 'bad argument #1 to \'tovec\' expected integer, got '..type(entity)) end
+    if not math.isint(entity) then trace('error', 'bad argument #1 to \'tovec\' (expected integer, got '..type(entity)..')') end
     return does_entity_exist(entity) and get_coords(entity) or 0
   end
 
@@ -85,7 +85,7 @@ local vecmath do
   ---@return integer|vector? closest, number? dist, (integer|vector)[]? closests <br> `closest` is the closest value to `check`. <br>  `dist` is the distance to the closest value. <br> `closests` is an array of all vectors within `radius`.
   local function get_closest(check, tbl, radius, excluding) -- Find the closest vector in `tbl` to `check`.
     local coords = to_vector(check) --[[@as vector|integer]]
-    if coords == 0 then trace('error', 'bad argument #1 to \'getclosest\' expected vector, entity or table, got '..type(check)) end
+    if coords == 0 then trace('error', 'bad argument #1 to \'getclosest\' (expected vector, entity or table, got '..type(check)..')') end
     tbl = type(tbl) == 'table' and tbl or {tbl}
     local closest, dist, closests = nil, radius or huge, {}
     local exc_type = type(excluding)
@@ -105,7 +105,7 @@ local vecmath do
   local function sv_get_entity_matrix(entity) -- Credits go to: [draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297)
     if not is_server or not get_rot then return end
     local coords = ent_to_vector(entity)
-    if not coords then trace('error', 'bad argument #1 to \'getentitymatrix\' expected entity, got '..type(entity)) return end
+    if not coords then trace('error', 'bad argument #1 to \'getentitymatrix\' (expected entity, got '..type(entity)..')') return end
     local rot = get_rot(entity)
     local x, y, z = rot.x, rot.y, rot.z
     x, y, z = rad(x), rad(y), rad(z)
@@ -128,7 +128,7 @@ local vecmath do
   ---@return vector3? forward `forward` vector of the entity.
   local function get_entity_forward_vec(entity)
     if not is_server then return end
-    if not does_entity_exist(entity) then trace('error', 'bad argument #1 to \'getentityforward\' entity does not exist') return end
+    if not does_entity_exist(entity) then trace('error', 'bad argument #1 to \'getentityforward\' (entity does not exist)') return end
     local forward = get_entity_matrix(entity)
     return forward
   end
@@ -137,7 +137,7 @@ local vecmath do
   ---@return vector3? right `right` vector of the entity.
   local function sv_get_entity_right_vec(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
     if not is_server then return end
-    if not does_entity_exist(entity) then trace('error', 'bad argument #1 to \'getentityright\' entity does not exist') return end
+    if not does_entity_exist(entity) then trace('error', 'bad argument #1 to \'getentityright\' (entity does not exist)') return end
     local _, right = get_entity_matrix(entity)
     return right
   end
@@ -146,7 +146,7 @@ local vecmath do
   ---@return vector3? up `up` vector of the entity.
   local function sv_get_entity_up_vec(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
     if not is_server then return end
-    if not does_entity_exist(entity) then trace('error', 'bad argument #1 to \'getentityup\' entity does not exist') return end
+    if not does_entity_exist(entity) then trace('error', 'bad argument #1 to \'getentityup\' (entity does not exist)') return end
     local _, _, up = get_entity_matrix(entity)
     return up
   end
@@ -158,7 +158,7 @@ local vecmath do
   ---@return vector3? offset The world coordinates of the entity with the offset.
   local function get_offset_entity_worldcoords(entity, offset_x, offset_y, offset_z) -- Credits go to: [draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297)
     if not is_server then return end
-    if not does_entity_exist(entity) then trace('error', 'bad argument #1 to \'getoffsetfromentityinworldcoords\' entity does not exist') return end
+    if not does_entity_exist(entity) then trace('error', 'bad argument #1 to \'getoffsetfromentityinworldcoords\' (entity does not exist)') return end
     local forward, right, up, pos = get_entity_matrix(entity)
     if not forward or not right or not up or not pos then return end
     local x = offset_x * forward.x + offset_y * right.x + offset_z * up.x + pos.x
@@ -171,7 +171,7 @@ local vecmath do
   ---@return vector3? right `right` vector of the entity.
   local function get_entity_right_vec(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
     if is_server then return end
-    if not does_entity_exist(entity) then trace('error', 'bad argument #1 to \'getentityright\' entity does not exist') return end
+    if not does_entity_exist(entity) then trace('error', 'bad argument #1 to \'getentityright\' (entity does not exist)') return end
     local _, right = get_entity_matrix(entity)
     return right
   end
@@ -180,7 +180,7 @@ local vecmath do
   ---@return vector3? up `up` vector of the entity.
   local function get_entity_up_vec(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
     if is_server then return end
-    if not does_entity_exist(entity) then trace('error', 'bad argument #1 to \'getentityup\' entity does not exist') return end
+    if not does_entity_exist(entity) then trace('error', 'bad argument #1 to \'getentityup\' (entity does not exist)') return end
     local _, _, up = get_entity_matrix(entity)
     return up
   end

@@ -18,7 +18,7 @@ local check_version = is_server and function(resource, version, git, repo) retur
 ---@field pools pools
 ---@field streaming streaming
 ---@field scope scope
----@field vector vector
+---@field vecmath vecmath
 ---@field zone zone
 duff = {
   _VERSION = res_version,
@@ -30,7 +30,7 @@ duff = {
   bridge = require 'duff.shared.bridge',
   locale = require 'duff.shared.locale',
   math = require 'duff.shared.math',
-  vector = require 'duff.shared.vector'
+  vecmath = require 'duff.shared.vecmath'
 }
 if not is_server then
   duff.blips = require 'duff.client.blips'
