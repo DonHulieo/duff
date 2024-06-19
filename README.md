@@ -956,6 +956,8 @@ math is an object containing some useful math functions. Most notably, it contai
 
 It also imports the default Lua math functions, so you can use it as a drop-in replacement for the default math library.
 
+*This is a shared module, and can be used on both the client, server and shared enviroment.*
+
 #### Importing the math Module
 
 ```lua
@@ -1163,6 +1165,8 @@ function math.toratio(value, precision)
 
 ### vecmath
 
+vecmath is an object containing functions for vector math. It provides functions for vector operations, conversions and checks.
+
 *This is a shared module, but has functions which are exclusive to their respective enviroments.*
 
 #### Importing the vecmath Module
@@ -1184,7 +1188,7 @@ Checks if a value is a vector.
 
 ```lua
 ---@param value any
----@return boolean? is_vector
+---@return boolean is_vector
 function vecmath.isvec(value)
 ```
 
@@ -1197,7 +1201,7 @@ Converts a vector to a double-precision binary string.
 
 ```lua
 ---@param vec vector
----@return string? bin
+---@return string bin
 function vecmath.tobin(vec)
 ```
 
@@ -1210,7 +1214,7 @@ Converts a double-precision binary string to a vector.
 
 ```lua
 ---@param bin string
----@return vector? vec
+---@return vector vec
 function vecmath.frombin(bin)
 ```
 
@@ -1242,7 +1246,7 @@ Finds the closest vector3 in an array to a given vector3.
 ---@param tbl (integer|vector)[]
 ---@param radius number?
 ---@param excluding (integer|vector|{x: number, y: number, z: number?, w: number?}|number[])[]?
----@return integer|vector3?, number?, array?
+---@return integer|vector|{x: number, y: number, z: number?, w: number?}|number[]? closest, number? dist, (integer|vector|{x: number, y: number, z: number?, w: number?}|number[])[]? closests
 function vector.getclosest(check, list, radius, ignore)
 ```
 
@@ -1262,6 +1266,10 @@ function vector.getclosest(check, list, radius, ignore)
   - `vector[]` - An array of vectors.
   - `table[]` - An array of tables containing `x`, `y`, `z` and `w` keys.
   - `number[]` - An array of arrays containing the values.
+- `returns:`;  
+  - `integer|vector|{x: number, y: number, z: number?, w: number?}|number[]` - The closest value,
+  - `number` - The distance to the closest value,
+  - `(integer|vector|{x: number, y: number, z: number?, w: number?}|number[])[]` - The closest values.
 
 ##### getentityright
 
@@ -1269,7 +1277,7 @@ Returns the right vector of an entity. Based on FiveM and VenomXNL's `GetEntityR
 
 ```lua
 ---@param entity integer
----@return vector3? right
+---@return vector3 right
 function vector.getentityright(entity)
 ```
 
@@ -1282,7 +1290,7 @@ Returns the up vector of an entity. Based on FiveM and VenomXNL's `GetEntityUp` 
 
 ```lua
 ---@param entity integer
----@return vector3? up
+---@return vector3 up
 function vector.getentityup(entity)
 ```
 
@@ -1297,7 +1305,7 @@ Returns the matrix of an entity. The matrix is a table containing the forward, r
 
 ```lua
 ---@param entity integer
----@return vector3? forward, vector3? right, vector3? up, vector3? pos
+---@return vector3 forward, vector3 right, vector3 up, vector3 pos
 function vector.getentitymatrix(entity)
 ```
 
@@ -1310,7 +1318,7 @@ Returns the forward vector of an entity.
 
 ```lua
 ---@param entity integer
----@return vector3? forward
+---@return vector3 forward
 function vector.getentityforward(entity)
 ```
 
@@ -1326,7 +1334,7 @@ Returns the offset from an entity in world coordinates. Based on FiveM and draob
 ---@param offsetX number
 ---@param offsetY number
 ---@param offsetZ number
----@return vector3? offset
+---@return vector3 offset
 function vector.getoffsetfromentityinworldcoords(entity, offsetX, offsetY, offsetZ)
 ```
 
@@ -1352,6 +1360,8 @@ local trace = exports.duff:require 'duff.shared.trace'
 
 Prints a message to the console with the file name, line number and passed arguments. It's based on FiveM and Lume's `trace` functions, see [ref](README.md#credits).
 
+*This is a shared module, and can be used on both the client, server and shared enviroment.*
+
 ```lua
 ---@param trace_type 'error'|'warn'|'info'|'debug'
 ---@param ... any
@@ -1367,7 +1377,9 @@ function trace(trace_type, ...)
 
 ### blips
 
-*This is a client module.*
+blips is an object containing functions for managing blips. It provides functions for getting all blips, onscreen blips, blips by coordinates, blips by sprite, blips by type, getting blip information and removing blips.
+
+*This is a client module, and can only be used in the client enviroment.*
 
 #### Importing the blips Module
 
@@ -1382,44 +1394,77 @@ local blips = duff.blips
 
 #### getall
 
+Returns an array of all active blips handles.
+
 ```lua
----@return array? blips
+---@return integer[] blip_ids
 function blips.getall()
 ```
 
+- `returns: integer[]` - An array of all active blips handles.
+
 #### onscreen
 
+Returns an array of all blips handles currently on the minimap.
+
 ```lua
----@return array? blips
+---@return integer[]? blip_ids
 function blips.onscreen()
 ```
 
+- `returns: integer[]` - An array of all blips handles currently on the minimap.
+
 #### bycoords
+
+Finds all blips within `radius` of `coords`.
 
 ```lua
 ---@param coords vector3|vector3[]
 ---@param radius number?
----@return array? blips
+---@return integer[]? blip_ids
 function blips.bycoords(coords, radius)
 ```
 
+- `coords` - The coordinates to check. Can be a single vector3 or an array of vector3s.
+- `radius` - The radius to check within.
+- `returns: integer[]` - An array of all blips within the radius of the coordinates.
+
 #### bysprite
+
+Finds all blips with `sprite`.
 
 ```lua
 ---@param sprite integer
----@return array? blips
+---@return integer[]? blip_ids
 function blips.bysprite(sprite)
 ```
 
+- `sprite` - The sprite to check for.
+- `returns: integer[]` - An array of all blips with the sprite.
+
 #### bytype
+
+Finds all blips with `type`.
 
 ```lua
 ---@param type integer
----@return array? blips
+---@return integer[]? blip_ids
 function blips.bytype(type)
 ```
 
+- `type` - The type to check for.
+  - `1` - Vehicle.
+  - `2` - Ped.
+  - `3` - Object.
+  - `4` - Coord.
+  - `5` - Unk.
+  - `6` - Pickup.
+  - `7` - Radius.
+- `returns: integer[]` - An array of all blips with the type
+
 #### getinfo
+
+Returns information about a blip.
   
 ```lua
 ---@param blip integer
@@ -1427,12 +1472,33 @@ function blips.bytype(type)
 function blips.getinfo(blip)
 ```
 
+- `blip` - The blip handle.
+- `returns: table` - The blip information.
+  
+```lua
+{
+  alpha = 255, -- The alpha value of the blip.
+  coords = vector3, -- The coordinates of the blip.
+  colour = 0, -- The colour of the blip.
+  display = 2, -- The display of the blip.
+  fade = false, -- Whether the blip fades.
+  hud_colour = 0, -- The HUD colour of the blip.
+  type = 1, -- The type of the blip.
+  rotation = 0.0, -- The rotation of the blip.
+  is_shortrange = false, -- Whether the blip is short range.
+}
+```
+
 #### remove
+
+Removes a blip or an array of blips.
 
 ```lua
 ---@param blips integer|integer[]
 function blips.remove(blips)
 ```
+
+- `blips` - The blip handle or an array of blip handles.
 
 ### pools
 
