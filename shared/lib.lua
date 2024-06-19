@@ -70,7 +70,7 @@ local function test_path(resource, file)
 end
 
 ---@param name string
----@return string?, function|table?
+---@return string?, table?
 local function find_path(name)
   local parts = {}
   for part in name:gmatch('[^.]+') do parts[#parts + 1] = part end
@@ -102,22 +102,24 @@ local function find_path(name)
   end
 end
 
+---@param file string
+---@param name string
 ---@param fn function
 ---@return function
-local function wrap_fn(fn)
+local function protect(file, name, fn)
   return function(...)
-    local results = {pcall(fn, ...)}
+    local results = {xpcall(fn, function(err) return '^1SCRIPT ERROR: @'..file..'.lua:'..debug.getinfo(3, 'S').linedefined..': '..string.format(err, name)..'^7' end, ...)}
     local success, err = results[1], results[2]
-    if not success then error(err, 0) end
+    if not success then print(err) end
     return select(2, unpack(results))
   end
 end
 
 ---@param module {[string]: any}
 ---@return {[string]: any} module
-local function safe_load_module(module)
+local function protect_module(file, module)
   for k, v in pairs(module) do
-    if type(v) == 'function' then module[k] = wrap_fn(v) end
+    if type(v) == 'function' then module[k] = protect(file, k, v) end
   end
   return module
 end
@@ -127,17 +129,17 @@ end
 function require(name)
   local param_type = type(name)
   if param_type ~= 'string' then error('bad argument #1 to \'require\' (string expected, got ' ..param_type.. ')', 2) end
-  local path = find_path(name)
-  if not path then error('bad argument #1 to \'require\' (invalid path)', 2) end
+  local path, parts = find_path(name)
+  if not path or not parts then error('bad argument #1 to \'require\' (invalid path)', 2) end
   if package.loaded[path] then return package.loaded[path] end
   if not package.preload[path] then error('bad argument #1 to \'require\' (no file found)', 2) end
   local loaded, module = pcall(package.preload[path])
   if not loaded then error('bad argument #1 to \'require\' (error loading file) \n' ..module, 2)
   elseif not module then module = package.preload[path] end
   local mod_type = type(module)
-  module = mod_type == 'table' and safe_load_module(module) or mod_type == 'function' and wrap_fn(module) or module
-  package.loaded[name] = module
-  return module
+  if mod_type ~= 'table' and mod_type ~= 'function' then error('bad argument #1 to \'require\' (table or function expected, got ' ..mod_type.. ')', 2) end
+  package.loaded[name] = mod_type == 'table' and protect_module(path, module) or protect(path, parts[2], module)
+  return package.loaded[name]
 end
 
 exports('require', require)
