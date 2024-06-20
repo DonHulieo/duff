@@ -162,6 +162,7 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [getzone](#getzone)
       - [getzonename](#getzonename)
       - [getzoneindex](#getzoneindex)
+      - [getzonefromname](#getzonefromname)
       - [addzoneevent](#addzoneevent)
       - [removezoneevent](#removezoneevent)
     - [Support](#support)
@@ -1900,6 +1901,8 @@ function scope.removesyncedscopeevent(event)
 
 ### zone
 
+zone is an object containing functions for managing map zones. It functions similar to [PolyZone](https://github.com/mkafrin/PolyZone) and ox_libs' CZone, but is server-side only, whilst providing the same functionality and more.
+
 *This is a server module.*
 
 #### Importing the zone Module
@@ -1915,54 +1918,121 @@ local zone = duff.zone
 
 #### contains (zone)
 
+Checks if a zone contains a point.
+
 ```lua
----@param check vector3|{x: number, y: number, z: number}|string
----@return boolean?, integer?
-function zone.contains(check)
+---@param coords vector3|{x: number, y: number, z: number}|number[]
+---@return boolean contains, integer index
+function zone.contains(coords)
 ```
+
+- `coords` - The coordinates to check, can be;
+  - `vector3` - The vector to check.
+  - `{x: number, y: number, z: number}` - The table containing `x`, `y`, `z` keys.
+  - `number[]` - The array containing the coordinates.
+- `returns: boolean, integer` - Whether the zone contains the point and the zone index.
 
 #### getzone
 
+Returns a zone by index.
+
 ```lua
 ---@param index integer
----@return table?
+---@return {Name: string, DisplayName: string, Bounds: {Minimum: {X: number, Y: number, Z: number}, Maximum: {X: number, Y: number, Z: number}}}? zone
 function zone.getzone(index)
 ```
 
+- `index` - The index of the zone.
+- `returns: table` - The zone information.
+  - `Name` - The name of the zone.
+  - `DisplayName` - The display name of the zone.
+  - `Bounds` - The bounds of the zone.
+    - `Minimum` - The minimum bounds.
+      - `{X: number, Y: number, Z: number}`
+    - `Maximum` - The maximum bounds.
+      - `{X: number, Y: number, Z: number}`
+
 #### getzonename
 
+Returns a zone name by coordinates.
+
 ```lua
----@param check vector3|{x: number, y: number, z: number}|string
----@return string? name
-function zone.getzonename(check)
+---@param coords vector3|{x: number, y: number, z: number}|number[]
+---@return string name
+function zone.getzonename(coords)
 ```
+
+- `coords` - The coordinates to check, can be;
+  - `vector3` - The vector to check.
+  - `{x: number, y: number, z: number}` - The table containing `x`, `y`, `z` keys.
+  - `number[]` - The array containing the coordinates.
+- `returns: string` - The name of the zone.
 
 #### getzoneindex
 
+Returns a zone index by coordinates.
+
 ```lua
----@param check vector3|{x: number, y: number, z: number}|string
----@return integer? index
-function zone.getzoneindex(check)
+---@param coords vector3|{x: number, y: number, z: number}|number[]
+---@return integer index
+function zone.getzoneindex(coords)
 ```
+
+- `coords` - The coordinates to check, can be;
+  - `vector3` - The vector to check.
+  - `{x: number, y: number, z: number}` - The table containing `x`, `y`, `z` keys.
+  - `number[]` - The array containing the coordinates.
+- `returns: integer` - The index of the zone.
+
+#### getzonefromname
+
+Returns a zone by name.
+
+```lua
+---@param name string
+---@return integer index
+function zone.getzonefromname(name)
+```
+
+- `name` - The name of the zone, both name and display name are accepted.
+- `returns: integer` - The index of the zone.
 
 #### addzoneevent
 
+Adds a zone event.
+
 ```lua
 ---@param event string
----@param zone_id vector3|{x: number, y: number, z: number}|string
----@param onEnter fun(player: string, coords: vector3)
----@param onExit fun(player: string, coords: vector3, disconnected: boolean?)
+---@param zone_id integer|vector3|{x: number, y: number, z: number}|number[]|string
+---@param onEnter fun(player: string, coords: vector3)?
+---@param onExit fun(player: string, coords: vector3, disconnected: boolean?)?
 ---@param time integer?
----@param players string?\
+---@param player string?
 function zone.addzoneevent(event, zone_id, onEnter, onExit, time, players)
 ```
 
+- `event` - The event to add.
+- `zone_id` - The zone to add the event to, can be;
+  - `integer` - The index of the zone.
+  - `vector3` - The vector to check.
+  - `{x: number, y: number, z: number}` - The table containing `x`, `y`, `z` keys.
+  - `number[]` - The array containing the coordinates.
+  - `string` - The name of the zone.
+- `onEnter` - The function to call when a player enters the zone.
+- `onExit` - The function to call when a player exits the zone.
+- `time` - The time in milliseconds between each event.
+- `player` - The player to trigger the event for, if `nil` all players are checked.
+
 #### removezoneevent
+
+Removes a zone event.
 
 ```lua
 ---@param event string
 function zone.removezoneevent(event)
 ```
+
+- `event` - The event to remove.
 
 ### Support
 

@@ -1,20 +1,35 @@
 ---@class zone
----@field contains fun(check: vector3|{x: number, y: number, z: number}|string): boolean?, integer?
----@field getzone fun(index: integer): table?
----@field getzonename fun(check: vector3|{x: number, y: number, z: number}|string): string?
----@field getzoneindex fun(check: vector3|{x: number, y: number, z: number}|string): integer?
----@field addzoneevent fun(event: string, zone_id: vector3|{x: number, y: number, z: number}|string, onEnter: fun(player: string, coords: vector3), onExit: fun(player: string, coords: vector3, disconnected: boolean?), time: integer?, player: string?)
----@field removezoneevent fun(event: string)
+---@field contains fun(check: vector3|{x: number, y: number, z: number}|number[]): boolean, integer Returns whether `check` is within a zone and the index of the zone. <br> `check` can be vector3, a table with `x`, `y`, `z`, and `w` keys or an array with the same values.
+---@field getzone fun(index: integer): {Name: string, DisplayName: string, Bounds: {Minimum: {X: number, Y: number, Z: number}, Maximum: {X: number, Y: number, Z: number}}}? Returns the zone data at `index`. <br> `index` is the index of the zone.
+---@field getzonename fun(coords: vector3|{x: number, y: number, z: number}|number[]): string Returns the name of the zone. <br> `check` can be vector3, a table with `x`, `y`, `z`, and `w` keys or an array with the same values.
+---@field getzoneindex fun(coords: vector3|{x: number, y: number, z: number}|number[]): integer Returns the index of the zone. <br> `check` can be vector3, a table with `x`, `y`, `z`, and `w` keys or an array with the same values.
+---@field getzonefromname fun(name: string): integer Returns the index of the zone. <br> `name` is the name of the zone.
+---@field addzoneevent fun(event: string, zone_id: integer|vector3|{x: number, y: number, z: number}|number[]|string, onEnter: fun(player: string, coords: vector3)?, onExit: fun(player: string, coords: vector3, disconnected: boolean?)?, time: integer?, player: string?) Adds an event to a zone. <br> `zone_id` can be vector3, a table with `x`, `y`, `z`, and `w` keys, an array with the same values, the name or the index of the zone. <br> `onEnter` is the function to call when a player enters the zone. <br> `onExit` is the function to call when a player exits the zone. <br> `time` is the time to wait between checks in milliseconds. <br> `player` is the player to add the event for.
+---@field removezoneevent fun(event: string) Removes the event from the zone. <br> `event` is the name of the event.
 local zone do
   local ZONES = json.decode(LoadResourceFile('duff', 'data/zones.json'))
-  local check_type = require('duff.shared.debug').checktype
-  local convert_to_vec = require('duff.shared.vector').tabletovector
-  local Listeners = {}
+  ---@module 'duff.shared.vecmath'
+  local vecmath = require 'duff.shared.vecmath'
+  local to_vec, is_vec = vecmath.tovec, vecmath.isvec
+  local current_resource = GetCurrentResourceName()
+  local Listeners, Players = {}, GetPlayers()
 
-  ---@param index integer
-  ---@param coords vector3|{x: number, y: number, z: number}
-  ---@return boolean
-  local function check_bounds(index, coords)
+  ---@param resource string
+  local function deinit_zones(resource)
+    if resource ~= current_resource then return end
+    Listeners, Players = nil, {}
+  end
+
+  ---@param string any The string to check.
+  ---@return string string The string if it is a string, otherwise the string representation of the value.
+  local function ensure_string(string)
+    return type(string) ~= 'string' and tostring(string) or string
+  end
+
+  ---@param index integer The index of the zone.
+  ---@param coords vector3|{x: number, y: number, z: number}|number[] The coordinates to check.
+  ---@return boolean in_bounds Returns whether `coords` is within the bounds of the zone.
+  local function check_bounds(index, coords) -- Internal function to check if the coordinates are within the bounds of the zone.
     local bounds = ZONES[index].Bounds
     local x, y, z = coords.x, coords.y, coords.z
     for i = 1, #bounds do
@@ -25,70 +40,89 @@ local zone do
     return false
   end
 
-  ---@param check vector3|{x: number, y: number, z: number}|string
-  ---@return boolean?, integer?
-  local function contains(check)
-    local bool, param_type = check_type(check, {'vector3', 'table', 'string'}, contains, 1)
-    if not bool then return end
-    check = param_type == 'table' and convert_to_vec(check--[[@as table]]) or param_type == 'string' and check--[[@as string]]:upper() or check
-    if not check then return end
-    local isVec = type(check) == 'vector3'
-    local x, y, z = isVec and check.x, isVec and check.y, isVec and check.z
+  ---@param coords vector3|{x: number, y: number, z: number}|number[]  The value to check. <br> Can be vector3, a table with `x`, `y`, `z`, and `w` keys or an array with the same values.
+  ---@return boolean contains, integer index Returns whether `check` is within a zone and the index of the zone.
+  local function contains(coords)
+    local param_type = type(coords)
+    coords = param_type ~= 'vector3' and to_vec(coords) or coords --[[@as vector3]]
+    if not coords or not is_vec(coords) then error('bad argument #1 to \'%s\' (vector3 or table expected, got '..param_type..')', 0) end
+    local does_contain, index = false, 0
     for i = 1, #ZONES do
-      local zone_data = ZONES[i]
-      if x and y and z and param_type ~= 'string' then
-        if check_bounds(i, check--[[@as table|vector3]]) then return true, i end
-      elseif param_type == 'string' then
-        if zone_data.Name:upper() == check or zone_data.DisplayName:upper() == check then return true, i end
-      end
+      if check_bounds(i, coords) then does_contain, index = true, i break end
     end
-    return false
+    return does_contain, index
   end
 
-  ---@param index integer
-  ---@return table?
+  ---@param index integer The index of the zone.
+  ---@return {Name: string, DisplayName: string, Bounds: {Minimum: {X: number, Y: number, Z: number}, Maximum: {X: number, Y: number, Z: number}}}? zone Returns the zone data.
   local function get_zone(index)
     return ZONES[index]
   end
 
-  ---@param coords vector3|{x: number, y: number, z: number}|string
-  ---@return string? name
+  ---@param coords vector3|{x: number, y: number, z: number}|number[] The value to check. <br> Can be vector3, a table with `x`, `y`, `z`, and `w` keys or an array with the same values.
+  ---@return string name Returns the name of the zone.
   local function get_name_of_zone(coords)
-    if not check_type(coords, {'vector3', 'table'}, get_name_of_zone, 1) then return end
     local bool, index = contains(coords)
-    return bool and ZONES[index].Name:upper() or nil
+    return bool and ZONES[index].Name:upper() or 'UNKNOWN'
   end
 
-  ---@param coords vector3|{x: number, y: number, z: number}|string
-  ---@return integer? index
+  ---@param coords vector3|{x: number, y: number, z: number}|number[] The value to check. <br> Can be vector3, a table with `x`, `y`, `z`, and `w` keys or an array with the same values.
+  ---@return integer index Returns the index of the zone.
   local function get_index_of_zone(coords)
-    if not check_type(coords, {'vector3', 'table'}, get_index_of_zone, 1) then return end
     local bool, index = contains(coords)
-    return bool and index or nil
+    return bool and index or 0
   end
 
-  ---@param event string
-  ---@param zone_id vector3|{x: number, y: number, z: number}|string
-  ---@param onEnter fun(player: string, coords: vector3)
-  ---@param onExit fun(player: string, coords: vector3, disconnected: boolean?)
-  ---@param time integer?
-  ---@param player string?
+  ---@param name string The name of the zone.
+  ---@return integer index Returns the index of the zone.
+  local function get_index_from_name(name)
+    if type(name) ~= 'string' then error('bad argument #1 to \'%s\' (string expected, got '..type(name)..')', 0) end
+    local index = 0
+    name = name:upper()
+    for i = 1, #ZONES do
+      local ZONE = ZONES[i]
+      if ZONE.Name:upper() == name or ZONE.DisplayName:upper() == name then index = i break end
+    end
+    return index
+  end
+
+  local function on_joined()
+    local src = ensure_string(source)
+    if not src then return end
+    Players[#Players + 1] = src
+  end
+
+  local function on_dropped()
+    local src = ensure_string(source)
+    if not src then return end
+    for i = 1, #Players do
+      if Players[i] == src then table.remove(Players, i) break end
+    end
+    for _, listener in pairs(Listeners) do
+      if listener.players[src] then listener.players[src] = nil end
+    end
+  end
+
+  ---@param event string The name of the event.
+  ---@param zone_id integer|vector3|{x: number, y: number, z: number}|number[]|string The zone to add the event to. <br> Can be vector3, a table with `x`, `y`, `z`, and `w` keys, an array with the same values, the name or the index of the zone.
+  ---@param onEnter fun(player: string, coords: vector3)? The function to call when a player enters the zone.
+  ---@param onExit fun(player: string, coords: vector3, disconnected: boolean?)? The function to call when a player exits the zone.
+  ---@param time integer? The time to wait between checks in milliseconds.
+  ---@param player string? The player to add the event for.
   local function add_zone_event(event, zone_id, onEnter, onExit, time, player)
-    if not check_type(event, 'string', add_zone_event, 1) then return end
-    if not check_type(zone, 'string', add_zone_event, 2) then return end
-    if not check_type(onEnter, 'function', add_zone_event, 3) then return end
-    if not check_type(onExit, 'function', add_zone_event, 4) then return end
-    if time and not check_type(time, 'integer', add_zone_event, 5) then return end
-    if player and not check_type(player, 'string', add_zone_event, 6) then return end
-    local index = get_index_of_zone(zone_id)
-    if not index or Listeners[event] then return end
+    if not event or type(event) ~= 'string' then error('bad argument #1 to \'%s\' (string expected, got '..type(event)..')', 0) end
+    local zone_id_type = type(zone_id)
+    if not zone_id or not (is_vec(zone_id --[[@as table|number[]|vector3]]) or zone_id_type == 'string') then error('bad argument #2 to \'%s\' (vector3 or string expected, got '..zone_id_type..')', 0) end
+    local index = zone_id_type == 'number' and zone_id and zone_id_type ~= 'string' and get_index_of_zone(zone_id --[[@as number[]|vector3|{x: number, y: number, z: number}]]) or get_index_from_name(zone_id --[[@as string]])
+    if index == 0 or not ZONES[index] then error('bad argument #2 to \'%s\' (zone not found)', 0) end
+    if Listeners[event] then error('bad argument #1 to \'%s\' (event \''..event..'\' already exists)', 0) end
     Listeners[event] = {players = {}}
-    local Players = GetPlayers()
     local sleep = time or 500
     CreateThread(function()
       while Listeners[event] do
-        Wait(sleep)
-        for _, player_src in pairs(Players) do
+        Wait(2500)
+        for i = 1, #Players do
+          local player_src = Players[i]
           if (not player or player_src == player) and Listeners[event].players[player_src] == nil then
             CreateThread(function()
               Listeners[event].players[player_src] = true
@@ -102,38 +136,44 @@ local zone do
                     if not entered then
                       entered = true
                       Listeners[event].players[player_src] = true
-                      onEnter(player_src, coords)
+                      if onEnter then onEnter(player_src, coords) end
                     end
                   elseif entered then
                     entered = false
                     Listeners[event].players[player_src] = false
-                    onExit(player_src, coords)
+                    if onExit then onExit(player_src, coords) end
                   end
                   Wait(sleep)
                   coords = GetEntityCoords(ped)
                 end
-                if entered then onExit(player_src, coords, true) end
+                if entered and onExit then onExit(player_src, coords, true) end
               end
               Listeners[event].players[player_src] = nil
             end)
           end
         end
-        Players = GetPlayers()
+        Players = Players
       end
     end)
   end
 
-  ---@param event string
+  ---@param event string The name of the event.
   local function remove_zone_event(event)
-    if not check_type(event, 'string', remove_zone_event, 1) then return end
+    if not event or type(event) ~= 'string' then error('bad argument #1 to \'%s\' (string expected, got '..type(event)..')', 0) end
     if Listeners[event] then Listeners[event] = nil end
   end
 
+  -------------------------------- INTERNAL HANDLERS --------------------------------
+  AddEventHandler('onResourceStop', deinit_zones)
+  AddEventHandler('playerJoining', on_joined)
+  AddEventHandler('playerDropped', on_dropped)
+  -----------------------------------------------------------------------------------
   return {
     contains = contains,
     getzone = get_zone,
     getzonename = get_name_of_zone,
     getzoneindex = get_index_of_zone,
+    getzonefromname = get_index_from_name,
     addzoneevent = add_zone_event,
     removezoneevent = remove_zone_event
   }
