@@ -1,52 +1,56 @@
 ---@class scope
 ---@field Scopes {[string]: {[string]: boolean}, Synced: {[string]: {[string]: boolean}}}?
----@field getplayerscope fun(source: number|integer): {[string]: boolean}?
----@field triggerscopeevent fun(event: string, owner: number|integer, ...: any): {[string]: boolean}?
----@field createsyncedscopeevent fun(event: string, owner: number|integer, time: integer?, duration: integer?, ...: any)
----@field removesyncedscopeevent fun(event: string)
+---@field getplayerscope fun(player: number|integer): {[string]: boolean} Returns the scope of `player` or the source player if `player` is not provided. <br> The scope is a table containing the players that are in the same scope as the owner. <br> Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21).
+---@field triggerscopeevent fun(event: string, owner: number|integer, ...: any): {[string]: boolean}? Triggers the `event` for the owner and all the players in the same scope as the owner. <br> The `...` arguments are the arguments that will be passed to the event. <br> Returns the players that the event was triggered for. <br> Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21).
+---@field createsyncedscopeevent fun(event: string, owner: number|integer, time: integer?, duration: integer?, ...: any) Creates a synced scope event that triggers the `event` for the owner and all the players in the same scope as the owner. <br> The event will be triggered every `time` milliseconds and will last for `duration` milliseconds. <br> The `...` arguments are the arguments that will be passed to the event. <br> The event will be removed after `duration` milliseconds if `duration` is provided.
+---@field removesyncedscopeevent fun(event: string) Removes the synced scope event with the name `event`.
 local scope do
-  local check_type = require('duff.shared.debug').checktype
-  ---@diagnostic disable-next-line: deprecated
-  local tostring, unpack = tostring, unpack or table.unpack
+  local tostring, unpack = tostring, table.unpack
   local timer = require('duff.shared.math').timer
   local client_event, create_thread, wait = TriggerLatentClientEvent, CreateThread, Wait
   local game_timer = GetGameTimer
   local current_resource = GetCurrentResourceName()
   local Scopes = {}
 
-  local function clear_scopes(resource)
-    local bool = check_type(resource, 'string', clear_scopes, 1)
-    if not bool or resource ~= current_resource then return end
+  ---@param resource string
+  local function deinit_scopes(resource)
+    if resource ~= current_resource then return end
     Scopes = {}
   end
 
-  ---@param string any
-  ---@return string
+  ---@param string any The string to check.
+  ---@return string string The string if it is a string, otherwise the string representation of the value.
   local function ensure_string(string)
     return type(string) ~= 'string' and tostring(string) or string
   end
 
-  ---@param player number|integer
-  ---@return {[string]: boolean}? Scope
+  ---@param player number|integer? The player to get the scope for. If not provided, the source player will be used.
+  ---@return {[string]: boolean} Scope Returns the scope of `player` or the source player if `player` is not provided.
   local function get_player_scope(player) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
     local src = ensure_string(player or source)
-    if not check_type(src, 'string', get_player_scope, 1) then return end
+    if not src or type(src) ~= 'string' then error('bad argument #1 to \'%s\' (string expected, got '..type(src)..')', 0) end
     Scopes[src] = Scopes[src] or {}
     return Scopes[src]
   end
 
-  ---@param data {for: string, player: string}
+  ---@param data {for: string, player: string} The data containing the player and the owner.
   local function on_entered_scope(data)
     local player, owner = data['player'], data['for']
     Scopes[owner] = Scopes[owner] or {}
     Scopes[owner][player] = true
   end
 
-  ---@param data {for: string, player: string}
+  ---@param data {for: string, player: string} The data containing the player and the owner.
   local function on_exited_scope(data)
     local player, owner = data['player'], data['for']
     if not Scopes[owner] then return end
     Scopes[owner][player] = nil
+  end
+
+  local function on_joined()
+    local src = ensure_string(source)
+    if not src then return end
+    Scopes[src] = {}
   end
 
   local function on_dropped()
@@ -58,10 +62,10 @@ local scope do
     end
   end
 
-  ---@param event string
-  ---@param owner number|integer
-  ---@param ... any
-  ---@return {[string]: boolean}? targets
+  ---@param event string The event to trigger.
+  ---@param owner number|integer The owner of the event.
+  ---@param ... any The arguments to pass to the event.
+  ---@return {[string]: boolean}? targets Returns the players that the event was triggered for.
   local function trigger_scope_event(event, owner, ...) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
     local targets = get_player_scope(owner)
     client_event(event, owner, 50000, ...)
@@ -70,11 +74,11 @@ local scope do
     return targets
   end
 
-  ---@param event string
-  ---@param owner number|integer
-  ---@param time integer?
-  ---@param duration integer?
-  ---@param ... any
+  ---@param event string The event to create.
+  ---@param owner number|integer The owner of the event.
+  ---@param time integer? The time in milliseconds between each event.
+  ---@param duration integer? The duration in milliseconds of the event.
+  ---@param ... any The arguments to pass to the event.
   local function create_synced_scope_event(event, owner, time, duration, ...)
     if not get_player_scope(owner) then return end
     local targets = trigger_scope_event(event, owner, ...)
@@ -99,15 +103,16 @@ local scope do
     end)
   end
 
-  ---@param event string
+  ---@param event string The event to remove.
   local function remove_synced_scope_event(event)
     Scopes.Synced[event] = nil
   end
 
   -------------------------------- INTERNAL HANDLERS --------------------------------
-  AddEventHandler('onResourceStop', clear_scopes)
+  AddEventHandler('onResourceStop', deinit_scopes)
   AddEventHandler('playerEnteredScope', on_entered_scope)
   AddEventHandler('playerLeftScope', on_exited_scope)
+  AddEventHandler('playerJoining', on_joined)
   AddEventHandler('playerDropped', on_dropped)
   -----------------------------------------------------------------------------------
   return {

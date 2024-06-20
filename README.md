@@ -1823,6 +1823,8 @@ function streaming.async.loadptfx(fx)
 
 ### scope
 
+scope is an object containing functions for managing scope. It provides functions for getting a player's scope, triggering a scope event and creating a synced scope event.
+
 *This is a server module.*
 
 #### Importing the scope Module
@@ -1838,39 +1840,63 @@ local scope = duff.scope
 
 #### getplayerscope
 
+Returns a player's scope.
+
 ```lua
----@param source number|integer
----@return {[string]: boolean}? Scope
-function scope.getplayerscope(source)
+---@param player number|integer
+---@return {[string]: boolean} Scope
+function scope.getplayerscope(player)
 ```
+
+- `player` - The player to get the scope of.
+- `returns: {[string]: boolean}` - The player's scope.
 
 #### triggerscopeevent
 
+Triggers a scope event.
+
 ```lua
 ---@param event string
----@param source number|integer
+---@param owner number|integer
 ---@param ... any
 ---@return {[string]: boolean}? targets
-function scope.triggerscopeevent(event, source, ...)
+function scope.triggerscopeevent(event, owner, ...)
 ```
 
+- `event` - The event to trigger.
+- `owner` - The owner of the event.
+- `...` - The arguments to pass to the event.
+- `returns: {[string]: boolean}` - The targets of the event.
+
 #### createsyncedscopeevent
+
+Creates a synced scope event.
   
 ```lua
 ---@param event string
----@param source number|integer
+---@param owner number|integer
 ---@param timer integer?
 ---@param duration integer?
 ---@param ... any
-function scope.createsyncedscopeevent(event, source, timer, duration, ...)
+function scope.createsyncedscopeevent(event, owner, timer, duration, ...)
 ```
 
+- `event` - The event to create.
+- `owner` - The owner of the event.
+- `timer` - The time in milliseconds between each event.
+- `duration` - The duration in milliseconds of the event.
+- `...` - The arguments to pass to the event.
+
 #### removesyncedscopeevent
+
+Removes a synced scope event.
 
 ```lua
 ---@param event string
 function scope.removesyncedscopeevent(event)
 ```
+
+- `event` - The event to remove.
 
 ### zone
 
