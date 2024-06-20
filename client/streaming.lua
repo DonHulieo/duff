@@ -17,7 +17,8 @@ local streaming do
   local is_ipl_active, request_ipl = IsIplActive, RequestIpl
   local is_model_in_cd, is_model_in_valid, has_model_loaded, request_model = IsModelInCdimage, IsModelValid, HasModelLoaded, RequestModel
   local has_named_ptfx_asset_loaded, request_named_ptfx_asset = HasNamedPtfxAssetLoaded, RequestNamedPtfxAsset
-  local async = require('duff.shared.async')
+  ---@module 'duff.shared.async'
+  local async = require 'duff.shared.async'
 
   ---@param asset string|number The asset to load.
   ---@param loaded function The function to check if the asset is loaded.
@@ -83,21 +84,27 @@ local streaming do
 
   return {
     async = {
+      -- Loads an animation dictionary without blocking the main thread.
       ---@param dict string The animation dictionary to load.
       ---@return boolean? loaded Whether the animation dictionary was loaded.
       loadanimdict = function(dict) return async(req_anim_dict, dict) end,
+      -- Loads an animation set without blocking the main thread.
       ---@param set string The animation set to load.
       ---@return boolean? loaded Whether the animation set was loaded.
       loadanimset = function(set) return async(req_anim_set, set) end,
+      -- Loads collision for a model without blocking the main thread.
       ---@param model string|number The model to load collision for.
       ---@return boolean? loaded Whether the collision was loaded.
       loadcollision = function(model) return async(req_collision, model) end,
+      -- Loads an IPL without blocking the main thread.
       ---@param ipl string The IPL to load.
       ---@return boolean? loaded Whether the IPL was loaded.
       loadipl = function(ipl) return async(req_ipl, ipl) end,
+      -- Loads a model without blocking the main thread.
       ---@param model string|number The model to load.
       ---@return boolean? loaded Whether the model was loaded.
       loadmodel = function(model) return async(req_model, model) end,
+      -- Loads a particle effect asset without blocking the main thread.
       ---@param fx string The particle effect asset to load.
       ---@return boolean? loaded Whether the particle effect asset was loaded.
       loadptfx = function(fx) return async(req_ptfx, fx) end

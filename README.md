@@ -91,15 +91,16 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [translate](#translate)
     - [pools](#pools)
       - [Importing the pools Module](#importing-the-pools-module)
-      - [getpeds](#getpeds)
-      - [getvehicles](#getvehicles)
-      - [getobjects](#getobjects)
-      - [getclosestped](#getclosestped)
-      - [getclosestvehicle](#getclosestvehicle)
-      - [getclosestobject](#getclosestobject)
+      - [Shared Functions (pools)](#shared-functions-pools)
+        - [getpeds](#getpeds)
+        - [getvehicles](#getvehicles)
+        - [getobjects](#getobjects)
+        - [getclosestped](#getclosestped)
+        - [getclosestvehicle](#getclosestvehicle)
+        - [getclosestobject](#getclosestobject)
       - [Client Functions (pools)](#client-functions-pools)
-      - [getpickups](#getpickups)
-      - [getclosestpickup](#getclosestpickup)
+        - [getpickups](#getpickups)
+        - [getclosestpickup](#getclosestpickup)
     - [math](#math)
       - [Importing the math Module](#importing-the-math-module)
       - [between](#between)
@@ -107,8 +108,8 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [gcd](#gcd)
       - [ishalf](#ishalf)
       - [isint](#isint)
-      - [ispos](#ispos)
       - [round](#round)
+      - [sign](#sign)
       - [seedrng](#seedrng)
       - [random](#random)
       - [timer](#timer)
@@ -1000,7 +1001,9 @@ local pools = exports.duff:require 'duff.client.pools'
 local pools = duff.pools
 ```
 
-#### getpeds
+#### Shared Functions (pools)
+
+##### getpeds
 
 Returns an array of all peds in the pool, filtered by `ped_type` if client-side and provided.
 
@@ -1013,7 +1016,7 @@ function pools.getpeds(ped_type)
 - `ped_type` - The ped type to filter by (client-side only). Ped types can be found in the [Native Reference](https://docs.fivem.net/natives/?_0xFF059E1E4C01E63C).
 - `returns: integer[]` - An array of all peds.
 
-#### getvehicles
+##### getvehicles
 
 Returns an array of all vehicles in the pool, filtered by `vehicle_type` if provided.
 
@@ -1026,7 +1029,7 @@ function pools.getvehicles(vehicle_type)
 - `vehicle_type` - The vehicle type to filter by. Client side filters by [class](https://docs.fivem.net/natives/?_0x29439776AAA00A62) and server side filters by [type](https://docs.fivem.net/natives/?_0xA273060E).
 - `returns: integer[]` - An array of all vehicles.
 
-#### getobjects
+##### getobjects
 
 Returns an array of all objects in the pool.
 
@@ -1037,7 +1040,7 @@ function pools.getobjects()
 
 - `returns: integer[]` - An array of all objects.
 
-#### getclosestped
+##### getclosestped
 
 Returns the closest ped to a specified position, filtered by `ped_type` if provided, and within a specified `radius`.
 
@@ -1060,7 +1063,7 @@ function pools.getclosestped(check, ped_type, radius, excluding)
 - `excluding` - The ped or peds to ignore.
 - `returns: integer, number, integer[]` - The closest ped, the distance to the ped, and an array of all peds.
 
-#### getclosestvehicle
+##### getclosestvehicle
 
 Returns the closest vehicle to a specified position, filtered by `vehicle_type` if provided, and within a specified `radius`.
 
@@ -1085,7 +1088,7 @@ function pools.getclosestvehicle(check, vehicle_type, radius, excluding)
 - `excluding` - The vehicle or vehicles to ignore.
 - `returns: integer, number, integer[]` - The closest vehicle, the distance to the vehicle, and an array of all vehicles.
 
-#### getclosestobject
+##### getclosestobject
 
 Returns the closest object to a specified position, within a specified `radius`.
 
@@ -1108,7 +1111,7 @@ function pools.getclosestobject(check, radius, excluding)
 
 #### Client Functions (pools)
 
-#### getpickups
+##### getpickups
 
 Returns an array of all pickups in the pool, filtered by `hash` if provided.
 
@@ -1123,7 +1126,7 @@ function pools.getpickups(hash)
   - The hash of the pickup, e.g. `0x5099E8AF`.
 - `returns: integer[]` - An array of all pickups.
 
-#### getclosestpickup
+##### getclosestpickup
 
 Returns the closest pickup to a specified position, filtered by `hash` if provided, and within a specified `radius`.
 
@@ -1175,7 +1178,7 @@ Checks if a value is between two other values.
 ---@param val number
 ---@param min number
 ---@param max number
----@return boolean? is_between
+---@return boolean is_between
 function math.between(val, min, max)
 ```
 
@@ -1222,7 +1225,7 @@ Checks if a number is a half, 1.5, 2.5, etc.
 
 ```lua
 ---@param value number
----@return boolean? is_half
+---@return boolean is_half
 function math.ishalf(value)
 ```
 
@@ -1235,32 +1238,19 @@ Checks if a number is an integer.
 
 ```lua
 ---@param value integer|number 
----@return boolean? is_int
+---@return boolean is_int
 function math.isint(value)
 ```
 
 - `value` - The value to check.
 - `returns: boolean` - Whether the value is an integer.
 
-#### ispos
-
-Checks if a number is positive.
-
-```lua
----@param value number
----@return boolean? is_positive
-function math.ispos(value)
-```
-
-- `value` - The value to check.
-- `returns: boolean` - Whether the value is positive.
-
 #### round
 
 ```lua
 ---@param value number
 ---@param increment integer?
----@return number|integer?
+---@return number|integer
 function math.round(value, increment)
 ```
 
@@ -1270,12 +1260,25 @@ function math.round(value, increment)
   - returns the closest integer round from zero if `increment` is `nil`, otherwise;
   - returns the closest integer round to the increment.
 
+#### sign
+
+Checks if a number is positive.
+
+```lua
+---@param value number
+---@return integer sign
+function math.sign(value)
+```
+
+- `value` - The value to check.
+- `returns: integer` - `1` if `val` is positive, `-1` if `val` is negative.
+
 #### seedrng
 
 Generates a random seed based on the current time.
   
 ```lua
----@return integer? seed
+---@return integer seed
 function math.seedrng()
 ```
 
