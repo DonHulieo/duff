@@ -53,6 +53,9 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [filter](#filter)
       - [foreach](#foreach)
       - [reverse](#reverse)
+    - [async](#async)
+      - [Importing async](#importing-async)
+      - [async (function)](#async-function)
     - [bm](#bm)
       - [Importing bm](#importing-bm)
       - [bm (function)](#bm-function)
@@ -582,6 +585,33 @@ function array.reverse(self, length)
 - `list` - The array to reverse.
 - `length` - The length of the array.
 - `returns: any[]` - The reversed array, `nil` if `list` is invalid.
+
+### async
+
+async is a function that allows you to call and return functions asynchronously, using promises.
+
+#### Importing async
+
+This module is not exposed in the duff object, and must be imported using the `require` function.
+
+```lua
+local async = exports.duff:require 'duff.shared.async'
+```
+
+#### async (function)
+
+Calls and returns functions asynchronously, using promises.
+
+```lua
+---@param func fun(...): any
+---@param ... any
+---@return ...?
+function async(func, ...)
+```
+
+- `func` - The function to call.
+- `...` - The arguments to pass to the function.
+- `returns: ...` - The result of the function.
 
 ### bm
 
@@ -1671,6 +1701,8 @@ function blips.remove(blips)
 
 ### streaming
 
+streaming is an object containing functions for loading game assets. It provides functions for loading animation dictionaries, animation sets, collisions, IPLs, models and particle effects.
+
 *This is a client module.*
 
 #### Importing the streaming Module
@@ -1685,58 +1717,109 @@ local streaming = duff.streaming
 ```
 
 #### loadanimdict
+
+Loads an animation dictionary.
   
 ```lua
 ---@param dict string
----@param isAsync boolean?
----@return boolean?
-function streaming.loadanimdict(dict, isAsync)
+---@return boolean loaded
+function streaming.loadanimdict(dict)
+
+---@async
+---@param dict string
+---@return boolean loaded
+function streaming.async.loadanimdict(dict)
 ```
+
+- `dict` - The animation dictionary to load.
+- `returns: boolean` - Whether the animation dictionary was loaded.
 
 #### loadanimset
 
+Loads an animation set.
+
 ```lua
 ---@param set string
----@param isAsync boolean?
----@return boolean?
-function streaming.loadanimset(set, isAsync)
+---@return boolean loaded
+function streaming.loadanimset(set)
+
+---@async
+---@param set string
+---@return boolean loaded
+function streaming.async.loadanimset(set)
 ```
+
+- `set` - The animation set to load.
+- `returns: boolean` - Whether the animation set was loaded.
 
 #### loadcollision
 
+Loads a collision for a model.
+
 ```lua
 ---@param model string|number
----@param isAsync boolean?
----@return boolean?
-function streaming.loadcollision(model, isAsync)
+---@return boolean loaded
+function streaming.loadcollision(model)
+
+---@async
+---@param model string|number
+---@return boolean loaded
+function streaming.async.loadcollision(model)
 ```
+
+- `model` - The model to load the collision for.
+- `returns: boolean` - Whether the collision was loaded.
 
 #### loadipl
 
+Loads an IPL.
+
 ```lua
 ---@param ipl string
----@param isAsync boolean?
----@return boolean?
-function streaming.loadipl(ipl, isAsync)
+---@return boolean loaded
+function streaming.loadipl(ipl)
+
+---@async
+---@param ipl string
+---@return boolean loaded
+function streaming.async.loadipl(ipl)
 ```
+
+- `ipl` - The IPL to load.
+- `returns: boolean` - Whether the IPL was loaded.
 
 #### loadmodel
 
+Loads a model.
+
 ```lua
 ---@param model string|number
----@param isAsync boolean?
----@return boolean?
-function streaming.loadmodel(model, isAsync)
+---@return boolean loaded
+function streaming.loadmodel(model)
+
+---@async
+---@param model string|number
+---@return boolean loaded
+function streaming.async.loadmodel(model)
 ```
 
 #### loadptfx
 
+Loads a particle effect.
+
 ```lua
 ---@param fx string
----@param isAsync boolean?
----@return boolean?
-function streaming.loadptfx(fx, isAsync)
+---@return boolean loaded
+function streaming.loadptfx(fx)
+
+---@async
+---@param fx string
+---@return boolean loaded
+function streaming.async.loadptfx(fx)
 ```
+
+- `fx` - The particle effect to load.
+- `returns: boolean` - Whether the particle effect was loaded.
 
 ### scope
 
