@@ -97,23 +97,45 @@ local function find_path(name)
   if func then
     name = resource..':'..file
     package.path[name] = {resource, file}
-    package.preload[name] = func
+    package.preload[name] = load(load_resource_file(resource, file..'.lua'))
     return name, package.path[name]
   end
 end
 
----@param file string
----@param name string
----@param fn function
----@return function
-local function protect(file, name, fn)
+---@param file string The name of the file that the function is in.
+---@param name string The name of the function.
+---@param fn function The function to protect.
+---@return function protected_fn The protected function.
+local function protect(file, name, fn) -- Wraps a function with error handling and stack trace printing. <br> [Lua: How to call error without stack trace](https://stackoverflow.com/questions/20547499/lua-how-to-call-error-without-stack-trace?rq=3) <br> [FinalizedExceptions](http://lua-users.org/wiki/FinalizedExceptions) <br> [Lua: How to get true stack trace of an error in pcall](https://stackoverflow.com/questions/45788739/get-true-stack-trace-of-an-error-in-lua-pcall)
   return function(...)
-    local results = {xpcall(fn, function(err) return '^1SCRIPT ERROR: @'..file..'.lua:'..debug.getinfo(3, 'S').linedefined..': '..string.format(err, name)..'^7' end, ...)}
+    local results = {
+      xpcall(fn, function(err)
+        err = '@'..file..'.lua:'..debug.getinfo(fn, 'S').linedefined..': '..string.format(err, name)
+        local trace = debug.traceback(nil, 3):sub(17):gsub('\t', '')
+        local index = trace:find('%[C%]: in function')
+        return index and err..trace:sub(1, index - 4) or trace or err
+      end, ...)
+    }
     local success, err = results[1], results[2]
-    if not success then print(err) end
+    if not success then print('^1SCRIPT ERROR: '..err..'^7') return end
     return select(2, unpack(results))
   end
 end
+
+-- ---@param file string
+-- ---@param name string
+-- ---@param fn function
+-- ---@return function
+-- local function protect(file, name, fn) -- testing coroutine protection, and error handling | https://stackoverflow.com/questions/45788739/get-true-stack-trace-of-an-error-in-lua-pcall
+--   local co = coroutine.create(fn)
+--   return function(...)
+--     if coroutine.status(co) == 'dead' then co = coroutine.create(fn) end
+--     local results = {coroutine.resume(co, ...)}
+--     local success, err = results[1], results[2]
+--     if not success then print('^1SCRIPT ERROR: ' ..debug.traceback(co, ' @'..file..'.lua:'..debug.getinfo(fn, 'S').linedefined..': '..string.format(err, name), 1)..'^7') end
+--     return select(2, unpack(results))
+--   end
+-- end
 
 ---@param module {[string]: any}
 ---@return {[string]: any} module
@@ -134,8 +156,8 @@ function require(name)
   if package.loaded[path] then return package.loaded[path] end
   if not package.preload[path] then error('bad argument #1 to \'require\' (no file found)', 2) end
   local loaded, module = pcall(package.preload[path])
-  if not loaded then error('bad argument #1 to \'require\' (error loading file) \n' ..module, 2)
-  elseif not module then module = package.preload[path] end
+  if not loaded then error('bad argument #1 to \'require\' (error loading file) \n' ..module, 2) end
+  module = package.preload[path]()
   local mod_type = type(module)
   if mod_type ~= 'table' and mod_type ~= 'function' then error('bad argument #1 to \'require\' (table or function expected, got ' ..mod_type.. ')', 2) end
   package.loaded[name] = mod_type == 'table' and protect_module(path, module) or protect(path, parts[2], module)
