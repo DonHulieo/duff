@@ -86,6 +86,17 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [load](#load)
       - [loadfile](#loadfile)
       - [translate](#translate)
+    - [pools](#pools)
+      - [Importing the pools Module](#importing-the-pools-module)
+      - [getpeds](#getpeds)
+      - [getvehicles](#getvehicles)
+      - [getobjects](#getobjects)
+      - [getclosestped](#getclosestped)
+      - [getclosestvehicle](#getclosestvehicle)
+      - [getclosestobject](#getclosestobject)
+      - [Client Functions (pools)](#client-functions-pools)
+      - [getpickups](#getpickups)
+      - [getclosestpickup](#getclosestpickup)
     - [math](#math)
       - [Importing the math Module](#importing-the-math-module)
       - [between](#between)
@@ -109,9 +120,10 @@ Well, this is the solution for you! This is a collection of *optimised utility m
         - [frombin](#frombin)
         - [tovec](#tovec)
         - [getclosest](#getclosest)
+      - [Client Functions (vecmath)](#client-functions-vecmath)
         - [getentityright](#getentityright)
         - [getentityup](#getentityup)
-      - [Server Functions (math)](#server-functions-math)
+      - [Server Functions (vecmath)](#server-functions-vecmath)
         - [getentitymatrix](#getentitymatrix)
         - [getentityforward](#getentityforward)
         - [getoffsetfromentityinworldcoords](#getoffsetfromentityinworldcoords)
@@ -127,16 +139,6 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [bytype](#bytype)
       - [getinfo](#getinfo)
       - [remove](#remove)
-    - [pools](#pools)
-      - [Importing the pools Module](#importing-the-pools-module)
-      - [getpeds](#getpeds)
-      - [getvehicles](#getvehicles)
-      - [getobjects](#getobjects)
-      - [getpickups](#getpickups)
-      - [getclosestped](#getclosestped)
-      - [getclosestvehicle](#getclosestvehicle)
-      - [getclosestobject](#getclosestobject)
-      - [getclosestpickup](#getclosestpickup)
     - [streaming](#streaming)
       - [Importing the streaming Module](#importing-the-streaming-module)
       - [loadanimdict](#loadanimdict)
@@ -950,6 +952,171 @@ Translates a key to a value. This function also supports placeholders, which can
 function locale.translate(key, data)
 ```
 
+### pools
+
+pools is an object containing functions for managing the game's entity pools. It provides functions for getting the closest entity of a specific type, and getting all entities of a specific type.
+
+*This is a shared module, but has functions which are exclusive to their respective enviroments.*
+
+#### Importing the pools Module
+
+```lua
+-- Using the `require` export
+---@module 'duff.client.pools'
+local pools = exports.duff:require 'duff.client.pools'
+
+-- Attaching the pools to a local variable from the duff object
+local pools = duff.pools
+```
+
+#### getpeds
+
+Returns an array of all peds in the pool, filtered by `ped_type` if client-side and provided.
+
+```lua
+---@param ped_type integer?
+---@return integer[] peds
+function pools.getpeds(ped_type)
+```
+
+- `ped_type` - The ped type to filter by (client-side only). Ped types can be found in the [Native Reference](https://docs.fivem.net/natives/?_0xFF059E1E4C01E63C).
+- `returns: integer[]` - An array of all peds.
+
+#### getvehicles
+
+Returns an array of all vehicles in the pool, filtered by `vehicle_type` if provided.
+
+```lua
+---@param vehicle_type integer|string?
+---@return integer[]? vehicles
+function pools.getvehicles(vehicle_type)
+```
+
+- `vehicle_type` - The vehicle type to filter by. Client side filters by [class](https://docs.fivem.net/natives/?_0x29439776AAA00A62) and server side filters by [type](https://docs.fivem.net/natives/?_0xA273060E).
+- `returns: integer[]` - An array of all vehicles.
+
+#### getobjects
+
+Returns an array of all objects in the pool.
+
+```lua
+---@return integer[]? objects
+function pools.getobjects()
+```
+
+- `returns: integer[]` - An array of all objects.
+
+#### getclosestped
+
+Returns the closest ped to a specified position, filtered by `ped_type` if provided, and within a specified `radius`.
+
+```lua
+---@param check integer|vector|{x: number, y: number, z: number}|number[]?
+---@param ped_type integer?
+---@param radius number?
+---@param excluding integer|integer[]?
+---@return integer? ped, number? dist, integer[]? peds
+function pools.getclosestped(check, ped_type, radius, excluding)
+```
+
+- `check` - The value to check, can be;
+  - `integer` - The entity to get the position of.
+  - `table` - The table containing `x`, `y`, `z` and `w` keys.
+  - `number[]` - The array containing the values.
+  - `vector` - The vector to check.
+- `ped_type` - The ped type to filter by (client-side only).
+- `radius` - The radius to check within.
+- `excluding` - The ped or peds to ignore.
+- `returns: integer, number, integer[]` - The closest ped, the distance to the ped, and an array of all peds.
+
+#### getclosestvehicle
+
+Returns the closest vehicle to a specified position, filtered by `vehicle_type` if provided, and within a specified `radius`.
+
+```lua
+---@param check integer|vector|{x: number, y: number, z: number}|number[]?
+---@param vehicle_type integer|string?
+---@param radius number?
+---@param excluding integer|integer[]?
+---@return integer? vehicle, number? distance, integer[]? vehicles
+function pools.getclosestvehicle(check, vehicle_type, radius, excluding)
+```
+
+- `check` - The value to check, can be;
+  - `integer` - The entity to get the position of.
+  - `table` - The table containing `x`, `y`, `z` and `w` keys.
+  - `number[]` - The array containing the values.
+  - `vector` - The vector to check.
+- `vehicle_type` - The vehicle type to filter by, for;
+  - Client-side, this is the vehicle class.
+  - Server-side, this is the vehicle type.
+- `radius` - The radius to check within.
+- `excluding` - The vehicle or vehicles to ignore.
+- `returns: integer, number, integer[]` - The closest vehicle, the distance to the vehicle, and an array of all vehicles.
+
+#### getclosestobject
+
+Returns the closest object to a specified position, within a specified `radius`.
+
+```lua
+---@param check integer|vector|{x: number, y: number, z: number}|number[]?
+---@param radius number?
+---@param excluding integer|integer[]?
+---@return integer? object, number? distance, integer[]? objects
+function pools.getclosestobject(check, radius, excluding)
+```
+
+- `check` - The value to check, can be;
+  - `integer` - The entity to get the position of.
+  - `table` - The table containing `x`, `y`, `z` and `w` keys.
+  - `number[]` - The array containing the values.
+  - `vector` - The vector to check.
+- `radius` - The radius to check within.
+- `excluding` - The object or objects to ignore.
+- `returns: integer, number, integer[]` - The closest object, the distance to the object, and an array of all objects.
+
+#### Client Functions (pools)
+
+#### getpickups
+
+Returns an array of all pickups in the pool, filtered by `hash` if provided.
+
+```lua
+---@param hash string|number?
+---@return integer[]? pickups
+function pools.getpickups(hash)
+```
+
+- `hash` - The hash of the pickup to filter by, can be either;
+  - The name of the pickup, e.g. `prop_money_bag_01`.
+  - The hash of the pickup, e.g. `0x5099E8AF`.
+- `returns: integer[]` - An array of all pickups.
+
+#### getclosestpickup
+
+Returns the closest pickup to a specified position, filtered by `hash` if provided, and within a specified `radius`.
+
+```lua
+---@param check integer|vector|{x: number, y: number, z: number}|number[]?
+---@param hash string|number?
+---@param radius number?
+---@param excluding integer|integer[]?
+---@return integer? pickup, number? distance, array? pickups
+function pools.getclosestpickup(check, hash, radius, excluding)
+```
+
+- `check` - The value to check, can be;
+  - `integer` - The entity to get the position of.
+  - `table` - The table containing `x`, `y`, `z` and `w` keys.
+  - `number[]` - The array containing the values.
+  - `vector` - The vector to check.
+- `hash` - The hash of the pickup to filter by, can be either;
+  - The name of the pickup, e.g. `prop_money_bag_01`.
+  - The hash of the pickup, e.g. `0x5099E8AF`.
+- `radius` - The radius to check within.
+- `excluding` - The pickup or pickups to ignore.
+- `returns: integer, number, integer[]` - The closest pickup, the distance to the pickup, and an array of all pickups.
+
 ### math
 
 math is an object containing some useful math functions. Most notably, it contains a `seedrng` function which generates a random seed based on the current time, and a `random` function which generates a random number between two values which should be an improvement over the default Lua pseudo-random number generator.
@@ -1271,6 +1438,8 @@ function vector.getclosest(check, list, radius, ignore)
   - `number` - The distance to the closest value,
   - `(integer|vector|{x: number, y: number, z: number?, w: number?}|number[])[]` - The closest values.
 
+#### Client Functions (vecmath)
+
 ##### getentityright
 
 Returns the right vector of an entity. Based on FiveM and VenomXNL's `GetEntityRight` function, see [ref](README.md#credits).
@@ -1297,7 +1466,7 @@ function vector.getentityup(entity)
 - `entity` - The entity to get the up vector of.
 - `returns: vector3` - The up vector.
 
-#### Server Functions (math)
+#### Server Functions (vecmath)
 
 ##### getentitymatrix
 
@@ -1499,92 +1668,6 @@ function blips.remove(blips)
 ```
 
 - `blips` - The blip handle or an array of blip handles.
-
-### pools
-
-*This is a client module.*
-
-#### Importing the pools Module
-
-```lua
--- Using the `require` export
----@module 'duff.client.pools'
-local pools = exports.duff:require 'duff.client.pools'
-
--- Attaching the pools to a local variable from the duff object
-local pools = duff.pools
-```
-
-#### getpeds
-
-```lua
----@return array? peds
-function pools.getpeds()
-```
-
-#### getvehicles
-
-```lua
----@return array? vehicles
-function pools.getvehicles()
-```
-
-#### getobjects
-
-```lua
----@return array? objects
-function pools.getobjects()
-```
-
-#### getpickups
-
-```lua
----@return array? pickups
-function pools.getpickups()
-```
-
-#### getclosestped
-
-```lua
----@param coords vector3|integer?
----@param ped_type integer?
----@param radius number?
----@param ignore integer[]?
----@return integer? ped, number? distance, array? peds
-function pools.getclosestped(coords, ped_type, radius, ignore)
-```
-
-#### getclosestvehicle
-
-```lua
----@param coords vector3|integer?
----@param vehicle_type integer?
----@param radius number?
----@param ignore integer[]?
----@return integer? vehicle, number? distance, array? vehicles
-function pools.getclosestvehicle(coords, vehicle_type, radius, ignore)
-```
-
-#### getclosestobject
-
-```lua
----@param coords vector3|integer?
----@param radius number?
----@param ignore integer[]?
----@return integer? object, number? distance, array? objects
-function pools.getclosestobject(coords, radius, ignore)
-```
-
-#### getclosestpickup
-
-```lua
----@param coords vector3|integer?
----@param hash string|number?
----@param radius number?
----@param ignore integer[]?
----@return integer? pickup, number? distance, array? pickups
-function pools.getclosestpickup(coords, hash, radius, ignore)
-```
 
 ### streaming
 

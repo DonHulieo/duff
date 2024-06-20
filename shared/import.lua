@@ -1,9 +1,9 @@
 local res_version = GetResourceMetadata('duff', 'version', 0)
 local url = GetResourceMetadata('duff', 'url', 0)
 local des = GetResourceMetadata('duff', 'description', 0)
-local require = GetCurrentResourceName() ~= 'duff' and function(path) return exports.duff:require(path) end or require
+local require = GetCurrentResourceName() ~= 'duff' and function(...) return exports.duff:require(...) end or require
 local is_server = IsDuplicityVersion() == 1
-local check_version = is_server and function(resource, version, git, repo) return exports.duff:checkversion(resource, version, git, repo) end or nil
+local check_version = is_server and function(...) return exports.duff:checkversion(...) end or nil
 ---@class duff
 ---@field _VERSION string
 ---@field _URL string
@@ -30,11 +30,11 @@ duff = {
   bridge = require 'duff.shared.bridge',
   locale = require 'duff.shared.locale',
   math = require 'duff.shared.math',
+  pools = require 'duff.shared.pools',
   vecmath = require 'duff.shared.vecmath'
 }
 if not is_server then
   duff.blips = require 'duff.client.blips'
-  duff.pools = require 'duff.client.pools'
   duff.streaming = require 'duff.client.streaming'
 else
   duff.scope = require 'duff.server.scope'
