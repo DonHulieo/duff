@@ -969,20 +969,26 @@ local locale = duff.locale
 Sets a translation key to a value.
 
 ```lua
----@param key string @A dot-separated key to set the translation value for.
----@param value string @The value to set the translation key to.
+---@param key string
+---@param value string
 function locale.set(key, value)
 ```
+
+- `key` - A dot-separated key to set the translation value for.
+- `value` - The value to set the translation key to.
 
 #### load
 
 Loads a translation table from a table.
 
 ```lua
----@param context string? @The context to load the translations into.
----@param data {[string]: {[string]: string}|string} @A table containing translation keys and values.
+---@param context string?
+---@param data {[string]: {[string]: string}|string}
 function locale.load(context, data)
 ```
+
+- `context` - The context to load the translations into.
+- `data` - A table containing translation keys and values.
 
 The table should contain translation keys and values.
 
@@ -1000,10 +1006,13 @@ locale.load(nil, {
 Loads a translation table from a file.
 
 ```lua
----@param resource string? @The resource name to load the translation file from.
----@param file string? @The file path to load the translation file from.
+---@param resource string?
+---@param file string?
 function locale.loadfile(resource, file)
 ```
+
+- `resource` - The resource name to load the translation file from, if not provided, it will use the invoking resource.
+- `file` - The file path to load the translation file from, if not provided, it will use the server's ConVar locale.
 
 The file should return a table containing translation keys and values.
 
@@ -1044,11 +1053,15 @@ return {
 Translates a key to a value. This function also supports placeholders, which can be replaced by providing a table of data.
 
 ```lua
----@param key string @The key to translate.
----@param data {[string]: string}? @A table containing data to replace placeholders in the translation.
----@return string? translation @The translated value, or nil if the key was not found.
+---@param key string
+---@param data {[string]: string}?
+---@return string? translation
 function locale.translate(key, data)
 ```
+
+- `key` - The key to translate.
+- `data` - A table containing data to replace placeholders in the translation.
+- `returns: string` - The translated value.
 
 ### pools
 
