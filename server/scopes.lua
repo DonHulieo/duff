@@ -1,10 +1,10 @@
----@class scope
+---@class CScopes
 ---@field Scopes {[string]: {[string]: boolean}, Synced: {[string]: {[string]: boolean}}}?
 ---@field getplayerscope fun(player: number|integer): {[string]: boolean} Returns the scope of `player` or the source player if `player` is not provided. <br> The scope is a table containing the players that are in the same scope as the owner. <br> Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21).
 ---@field triggerscopeevent fun(event: string, owner: number|integer, ...: any): {[string]: boolean}? Triggers the `event` for the owner and all the players in the same scope as the owner. <br> The `...` arguments are the arguments that will be passed to the event. <br> Returns the players that the event was triggered for. <br> Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21).
 ---@field createsyncedscopeevent fun(event: string, owner: number|integer, time: integer?, duration: integer?, ...: any) Creates a synced scope event that triggers the `event` for the owner and all the players in the same scope as the owner. <br> The event will be triggered every `time` milliseconds and will last for `duration` milliseconds. <br> The `...` arguments are the arguments that will be passed to the event. <br> The event will be removed after `duration` milliseconds if `duration` is provided.
 ---@field removesyncedscopeevent fun(event: string) Removes the synced scope event with the name `event`.
-local scope do
+do
   local tostring, unpack = tostring, table.unpack
   local timer = require('duff.shared.math').timer
   local client_event, create_thread, wait = TriggerLatentClientEvent, CreateThread, Wait

@@ -1,4 +1,4 @@
----@class array
+---@class CArray
 ---@field insert fun(list: any[], index: integer, value: any) Inserts `value` into `list` at `index`. <br> This is lua's `table.insert` imported; [documentation](https://www.lua.org/manual/5.4/manual.html#pdf-table.insert).
 ---@field remove fun(list: any[], index: integer): any? Returns and removes the element at `index` from `list`. <br> This is lua's `table.remove` imported; [documentation](https://www.lua.org/manual/5.4/manual.html#pdf-table.remove).
 ---@field sort fun(list: any[], fn: fun(a: any, b: any): boolean): any[] Sorts the elements of `list` in place. <br> This is lua's `table.sort` imported; [documentation](https://www.lua.org/manual/5.4/manual.html#pdf-table.sort).
@@ -20,13 +20,12 @@
 ---@field filter fun(list: any[], fn: function, in_place: boolean?): any[] Returns a new array with the elements that satisfy `fn`.
 ---@field foreach fun(list: any[], fn: function, reverse: boolean?) Iterates over `list` and calls `fn` for each element.
 ---@field reverse fun(list: any[], length: integer?): any[] Reverses the elements of `list` in place.
-local array do
+do
   local table = table
   local table_insert, table_remove, table_sort, table_concat, table_type, next = table.insert, table.remove, table.sort, table.concat, table.type, next
   local type, error = type, error
   local math_min = math.min
   local require = require
-  local trace = require 'duff.shared.trace'
 
   ---@param tbl any[]|table The table to check.
   ---@return boolean? is_array Whether the table is an array.

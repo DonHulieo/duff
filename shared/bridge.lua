@@ -1,4 +1,4 @@
----@class bridge
+---@class CBridge
 ---@field _DATA {FRAMEWORK: string?, LIB: string?, INVENTORY: string?, EVENTS: {LOAD: string?, UNLOAD: string?, JOBDATA: string?, PLAYERDATA: string?, UPDATEOBJECT: string?}, ITEMS: {[string]: {name: string, label: string, weight: number, useable: boolean, unique: boolean}}?}
 ---@field getframework fun(): string Returns the name of the framework being used. <br> Returns `esx` if [es_extended](https://github.com/esx-framework/esx_core/tree/main/%5Bcore%5D/es_extended) is present. <br> Returns `qb` if [qb-core](https://github.com/qbcore-framework/qb-core) is present.
 ---@field getlib fun(): string Returns the library object being used. <br> Returns `ox_lib` if [ox_lib](https://github.com/overextended/ox_lib) is present.
@@ -19,12 +19,12 @@
 ---@field removeitem fun(player: integer|string?, item: string, amount: integer): boolean? Removes `item` from the player's inventory. <br> **Note**: This is a server-only function.
 ---@field addlocalentity fun(entities: integer|integer[], options: {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: fun(entity: number, distance: number)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]}) Adds a target to `entities` with the specified `options`. <br> **Note**: This is a client-only function.
 ---@field removelocalentity fun(entities: integer|integer[], targets: string|string[]?) Removes the target from `entities` with the specified `targets`. <br> **Note**: This is a client-only function.
-local bridge do
+do
   local get_resource_state = GetResourceState
   local Frameworks = {['es_extended'] = 'esx', ['qb-core'] = 'qb'}
   local Inventories = {['ox_inventory'] = 'ox', ['qb-inventory'] = 'qb'}
   local Libs = {['ox_lib'] = 'ox'}
-  local Targets = {['ox_target'] = 'ox', ['qb_target'] = 'qb'}
+  local Targets = {['ox_target'] = 'ox', ['qb-target'] = 'qb'}
   local is_server = IsDuplicityVersion() == 1
 
   --------------------- INTERNAL ---------------------

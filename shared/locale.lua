@@ -1,10 +1,10 @@
----@class locale
+---@class CLocale
 ---@field set fun(key: string, value: string) Sets a `key` in the stored translations to `value`.
 ---@field load fun(context: string?, data: table) Loads `data` into the stored translations with an optional `context`.
 ---@field loadfile fun(resource: string?, file: string?) Loads `file` from `resource`, or current resource if nil, into the stored translations.
 ---@field translate fun(key: string, data: table?): string Translates `key` with optional `data`. <br> Returns the translation if found, or `data.default` if not.
 ---@field t fun(key: string, data: table?): string Alias for `translate`.
-local locale do
+do
   local require = require
   local reverse = require('duff.shared.array').reverse
   local unpack = table.unpack

@@ -1,4 +1,4 @@
----@class streaming
+---@class CStreaming
 ---@field loadanimdict fun(dict: string): boolean Loads an animation dictionary.
 ---@field async.loadanimdict fun(dict: string): boolean? Loads an animation dictionary without blocking the main thread.
 ---@field loadanimset fun(set: string): boolean Loads an animation set.
@@ -11,7 +11,7 @@
 ---@field async.loadmodel fun(model: string|number): boolean? Loads a model without blocking the main thread.
 ---@field loadptfx fun(fx: string): boolean Loads a particle effect asset.
 ---@field async.loadptfx fun(fx: string): boolean? Loads a particle effect asset without blocking the main thread.
-local streaming do
+do
   local game_timer = GetGameTimer
   local require = require
   local timer = require('duff.shared.math').timer

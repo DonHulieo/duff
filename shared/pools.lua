@@ -1,4 +1,4 @@
----@class pools
+---@class CPools
 ---@field getpeds fun(ped_type: integer?): integer[] Returns an array of all peds. <br> In the client env, `ped_type` is used to filter the peds by their type. <br> `ped_type` can be found [here](https://docs.fivem.net/natives/?_0xFF059E1E4C01E63C).
 ---@field getvehicles fun(vehicle_type: integer|string?): integer[] Returns an array of all vehicles. <br> In the client env, `vehicle_type` is used to filter the vehicles by their class. <br> `vehicle_type` can be found [here](https://docs.fivem.net/natives/?_0x29439776AAA00A62). <br> In the server env, `vehicle_type` is used to filter the vehicles by their type. <br> `vehicle_type` can be found [here](https://docs.fivem.net/natives/?_0xA273060E).
 ---@field getobjects fun(): integer[] Returns an array of all objects.
@@ -6,16 +6,16 @@
 ---@field getclosestped fun(check: integer|vector|{x: number, y: number, z: number}|number[]?, ped_type: integer?, radius: number?, excluding: integer|integer[]): integer?, number?, integer[]? Finds the closest ped to `check`. <br> `check` can be an entity, vector or a table. <br> `ped_type` will filter for only peds of that type. <br> `radius` is the maximum distance within. <br> `excluding` is the ped or array of peds to exclude from the search.
 ---@field getclosestvehicle fun(check: integer|vector|{x: number, y: number, z: number}|number[]?, vehicle_type: integer?, radius: number?, excluding: integer|integer[]): integer?, number?, integer[]? Finds the closest vehicle to `check`. <br> `check` can be an entity, vector or a table. <br> `vehicle_type` will filter for only vehicles of that type. <br> `radius` is the maximum distance within. <br> `excluding` is the vehicle or array of vehicles to exclude from the search.
 ---@field getclosestobject fun(check: integer|vector|{x: number, y: number, z: number}|number[]?, radius: number?, excluding: integer|integer[]): integer?, number?, integer[]? Finds the closest object to `check`. <br> `check` can be an entity, vector or a table. <br> `radius` is the maximum distance within. <br> `excluding` is the object or array of objects to exclude from the search.
----@field getclosestpickup fun(check: integer|vector|{x: number, y: number, z: number}|number[]?, hash: string|number?, radius: number?, excluding: integer|integer[]): integer?, number?, integer[]? Finds the closest pickup to `check`. <br> `check` can be an entity, vector or a table. <br> `hash` will filter for only pickups with that hash. <br> `radius` is the maximum distance within. <br> `excluding` is the pickup or array of pickups to exclude from the search.
-local pools do
+---@field getclosestpickup fun(check: integer|vector|{x: number, y: number, z: number}|number[]?, hash: string|number?, radius: number?, excluding: integer|integer[]): integer?, number?, integer[]? Finds the closest pickup to `check`. <br> `check` can be an entity, vector or a table. <br> `hash` will filter for only pickups with that hash. <br> `radius` is the maximum distance within. <br> `excluding` is the pickup or array of pickups to exclude from the search. <br> **Note:** This is a client-only function.
+do
   local require = require
   local filter = require('duff.shared.array').filter
   local type = type
   local get_pool, get_coords = GetGamePool, GetEntityCoords
   local is_server = IsDuplicityVersion() == 1
   local all_peds, all_vehs, all_objs = is_server and GetAllPeds or nil, is_server and GetAllVehicles or nil, is_server and GetAllObjects or nil
-  ---@module 'duff.shared.vecmath'
-  local vector = require('duff.shared.vecmath')
+  ---@module 'duff.shared.vector'
+  local vector = require('duff.shared.vector')
   local to_vec, get_closest = vector.tovec, vector.getclosest
 
   ---@param ped_type integer? The type of the ped to filter by. <br> `ped_type` can be found [here](https://docs.fivem.net/natives/?_0xFF059E1E4C01E63C). <br> **Note:** This is a client-only argument.

@@ -1,4 +1,4 @@
----@class zone
+---@class CMapZones
 ---@field contains fun(check: vector3|{x: number, y: number, z: number}|number[]): boolean, integer Returns whether `check` is within a zone and the index of the zone. <br> `check` can be vector3, a table with `x`, `y`, `z`, and `w` keys or an array with the same values.
 ---@field getzone fun(index: integer): {Name: string, DisplayName: string, Bounds: {Minimum: {X: number, Y: number, Z: number}, Maximum: {X: number, Y: number, Z: number}}}? Returns the zone data at `index`. <br> `index` is the index of the zone.
 ---@field getzonename fun(coords: vector3|{x: number, y: number, z: number}|number[]): string Returns the name of the zone. <br> `check` can be vector3, a table with `x`, `y`, `z`, and `w` keys or an array with the same values.
@@ -6,10 +6,10 @@
 ---@field getzonefromname fun(name: string): integer Returns the index of the zone. <br> `name` is the name of the zone.
 ---@field addzoneevent fun(event: string, zone_id: integer|vector3|{x: number, y: number, z: number}|number[]|string, onEnter: fun(player: string, coords: vector3)?, onExit: fun(player: string, coords: vector3, disconnected: boolean?)?, time: integer?, player: string?) Adds an event to a zone. <br> `zone_id` can be vector3, a table with `x`, `y`, `z`, and `w` keys, an array with the same values, the name or the index of the zone. <br> `onEnter` is the function to call when a player enters the zone. <br> `onExit` is the function to call when a player exits the zone. <br> `time` is the time to wait between checks in milliseconds. <br> `player` is the player to add the event for.
 ---@field removezoneevent fun(event: string) Removes the event from the zone. <br> `event` is the name of the event.
-local zone do
+do
   local ZONES = json.decode(LoadResourceFile('duff', 'data/zones.json'))
-  ---@module 'duff.shared.vecmath'
-  local vecmath = require 'duff.shared.vecmath'
+  ---@module 'duff.shared.vector'
+  local vecmath = require 'duff.shared.vector'
   local to_vec, is_vec = vecmath.tovec, vecmath.isvec
   local current_resource = GetCurrentResourceName()
   local Listeners, Players = {}, GetPlayers()

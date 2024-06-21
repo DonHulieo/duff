@@ -1,4 +1,4 @@
----@class blips
+---@class CBlips
 ---@field getall fun(): integer[] Returns an array of all active blip handles. <br> Credits go to: [negbook](https://github.com/negbook/nbk_blips).
 ---@field onscreen fun(): integer[] Returns an array of all active blip handles that are on the minimap.
 ---@field bycoords fun(coords: vector3|vector3[], radius: number?): integer[]? Finds all active blip handles at `coords` within `radius`. <br> `coords` can be a vector3 or any array of vector3's. <br> If `radius` is not provided, it defaults to `1.0`.
@@ -6,13 +6,13 @@
 ---@field bytype fun(id_type: integer): integer[]? Finds all active blip handles with `id_type`.
 ---@field getinfo fun(blip: integer): {alpha: integer, coords: vector3, colour: integer, display: integer, fade: boolean, hud_colour: integer, type: integer, rotation: number, is_shortrange: boolean}? Returns information about `blip`.
 ---@field remove fun(blips: integer|integer[]) Removes `blips` from the map. <br> If `blips` is a number, it removes that blip. <br> If `blips` is an array, it removes all blips in the array.
-local blips do
+do
   local require = require
   ---@module 'duff.shared.array'
   local array = require 'duff.shared.array'
   local push, filter = array.push, array.filter
   local does_blip_exist = DoesBlipExist
-  local get_closest = require('duff.shared.vecmath').getclosest
+  local get_closest = require('duff.shared.vector').getclosest
 
   ---@return integer[] blip_ids An array of all active blip handles.
   local function get_all() -- Credits go to: [negbook](https://github.com/negbook/nbk_blips)
@@ -21,7 +21,7 @@ local blips do
       local blip = GetFirstBlipInfoId(i)
       local exists = does_blip_exist(blip)
       while exists do
-        blip_ids = push(blip_ids, blip) --[[@as integer[]=]]
+        blip_ids = push(blip_ids, blip)
         blip = GetNextBlipInfoId(i)
         exists = does_blip_exist(blip)
         if not exists then break end

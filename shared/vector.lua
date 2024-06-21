@@ -1,4 +1,4 @@
----@class vecmath
+---@class CVector
 ---@field isvec fun(value: vector2|vector3|vector4): boolean Checks if `value` is a vector.
 ---@field tobin fun(value: vector): string Converts a vector, `value` to a binary string. <br> Uses double point precision for encoding.
 ---@field frombin fun(value: string): vector Converts a binary string, `value` to a vector.
@@ -9,7 +9,7 @@
 ---@field getentityright fun(entity: integer): vector3 Returns the right vector of `entity`. <br> Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980).
 ---@field getentityup fun(entity: integer): vector3 Returns the up vector of `entity`. <br> Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980).
 ---@field getoffsetfromentityinworldcoords fun(entity: integer, offset_x: number, offset_y: number, offset_z: number): vector3 Returns the world coordinates of `offset` from `entity`. <br> Credits go to: [draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297).
-local vecmath do
+do
   local type = type
   local string, table = string, table
   local s_pack, s_unpack = string.pack, string.unpack

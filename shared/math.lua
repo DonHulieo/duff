@@ -1,5 +1,4 @@
-local _math = math
----@class math: mathlib
+---@class CMath: mathlib
 ---@field between fun(val: number, min: number, max: number): boolean Returns `true` if `val` is between `min` and `max`, `false` otherwise.
 ---@field clamp fun(val: number, min: number, max: number): number `val` clamped between `min` and `max`.
 ---@field gcd fun(num: integer, den: integer): integer Greatest Common Divisor of `num` and `den`.
@@ -13,12 +12,12 @@ local _math = math
 ---@field tofloat fun(num: integer, den: integer): number `num` is the numerator. <br> `den` is the denominator. <br> Returns the rational number as a float.
 ---@field toint fun(val: number): integer Converts a float to integer following the round half away from zero rule. <br> e.g. `1.5 -> 2`, `-1.5 -> -2` <br> [Rounding Half Toward Zero](https://en.wikipedia.org/wiki/Rounding#Rounding_half_toward_zero)
 ---@field toratio fun(float: number, precision: number?): integer, integer `float` is the float to convert. <br> `precision` is the maximum error allowed in the conversion. <br> Returns the float as a rational number.
-local math do
-  local require = require
+do
   local type, error = type, error
-  local math_floor, math_abs = _math.floor, _math.abs
-  local random_seed, math_random = _math.randomseed, _math.random
-  local huge = _math.huge
+  local math = math
+  local math_floor, math_abs = math.floor, math.abs
+  local random_seed, math_random = math.randomseed, math.random
+  local huge = math.huge
   local tonumber, tostring = tonumber, tostring
   local is_server = IsDuplicityVersion() == 1
   local posix_time = is_server and os.time or GetCloudTimeAsInt
@@ -158,7 +157,7 @@ local math do
     return is_neg and -num or num, math_floor(k1 / divisor)
   end
 
-  math = {
+  local CMath = {
     between = between,
     clamp = clamp,
     gcd = g_c_d,
@@ -173,6 +172,6 @@ local math do
     toint = to_int,
     toratio = to_rational
   }
-  for k, v in pairs(_math) do math[not math[k] and k or '_'..k] = v end
-  return math
+  for k, v in pairs(math) do CMath[not CMath[k] and k or '_'..k] = v end
+  return CMath
 end
