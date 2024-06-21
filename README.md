@@ -74,13 +74,13 @@ Well, this is the solution for you! This is a collection of *optimised utility m
         - [isplayerdowned](#isplayerdowned)
         - [createcallback](#createcallback)
         - [triggercallback](#triggercallback)
-      - [Server Functions](#server-functions)
+      - [Server Functions (bridge)](#server-functions-bridge)
         - [getallitems](#getallitems)
         - [getitem](#getitem)
         - [createuseableitem](#createuseableitem)
         - [additem](#additem)
         - [removeitem](#removeitem)
-      - [Client Functions](#client-functions)
+      - [Client Functions (bridge)](#client-functions-bridge)
         - [addlocalentity](#addlocalentity)
         - [removelocalentity](#removelocalentity)
     - [locale](#locale)
@@ -646,7 +646,7 @@ function bench(funcs, lim)
 
 ### bridge
 
-bridge is a class that provides common functions between different frameworks and libraries for use in creating cross-framework scripts. It currently has limited scope, managing player job/gang data, retreiving the core framework and some exposed methods between comon Inventory and Target scripts.
+bridge is a class that provides common functions between different frameworks and libraries for use in creating cross-framework scripts. It currently has limited scope, managing player job/gang data, retreiving the core framework and some exposed methods between common Inventory and Target scripts.
 
 #### Importing the bridge Module
 
@@ -684,30 +684,37 @@ The `_DATA` table is used to store common data for the bridge class.
 
 ##### getcore
 
-Retrieves the core framework being used.
+Retrieves the core framework being used. Currently only supports `QBCore` & `ESX`.
 
 ```lua
----@return table? framework
+---@return QBCore|table Core
 function bridge.getcore()
 ```
 
+- `returns: QBCore|table` - The core framework being used.
+
 ##### getlib
 
-Retrieves the library being used.
+Retrieves the library object being used. Currently only supports `ox_lib`.
 
 ```lua
----@return table? lib
+---@return table Lib
 function bridge.getlib()
 ```
 
+- `returns: table` - The library object being used.
+
 ##### getinv
 
-Retrieves the inventory framework being used.
+Retrieves the inventory object being used. Currently only supports `ox_inventory` & `qb-inventory`.
+(ESX implements their inventory system via Player Methods or `ox_inventory` and thus does not require an inventory object.)
 
 ```lua
----@return table? inv
+---@return table inv
 function bridge.getinv()
 ```
+
+- `returns: table` - The inventory object being used.
 
 ##### getplayer
 
@@ -715,9 +722,12 @@ Retrieves the player data.
 
 ```lua
 ---@param player integer|string?
----@return table? player_data
+---@return table player_data
 function bridge.getplayer(player)
 ```
+
+- `player` - The player server ID to retrieve the object from. If client side, this can be left as `nil`.
+- `returns: table` - The player data.
 
 ##### getidentifier
 
@@ -725,9 +735,17 @@ Retrieves the player identifier.
 
 ```lua
 ---@param player integer|string?
----@return string? identifier
+---@return string|number identifier
 function bridge.getidentifier(player)
 ```
+
+- `player` - The `player` to retrieve the identifier from, can be;
+  - `integer` - The server ID (**server side**) or the PlayerID (**client side**) of the player.
+  - `string` - The server ID of the player as a string (**server side**).
+  - `nil` - Will use source (**server side**) or the cached PlayerData (**client side**) as the player.
+- `returns: string|integer` - The player identifier, if no framework is found, it will return;
+  - `serverId` - The server ID of the player (**client side**).
+  - `FiveM ID` - The FiveM ID of the player (**server side**).
 
 ##### getplayername
 
@@ -735,9 +753,15 @@ Retrieves the player name.
 
 ```lua
 ---@param player integer|string?
----@return string? name
+---@return string name
 function bridge.getplayername(player)
 ```
+
+- `player` - The `player` to retrieve the identifier from, can be;
+  - `integer` - The server ID (**server side**) or the PlayerID (**client side**) of the player.
+  - `string` - The server ID of the player as a string (**server side**).
+  - `nil` - Will use source (**server side**) or the cached PlayerData (**client side**) as the player.
+- `returns: string` - The player name.
 
 ##### getjob
 
@@ -749,6 +773,9 @@ Retrieves the player job data.
 function bridge.getjob(player)
 ```
 
+- `player` - The `player` server ID to retrieve job data from, if client side, this can be left as `nil`.
+- `returns: table` - The player job data.
+
 ##### doesplayerhavegroup
 
 Checks if the player has a specific group (either job or gang).
@@ -756,9 +783,13 @@ Checks if the player has a specific group (either job or gang).
 ```lua
 ---@param player integer|string?
 ---@param groups string|string[]
----@return boolean?
+---@return boolean has_group
 function bridge.doesplayerhavegroup(player, groups)
 ```
+
+- `player` - The `player` server ID to check the group of, if client side, this can be left as `nil`.
+- `groups` - The group(s) to check for.
+- `returns: boolean` - Whether the player has the group.
 
 ##### isplayerdowned
 
@@ -766,9 +797,12 @@ Checks if the player is downed.
 
 ```lua
 ---@param player integer|string?
----@return boolean?
+---@return boolean is_downed
 function bridge.isplayerdowned(player)
 ```
+
+- `player` - The `player` server ID to check if downed, if client side, this can be left as `nil`.
+- `returns: boolean` - Whether the player is downed.
 
 ##### createcallback
 
@@ -780,6 +814,9 @@ Creates a callback function.
 function bridge.createcallback(name, callback)
 ```
 
+- `name` - The name of the callback.
+- `callback` - The function to call when the callback is triggered.
+
 ##### triggercallback
 
 Triggers a callback function.
@@ -789,22 +826,28 @@ Triggers a callback function.
 ---@param name string
 ---@param callback function
 ---@param ... any
----@return any?
+---@return any result
 function bridge.triggercallback(player, name, callback, ...)
 ```
 
-**Note:** When triggering client callbacks, `player` is the source you wish to trigger the callback on, otherwise it can be left as `nil`.
+- `player` - The `player` source to trigger the (client) callback on, if client side, this can be left as `nil`.
+- `name` - The name of the callback.
+- `callback` - The function to call when the callback is received.
+- `...` - The arguments to pass to the callback.
+- `returns: any` - The result of the callback.
 
-#### Server Functions
+#### Server Functions (bridge)
 
 ##### getallitems
 
 Retrieves all items.
 
 ```lua
----@return {[string]: {name: string, label: string, weight: number, useable: boolean, unique: boolean}}?
+---@return {[string]: {name: string, label: string, weight: number, useable: boolean, unique: boolean}}
 function bridge.getallitems()
 ```
+
+- `returns: table` - All items.
 
 ##### getitem
 
@@ -816,6 +859,9 @@ Retrieves a specific item.
 function bridge.getitem(item)
 ```
 
+- `item` - The name of the item to retrieve.
+- `returns: table` - The item data.
+
 ##### createuseableitem
 
 Creates a useable item.
@@ -826,31 +872,44 @@ Creates a useable item.
 function bridge.createuseableitem(name, callback)
 ```
 
+- `name` - The name of the item.
+- `callback` - The function to call when the item is used.
+
 ##### additem
 
-Adds an item to the player inventory.
+Adds an item to the `player` inventory.
 
 ```lua
 ---@param player integer|string?
 ---@param item string
----@param amount integer
----@return boolean? success
+---@param amount integer?
+---@return boolean added
 function bridge.additem(player, item, amount)
 ```
 
+- `player` - The `player` server ID to add the item to.
+- `item` - The name of the item to add.
+- `amount` - The amount of the item to add, defaults to `1`.
+- `returns: boolean` - Whether the item was added.
+
 ##### removeitem
 
-Removes an item from the player inventory.
+Removes an item from the `player` inventory.
 
 ```lua
 ---@param player integer|string?
 ---@param item string
----@param amount integer
----@return boolean? success
+---@param amount integer?
+---@return boolean removed
 function bridge.removeitem(player, item, amount)
 ```
 
-#### Client Functions
+- `player` - The `player` server ID to remove the item from.
+- `item` - The name of the item to remove.
+- `amount` - The amount of the item to remove, defaults to `1`.
+- `returns: boolean` - Whether the item was removed.
+
+#### Client Functions (bridge)
 
 ##### addlocalentity
 
@@ -858,9 +917,12 @@ Adds a local target entity.
 
 ```lua
 ---@param entities integer|integer[]
----@param options {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: fun(entity: number, distance: number)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]}
+---@param options {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: fun(entity: integer, distance: number)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?}
 function bridge.addlocalentity(entities, options)
 ```
+
+- `entities` - The entity or entities to add.
+- `options` - The options for the entity.
 
 ##### removelocalentity
 
@@ -870,6 +932,8 @@ Removes a local target entity.
 ---@param entities integer|integer[]
 function bridge.removelocalentity(entities)
 ```
+
+- `entities` - The entity or entities to remove the target from.
 
 ### locale
 
