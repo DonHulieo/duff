@@ -117,7 +117,10 @@ local function protect(file, name, fn) -- Wraps a function with error handling a
       end, ...)
     }
     local success, err = results[1], results[2]
-    if not success then print('^1SCRIPT ERROR: '..err..'^7') return end
+    if not success then -- Unsure if we should actually `error` here, as if the error is from a module calling another module, it will print the called module's code as a string.
+      error(err, 0)     -- However, if we just print the error, we might lose the source of the error or at least some information.
+      return
+    end
     return select(2, unpack(results))
   end
 end
@@ -141,7 +144,11 @@ end
 ---@return {[string]: any} module
 local function protect_module(file, module)
   for k, v in pairs(module) do
-    if type(v) == 'function' then module[k] = protect(file, k, v) end
+    if type(v) == 'function' then
+      module[k] = protect(file, k, v)
+    elseif type(v) == 'table' then
+      module[k] = protect_module(file, v)
+    end
   end
   return module
 end
@@ -150,16 +157,16 @@ end
 ---@return {[string]: any}|function module
 function require(name)
   local param_type = type(name)
-  if param_type ~= 'string' then error('bad argument #1 to \'require\' (string expected, got ' ..param_type.. ')', 2) end
+  if param_type ~= 'string' then error('bad argument #1 to \'require\' (string expected, got '..param_type..')', 2) end
   local path, parts = find_path(name)
   if not path or not parts then error('bad argument #1 to \'require\' (invalid path)', 2) end
   if package.loaded[path] then return package.loaded[path] end
   if not package.preload[path] then error('bad argument #1 to \'require\' (no file found)', 2) end
   local loaded, module = pcall(package.preload[path])
-  if not loaded then error('bad argument #1 to \'require\' (error loading file) \n' ..module, 2) end
+  if not loaded then error('bad argument #1 to \'require\' (error loading file) \n'..module, 2) end
   module = package.preload[path]()
   local mod_type = type(module)
-  if mod_type ~= 'table' and mod_type ~= 'function' then error('bad argument #1 to \'require\' (table or function expected, got ' ..mod_type.. ')', 2) end
+  if mod_type ~= 'table' and mod_type ~= 'function' then error('bad argument #1 to \'require\' (table or function expected, got '..mod_type..')', 2) end
   package.loaded[name] = mod_type == 'table' and protect_module(path, module) or protect(path, parts[2], module)
   return package.loaded[name]
 end
