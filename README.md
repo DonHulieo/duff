@@ -56,9 +56,9 @@ Well, this is the solution for you! This is a collection of *optimised utility m
     - [async](#async)
       - [Importing async](#importing-async)
       - [async (function)](#async-function)
-    - [bm](#bm)
-      - [Importing bm](#importing-bm)
-      - [bm (function)](#bm-function)
+    - [bench](#bench)
+      - [Importing bench](#importing-bench)
+      - [bench (function)](#bench-function)
     - [bridge](#bridge)
       - [Importing the bridge Module](#importing-the-bridge-module)
       - [\_DATA](#_data)
@@ -597,6 +597,7 @@ async is a function that allows you to call and return functions asynchronously,
 This module is not exposed in the duff object, and must be imported using the `require` function.
 
 ```lua
+---@module 'duff.shared.async'
 local async = exports.duff:require 'duff.shared.async'
 ```
 
@@ -615,19 +616,20 @@ function async(func, ...)
 - `...` - The arguments to pass to the function.
 - `returns: ...` - The result of the function.
 
-### bm
+### bench
 
-bm is a function that allows you to benchmark the performance of a function, and returns the time taken to execute the function in milliseconds.
+bench is a function that allows you to benchmark the performance of a function, and returns the time taken to execute the function in milliseconds.
 
-#### Importing bm
+#### Importing bench
 
 This module is not exposed in the duff object, and must be imported using the `require` function.
 
 ```lua
-local bm = exports.duff:require 'duff.shared.bm'
+---@module 'duff.shared.bench'
+local bench = exports.duff:require 'duff.shared.bench'
 ```
 
-#### bm (function)
+#### bench (function)
 
 Benchmarks a `function` for `lim` iterations and returns the time taken to execute the function in milliseconds. Then prints the average time taken compared to other `functions`.
 
@@ -636,7 +638,7 @@ This is based on this [benchmarking snippet](https://gist.github.com/thelindat/9
 ```lua
 ---@param funcs {[string]: function}
 ---@param lim integer
-function bm(funcs, lim)
+function bench(funcs, lim)
 ```
 
 - `funcs` - A table of functions to benchmark.
