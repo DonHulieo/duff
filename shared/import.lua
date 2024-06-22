@@ -3,7 +3,7 @@ local url = GetResourceMetadata('duff', 'url', 0)
 local des = GetResourceMetadata('duff', 'description', 0)
 local require = GetCurrentResourceName() ~= 'duff' and function(path) return exports.duff:require(path) end or require
 local is_server = IsDuplicityVersion() == 1
----@class duff
+---@class CDuff
 ---@field _VERSION string
 ---@field _URL string
 ---@field _DESCRIPTION string
