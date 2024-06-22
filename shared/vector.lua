@@ -96,11 +96,11 @@ do
   ---@param check integer|vector|{x: number, y: number, z: number?, w: number?}|number[] The value to check.
   ---@param tbl (integer|vector|{x: number, y: number, z: number?, w: number?}|number[])[] The list of vectors to check against.
   ---@param radius number? The maximum distance within.
-  ---@param excluding (integer|vector|{x: number, y: number, z: number?, w: number?}|number[])[]? The entity, vector or group of either to exclude from the search.
+  ---@param excluding any|any[]? The entity, vector or group of either to exclude from the search.
   ---@return integer|vector|{x: number, y: number, z: number?, w: number?}|number[]? closest, number? dist, (integer|vector)[]? closests <br> `closest` is the closest value to `check`. <br>  `dist` is the distance to the closest value. <br> `closests` is an array of all vectors within `radius`.
   local function get_closest(check, tbl, radius, excluding) -- Find the closest vector in `tbl` to `check`.
     if check_types(check, {'number', 'table', 'vector'}, 1) ~= true then error(check_types(check, {'number', 'table', 'vector'}, 1), 0) end
-    if table.type(tbl) ~= 'array' then error('bad argument #2 to \'getclosest\' (expected array, got '..table.type(tbl)..')', 0) end
+    if table.type(tbl) ~= 'array' then error('bad argument #2 to \'%s\' (expected array, got '..(table.type(tbl) or type(tbl))..')', 0) end
     local coords = to_vector(check) --[[@as vector|integer]]
     tbl = type(tbl) == 'table' and tbl or {tbl}
     local closest, dist, closests = nil, radius or huge, {}
@@ -195,16 +195,16 @@ do
 
   --------------------- OBJECT ---------------------
 
-  vecmath = {isvec = is_vector, tobin = to_binary, frombin = from_binary, tovec = to_vector, getclosest = get_closest}
+  local _vector = {isvec = is_vector, tobin = to_binary, frombin = from_binary, tovec = to_vector, getclosest = get_closest}
   if not is_server then
-    vecmath.getentityright = get_entity_right_vec
-    vecmath.getentityup = get_entity_up_vec
+    _vector.getentityright = get_entity_right_vec
+    _vector.getentityup = get_entity_up_vec
   else
-    vecmath.getentitymatrix = get_entity_matrix
-    vecmath.getentityforward = get_entity_forward_vec
-    vecmath.getentityright = sv_get_entity_right_vec
-    vecmath.getentityup = sv_get_entity_up_vec
-    vecmath.getoffsetfromentityinworldcoords = get_offset_entity_worldcoords
+    _vector.getentitymatrix = get_entity_matrix
+    _vector.getentityforward = get_entity_forward_vec
+    _vector.getentityright = sv_get_entity_right_vec
+    _vector.getentityup = sv_get_entity_up_vec
+    _vector.getoffsetfromentityinworldcoords = get_offset_entity_worldcoords
   end
-  return vecmath
+  return _vector
 end

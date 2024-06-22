@@ -26,7 +26,7 @@ do
       function(ped)
         return not ped_type or GetPedType(ped) == ped_type
       end,
-    true) or {}
+    true)
   end
 
   ---@param vehicle_type integer|string? The class or type the vehicle to filter by. <br> `vehicle_type` is defined by class in the client env and by type in the server env. <br> Vehicles Class can be found [here](https://docs.fivem.net/natives/?_0x29439776AAA00A62). <br> Vehicles Type can be found [here](https://docs.fivem.net/natives/?_0xA273060E).
@@ -37,13 +37,13 @@ do
       function(vehicle)
         return not vehicle_type or is_server and GetVehicleType(vehicle) == vehicle_type or GetVehicleClass(vehicle) == vehicle_type
       end,
-    true) or {}
+    true)
   end
 
   ---@return integer[] objects An array of all objects.
   local function get_objects()
     if is_server and not all_objs then error('error calling \'%s\' (native at index _0x6886C3FE not found)', 0) end ---@cast all_objs -?
-    return is_server and all_objs() or get_pool('CObject') or {}
+    return is_server and all_objs() or get_pool('CObject')
   end
 
   ---@param hash string|number? The hash of the pickup to filter by. <br> `hash` can be a string or a number.
@@ -51,7 +51,7 @@ do
   local function get_pickups(hash) -- **Note**: This is a client-only function.
     if is_server then error('called a client only function \'%s\'', 0) end
     hash = type(hash) == 'string' and joaat(hash) or hash
-    return filter(get_pool('CPickup'), function(pickup) return not hash or GetPickupHash(pickup) == hash end, true) or {}
+    return filter(get_pool('CPickup'), function(pickup) return not hash or GetPickupHash(pickup) == hash end, true)
   end
 
   ---@param check integer|vector|{x: number, y: number, z: number}|number[]? The entity, vector or table to check the distance from. <br> If not provided, the player's coords will be used (client only).
@@ -62,8 +62,8 @@ do
   local function get_closest_ped(check, ped_type, radius, excluding)
     check = check and to_vec(check) or not is_server and get_coords(PlayerPedId()) --[[@as vector3]]
     if not check then error('bad argument #1 to \'%s\' (entity, vector or table expected, got '..type(check)..')', 0) end
-    local ped, dist, peds = get_closest(check, get_peds(ped_type), radius, excluding) ---@cast ped -vector
-    return ped, dist, peds
+    local ped, dist, peds = get_closest(check, get_peds(ped_type), radius, excluding)
+    return ped --[[@as integer]], dist, peds
   end
 
   ---@param check integer|vector|{x: number, y: number, z: number}|number[]? The entity, vector or table to check the distance from. <br> If not provided, the player's coords will be used (client only). 
@@ -74,8 +74,8 @@ do
   local function get_closest_vehicle(check, vehicle_type, radius, excluding)
     check = check and to_vec(check) or not is_server and get_coords(PlayerPedId()) --[[@as vector3]]
     if not check then error('bad argument #1 to \'%s\' (entity, vector or table expected, got '..type(check)..')', 0) end
-    local veh, dist, vehs = get_closest(check, get_vehicles(vehicle_type), radius, excluding) --[[@cast veh -vector]]
-    return veh, dist, vehs
+    local veh, dist, vehs = get_closest(check, get_vehicles(vehicle_type), radius, excluding)
+    return veh --[[@as integer]], dist, vehs
   end
 
   ---@param check integer|vector|{x: number, y: number, z: number}|number[]? The entity, vector or table to check the distance from. <br> If not provided, the player's coords will be used (client only).
@@ -85,8 +85,8 @@ do
   local function get_closest_object(check, radius, excluding)
     check = check and to_vec(check) or not is_server and get_coords(PlayerPedId()) --[[@as vector3]]
     if not check then error('bad argument #1 to \'%s\' (entity, vector or table expected, got '..type(check)..')', 0) end
-    local obj, dist, objs = get_closest(check, get_objects(), radius, excluding) --[[@cast obj -vector]]
-    return obj, dist, objs
+    local obj, dist, objs = get_closest(check, get_objects(), radius, excluding)
+    return obj --[[@as integer]], dist, objs
   end
 
   ---@param check integer|vector|{x: number, y: number, z: number}|number[]? The entity, vector or table to check the distance from. <br> If not provided, the player's coords will be used.
@@ -98,8 +98,8 @@ do
     if is_server then error('called a client only function \'%s\'', 0) end
     check = check and to_vec(check) or get_coords(PlayerPedId()) --[[@as vector3]]
     hash = type(hash) == 'string' and joaat(hash) or hash
-    local pickup, dist, pickups = get_closest(check, get_pickups(hash), radius, excluding) --[[@cast pickup -vector]]
-    return pickup, dist, pickups
+    local pickup, dist, pickups = get_closest(check, get_pickups(hash), radius, excluding)
+    return pickup --[[@as integer]], dist, pickups
   end
 
   return {

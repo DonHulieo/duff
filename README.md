@@ -116,7 +116,7 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [tofloat](#tofloat)
       - [toint](#toint)
       - [toratio](#toratio)
-    - [vecmath](#vecmath)
+    - [vector](#vector)
       - [Importing the vecmath Module](#importing-the-vecmath-module)
       - [Shared Functions (math)](#shared-functions-math)
         - [isvec](#isvec)
@@ -151,13 +151,13 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [loadipl](#loadipl)
       - [loadmodel](#loadmodel)
       - [loadptfx](#loadptfx)
-    - [scope](#scope)
+    - [scopes](#scopes)
       - [Importing the scope Module](#importing-the-scope-module)
       - [getplayerscope](#getplayerscope)
       - [triggerscopeevent](#triggerscopeevent)
       - [createsyncedscopeevent](#createsyncedscopeevent)
       - [removesyncedscopeevent](#removesyncedscopeevent)
-    - [zone](#zone)
+    - [zones](#zones)
       - [Importing the zone Module](#importing-the-zone-module)
       - [contains (zone)](#contains-zone)
       - [getzone](#getzone)
@@ -1443,9 +1443,9 @@ function math.toratio(value, precision)
   - `1e-10 | 0.0000000001` is used.
 - `returns: integer, integer` - The rational number.
 
-### vecmath
+### vector
 
-vecmath is an object containing functions for vector math. It provides functions for vector operations, conversions and checks.
+vector is an object containing functions for vector math. It provides functions for vector operations, conversions and checks.
 
 *This is a shared module, but has functions which are exclusive to their respective enviroments.*
 
@@ -1453,11 +1453,11 @@ vecmath is an object containing functions for vector math. It provides functions
 
 ```lua
 -- Using the `require` export
----@module 'duff.shared.vecmath'
-local vecmath = exports.duff:require 'duff.shared.vecmath'
+---@module 'duff.shared.vector'
+local vector = exports.duff:require 'duff.shared.vector'
 
 -- Attaching the vecmath to a local variable from the duff object
-local vecmath = duff.vecmath
+local vector = duff.vector
 ```
 
 #### Shared Functions (math)
@@ -1469,7 +1469,7 @@ Checks if a value is a vector.
 ```lua
 ---@param value any
 ---@return boolean is_vector
-function vecmath.isvec(value)
+function vector.isvec(value)
 ```
 
 - `value` - The value to check.
@@ -1482,7 +1482,7 @@ Converts a vector to a double-precision binary string.
 ```lua
 ---@param vec vector
 ---@return string bin
-function vecmath.tobin(vec)
+function vector.tobin(vec)
 ```
 
 - `vec` - The vector to convert.
@@ -1495,7 +1495,7 @@ Converts a double-precision binary string to a vector.
 ```lua
 ---@param bin string
 ---@return vector vec
-function vecmath.frombin(bin)
+function vector.frombin(bin)
 ```
 
 - `bin` - The binary string to convert.
@@ -1904,9 +1904,9 @@ function streaming.async.loadptfx(fx)
 - `fx` - The particle effect to load.
 - `returns: boolean` - Whether the particle effect was loaded.
 
-### scope
+### scopes
 
-scope is an object containing functions for managing scope. It provides functions for getting a player's scope, triggering a scope event and creating a synced scope event.
+scopes is an object containing functions for managing scope. It provides functions for getting a player's scope, triggering a scope event and creating a synced scope event.
 
 *This is a server module.*
 
@@ -1914,11 +1914,11 @@ scope is an object containing functions for managing scope. It provides function
 
 ```lua
 -- Using the `require` export
----@module 'duff.server.scope'
-local scope = exports.duff:require 'duff.server.scope'
+---@module 'duff.server.scopes'
+local scopes = exports.duff:require 'duff.server.scopes'
 
 -- Attaching the scope to a local variable from the duff object
-local scope = duff.scope
+local scopes = duff.scopes
 ```
 
 #### getplayerscope
@@ -1928,7 +1928,7 @@ Returns a player's scope.
 ```lua
 ---@param player number|integer
 ---@return {[string]: boolean} Scope
-function scope.getplayerscope(player)
+function scopes.getplayerscope(player)
 ```
 
 - `player` - The player to get the scope of.
@@ -1943,7 +1943,7 @@ Triggers a scope event.
 ---@param owner number|integer
 ---@param ... any
 ---@return {[string]: boolean}? targets
-function scope.triggerscopeevent(event, owner, ...)
+function scopes.triggerscopeevent(event, owner, ...)
 ```
 
 - `event` - The event to trigger.
@@ -1961,7 +1961,7 @@ Creates a synced scope event.
 ---@param timer integer?
 ---@param duration integer?
 ---@param ... any
-function scope.createsyncedscopeevent(event, owner, timer, duration, ...)
+function scopes.createsyncedscopeevent(event, owner, timer, duration, ...)
 ```
 
 - `event` - The event to create.
@@ -1976,14 +1976,14 @@ Removes a synced scope event.
 
 ```lua
 ---@param event string
-function scope.removesyncedscopeevent(event)
+function scopes.removesyncedscopeevent(event)
 ```
 
 - `event` - The event to remove.
 
-### zone
+### zones
 
-zone is an object containing functions for managing map zones. It functions similar to [PolyZone](https://github.com/mkafrin/PolyZone) and ox_libs' CZone, but is server-side only, whilst providing the same functionality and more.
+zones is an object containing functions for managing map zones. It functions similar to [PolyZone](https://github.com/mkafrin/PolyZone) and ox_libs' CZone, but is server-side only, whilst providing the same functionality and more.
 
 *This is a server module.*
 
@@ -1991,11 +1991,11 @@ zone is an object containing functions for managing map zones. It functions simi
 
 ```lua
 -- Using the `require` export
----@module 'duff.server.zone'
-local zone = exports.duff:require 'duff.server.zone'
+---@module 'duff.server.map_zones'
+local zones = exports.duff:require 'duff.server.map_zones'
 
 -- Attaching the zone to a local variable from the duff object
-local zone = duff.zone
+local zones = duff.zones
 ```
 
 #### contains (zone)
@@ -2005,7 +2005,7 @@ Checks if a zone contains a point.
 ```lua
 ---@param coords vector3|{x: number, y: number, z: number}|number[]
 ---@return boolean contains, integer index
-function zone.contains(coords)
+function zones.contains(coords)
 ```
 
 - `coords` - The coordinates to check, can be;
@@ -2021,7 +2021,7 @@ Returns a zone by index.
 ```lua
 ---@param index integer
 ---@return {Name: string, DisplayName: string, Bounds: {Minimum: {X: number, Y: number, Z: number}, Maximum: {X: number, Y: number, Z: number}}}? zone
-function zone.getzone(index)
+function zones.getzone(index)
 ```
 
 - `index` - The index of the zone.
@@ -2041,7 +2041,7 @@ Returns a zone name by coordinates.
 ```lua
 ---@param coords vector3|{x: number, y: number, z: number}|number[]
 ---@return string name
-function zone.getzonename(coords)
+function zones.getzonename(coords)
 ```
 
 - `coords` - The coordinates to check, can be;
@@ -2057,7 +2057,7 @@ Returns a zone index by coordinates.
 ```lua
 ---@param coords vector3|{x: number, y: number, z: number}|number[]
 ---@return integer index
-function zone.getzoneindex(coords)
+function zones.getzoneindex(coords)
 ```
 
 - `coords` - The coordinates to check, can be;
@@ -2073,7 +2073,7 @@ Returns a zone by name.
 ```lua
 ---@param name string
 ---@return integer index
-function zone.getzonefromname(name)
+function zones.getzonefromname(name)
 ```
 
 - `name` - The name of the zone, both name and display name are accepted.
@@ -2090,7 +2090,7 @@ Adds a zone event.
 ---@param onExit fun(player: string, coords: vector3, disconnected: boolean?)?
 ---@param time integer?
 ---@param player string?
-function zone.addzoneevent(event, zone_id, onEnter, onExit, time, players)
+function zones.addzoneevent(event, zone_id, onEnter, onExit, time, players)
 ```
 
 - `event` - The event to add.
