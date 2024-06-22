@@ -11,6 +11,8 @@ Well, this is the solution for you! This is a collection of *optimised utility m
 
 - **Require:** Emulates Lua's default require function, using package.path, package.preload and package.loaded. Also precaches all modules labled as `file` in the `fxmanifest.lua` and any modules that are imported using the `require` function.
 - **Array:** A module for the creation and manipulation of consecutive integer indexed arrays, providing a number of Functional Programming methods.
+- **Async:** Allows you to call and return functions asynchronously, using promises.
+- **Bench:** Allows you to benchmark the performance of a function, and returns the time taken to execute the function in milliseconds.
 - **Bridge:** Provides common functions between different frameworks and libraries for use in creating cross-framework scripts.
 - **Locale:** Contains functions for localisation and translation, based on the i18n.lua library by kikito.
 - **Math:** Contains some useful math functions, including a `seedrng` function which generates a random seed based on the current time, and an improvement to the default lua `random` function.
@@ -32,9 +34,9 @@ Well, this is the solution for you! This is a collection of *optimised utility m
   - [Documentation](#documentation)
     - [Require](#require)
     - [Check Version](#check-version)
-    - [Importing the duff Object](#importing-the-duff-object)
-    - [array](#array)
-      - [Importing the array Module](#importing-the-array-module)
+    - [Importing CDuff](#importing-cduff)
+    - [CArray](#carray)
+      - [Importing CArray](#importing-carray)
       - [Internal Methods](#internal-methods)
       - [isarray](#isarray)
       - [push](#push)
@@ -59,10 +61,10 @@ Well, this is the solution for you! This is a collection of *optimised utility m
     - [bench](#bench)
       - [Importing bench](#importing-bench)
       - [bench (function)](#bench-function)
-    - [bridge](#bridge)
-      - [Importing the bridge Module](#importing-the-bridge-module)
+    - [CBridge](#cbridge)
+      - [Importing CBridge](#importing-cbridge)
       - [\_DATA](#_data)
-      - [Shared Functions](#shared-functions)
+      - [Shared Functions (bridge)](#shared-functions-bridge)
         - [getcore](#getcore)
         - [getlib](#getlib)
         - [getinv](#getinv)
@@ -83,14 +85,14 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [Client Functions (bridge)](#client-functions-bridge)
         - [addlocalentity](#addlocalentity)
         - [removelocalentity](#removelocalentity)
-    - [locale](#locale)
-      - [Importing the locale Module](#importing-the-locale-module)
+    - [CLocale](#clocale)
+      - [Importing CLocale](#importing-clocale)
       - [set](#set)
       - [load](#load)
       - [loadfile](#loadfile)
       - [translate](#translate)
-    - [pools](#pools)
-      - [Importing the pools Module](#importing-the-pools-module)
+    - [CPools](#cpools)
+      - [Importing CPools](#importing-cpools)
       - [Shared Functions (pools)](#shared-functions-pools)
         - [getpeds](#getpeds)
         - [getvehicles](#getvehicles)
@@ -101,8 +103,8 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [Client Functions (pools)](#client-functions-pools)
         - [getpickups](#getpickups)
         - [getclosestpickup](#getclosestpickup)
-    - [math](#math)
-      - [Importing the math Module](#importing-the-math-module)
+    - [CMath](#cmath)
+      - [Importing the CMath](#importing-the-cmath)
       - [between](#between)
       - [clamp](#clamp)
       - [gcd](#gcd)
@@ -116,26 +118,26 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [tofloat](#tofloat)
       - [toint](#toint)
       - [toratio](#toratio)
-    - [vector](#vector)
-      - [Importing the vecmath Module](#importing-the-vecmath-module)
-      - [Shared Functions (math)](#shared-functions-math)
+    - [CVector](#cvector)
+      - [Importing CVector](#importing-cvector)
+      - [Shared Functions (vector)](#shared-functions-vector)
         - [isvec](#isvec)
         - [tobin](#tobin)
         - [frombin](#frombin)
         - [tovec](#tovec)
         - [getclosest](#getclosest)
-      - [Client Functions (vecmath)](#client-functions-vecmath)
+      - [Client Functions (vector)](#client-functions-vector)
         - [getentityright](#getentityright)
         - [getentityup](#getentityup)
-      - [Server Functions (vecmath)](#server-functions-vecmath)
+      - [Server Functions (vector)](#server-functions-vector)
         - [getentitymatrix](#getentitymatrix)
         - [getentityforward](#getentityforward)
         - [getoffsetfromentityinworldcoords](#getoffsetfromentityinworldcoords)
     - [trace](#trace)
       - [Importing trace](#importing-trace)
       - [trace (function)](#trace-function)
-    - [blips](#blips)
-      - [Importing the blips Module](#importing-the-blips-module)
+    - [CBlips](#cblips)
+      - [Importing CBlips](#importing-cblips)
       - [getall](#getall)
       - [onscreen](#onscreen)
       - [bycoords](#bycoords)
@@ -143,22 +145,22 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [bytype](#bytype)
       - [getinfo](#getinfo)
       - [remove](#remove)
-    - [streaming](#streaming)
-      - [Importing the streaming Module](#importing-the-streaming-module)
+    - [CStreaming](#cstreaming)
+      - [Importing CStreaming](#importing-cstreaming)
       - [loadanimdict](#loadanimdict)
       - [loadanimset](#loadanimset)
       - [loadcollision](#loadcollision)
       - [loadipl](#loadipl)
       - [loadmodel](#loadmodel)
       - [loadptfx](#loadptfx)
-    - [scopes](#scopes)
-      - [Importing the scope Module](#importing-the-scope-module)
+    - [CScopes](#cscopes)
+      - [Importing CScopes](#importing-cscopes)
       - [getplayerscope](#getplayerscope)
       - [triggerscopeevent](#triggerscopeevent)
       - [createsyncedscopeevent](#createsyncedscopeevent)
       - [removesyncedscopeevent](#removesyncedscopeevent)
-    - [zones](#zones)
-      - [Importing the zone Module](#importing-the-zone-module)
+    - [CMapZones](#cmapzones)
+      - [Importing CMapZones](#importing-cmapzones)
       - [contains (zone)](#contains-zone)
       - [getzone](#getzone)
       - [getzonename](#getzonename)
@@ -166,11 +168,9 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [getzonefromname](#getzonefromname)
       - [addzoneevent](#addzoneevent)
       - [removezoneevent](#removezoneevent)
-    - [Support](#support)
-    - [Changelog](#changelog)
 
 <!-- [x] Update #Description & Add #Features -->
-<!-- [ ] Add descriptions to Methods & Notes Needed -->
+<!-- [x] Add descriptions to Methods & Notes Needed -->
 
 ## Credits
 
@@ -190,10 +190,8 @@ Well, this is the solution for you! This is a collection of *optimised utility m
 
 - Always use the latest FiveM artifacts (tested on 6683), you can find them [here](https://runtime.fivem.net/artifacts/fivem/build_server_windows/master/).
 - Download the latest version from releases.
-- Extract the contents of the zip file into your resources folder, into a folder which starts after your framework and any script this is a dependency for, or;
-- Ensure the script in your `server.cfg` after your framework and any script this is a dependency for.
-- If using `ox_lib`, ensure `'@ox_lib/init.lua'` is uncommented in your `fxmanifest.lua` file.
-- If using es_extended and not using `ox_inventory`, ensure `server_script '@oxmysql/lib/MySQL.lua'` is uncommented in your `fxmanifest.lua` file.
+- Extract the contents of the zip file into your resources folder, into a folder which starts after your framework and before any script this is a dependency for, or;
+- Ensure the script in your `server.cfg` after your framework and before any script this is a dependency for.
 
 ## Documentation
 
@@ -247,7 +245,7 @@ end)
   - `'^1Unable to check for updates for \` resource `\ ^0'` | If the github repository can not be found.
   - `'^2\` resource `\ is running latest version.^0'` | If the resource is up to date.
 
-### Importing the duff Object
+### Importing CDuff
 
 ```lua
 -- Using the `require` export
@@ -258,20 +256,20 @@ local duff = exports.duff:require 'duff.shared.import'
 shared_script '@duff/shared/import.lua'
 ```
 
-### array
+### CArray
 
-array is a class for the creation and manipulation of consecutive integer indexed arrays. It provides a number of Functional Programming methods, and is designed to be used in a similar way to the Array class in JavaScript.
+CArray is a class for the creation and manipulation of consecutive integer indexed arrays. It provides a number of Functional Programming methods, and is designed to be used in a similar way to the Array class in JavaScript.
 
 *This is a shared module, and can be used on both the client, server and shared enviroment.*
 
-#### Importing the array Module
+#### Importing CArray
 
 ```lua
 -- Using the `require` export
 ---@module 'duff.shared.array'
 local array = exports.duff:require 'duff.shared.array'
 
--- Attaching array to a local variable from the duff object
+-- Attaching array to a local variable from CDuff
 local array = duff.array
 ```
 
@@ -644,18 +642,18 @@ function bench(funcs, lim)
 - `funcs` - A table of functions to benchmark.
 - `lim` - The number of iterations to run the benchmark.
 
-### bridge
+### CBridge
 
-bridge is a class that provides common functions between different frameworks and libraries for use in creating cross-framework scripts. It currently has limited scope, managing player job/gang data, retreiving the core framework and some exposed methods between common Inventory and Target scripts.
+CBridge is a class that provides common functions between different frameworks and libraries for use in creating cross-framework scripts. It currently has limited scope, managing player job/gang data, retreiving the core framework and some exposed methods between common Inventory and Target scripts.
 
-#### Importing the bridge Module
+#### Importing CBridge
 
 ```lua
 -- Using the `require` export
 ---@module 'duff.shared.bridge'
 local bridge = exports.duff:require 'duff.shared.bridge'
 
--- Attaching the bridge to a local variable from the duff object
+-- Attaching the bridge to a local variable from CDuff
 local bridge = duff.bridge
 ```
 
@@ -680,7 +678,7 @@ The `_DATA` table is used to store common data for the bridge class.
 - The `EXPORTS` table is used to store common exports.
 - The `ITEMS` table is only available on the server side, and is used to store item data for use in the inventory system.
 
-#### Shared Functions
+#### Shared Functions (bridge)
 
 ##### getcore
 
@@ -935,13 +933,13 @@ function bridge.removelocalentity(entities)
 
 - `entities` - The entity or entities to remove the target from.
 
-### locale
+### CLocale
 
-locale is an object containing functions for localisation and translation. It's based on the i18n.lua library by kikito [ref](README.md#credits), and provides a simple way to manage translations in your FiveM scripts.
+CLocale is an object containing functions for localisation and translation. It's based on the i18n.lua library by kikito [ref](README.md#credits), and provides a simple way to manage translations in your FiveM scripts.
 
 *This is a shared module, and can be used on both the client, server and shared enviroment.*
 
-#### Importing the locale Module
+#### Importing CLocale
 
 The module automatically uses the servers' convars to determine locale , both dialect and region. If the convars (`sets locale`) are not set, it defaults to `en`.
 
@@ -960,7 +958,7 @@ The module automatically uses the servers' convars to determine locale , both di
 ---@module 'duff.shared.locale'
 local locale = exports.duff:require 'duff.shared.locale'
 
--- Attaching the locale to a local variable from the duff object
+-- Attaching the locale to a local variable from CDuff
 local locale = duff.locale
 ```
 
@@ -1063,20 +1061,20 @@ function locale.translate(key, data)
 - `data` - A table containing data to replace placeholders in the translation.
 - `returns: string` - The translated value.
 
-### pools
+### CPools
 
-pools is an object containing functions for managing the game's entity pools. It provides functions for getting the closest entity of a specific type, and getting all entities of a specific type.
+CPools is an object containing functions for managing the game's entity pools. It provides functions for getting the closest entity of a specific type, and getting all entities of a specific type.
 
 *This is a shared module, but has functions which are exclusive to their respective enviroments.*
 
-#### Importing the pools Module
+#### Importing CPools
 
 ```lua
 -- Using the `require` export
 ---@module 'duff.client.pools'
 local pools = exports.duff:require 'duff.client.pools'
 
--- Attaching the pools to a local variable from the duff object
+-- Attaching the pools to a local variable from CDuff
 local pools = duff.pools
 ```
 
@@ -1230,22 +1228,22 @@ function pools.getclosestpickup(check, hash, radius, excluding)
 - `excluding` - The pickup or pickups to ignore.
 - `returns: integer, number, integer[]` - The closest pickup, the distance to the pickup, and an array of all pickups.
 
-### math
+### CMath
 
-math is an object containing some useful math functions. Most notably, it contains a `seedrng` function which generates a random seed based on the current time, and a `random` function which generates a random number between two values which should be an improvement over the default Lua pseudo-random number generator.
+CMath is an object containing some useful math functions. Most notably, it contains a `seedrng` function which generates a random seed based on the current time, and a `random` function which generates a random number between two values which should be an improvement over the default Lua pseudo-random number generator.
 
 It also imports the default Lua math functions, so you can use it as a drop-in replacement for the default math library.
 
 *This is a shared module, and can be used on both the client, server and shared enviroment.*
 
-#### Importing the math Module
+#### Importing the CMath
 
 ```lua
 -- Using the `require` export
 ---@module 'duff.shared.math'
 local math = exports.duff:require 'duff.shared.math'
 
--- Attaching the math to a local variable from the duff object
+-- Attaching the math to a local variable from CDuff
 local math = duff.math
 ```
 
@@ -1443,24 +1441,24 @@ function math.toratio(value, precision)
   - `1e-10 | 0.0000000001` is used.
 - `returns: integer, integer` - The rational number.
 
-### vector
+### CVector
 
-vector is an object containing functions for vector math. It provides functions for vector operations, conversions and checks.
+CVector is an object containing functions for vector math. It provides functions for vector operations, conversions and checks.
 
 *This is a shared module, but has functions which are exclusive to their respective enviroments.*
 
-#### Importing the vecmath Module
+#### Importing CVector
 
 ```lua
 -- Using the `require` export
 ---@module 'duff.shared.vector'
 local vector = exports.duff:require 'duff.shared.vector'
 
--- Attaching the vecmath to a local variable from the duff object
+-- Attaching the vecmath to a local variable from CDuff
 local vector = duff.vector
 ```
 
-#### Shared Functions (math)
+#### Shared Functions (vector)
 
 ##### isvec
 
@@ -1551,7 +1549,7 @@ function vector.getclosest(check, list, radius, ignore)
   - `number` - The distance to the closest value,
   - `(integer|vector|{x: number, y: number, z: number?, w: number?}|number[])[]` - The closest values.
 
-#### Client Functions (vecmath)
+#### Client Functions (vector)
 
 ##### getentityright
 
@@ -1579,7 +1577,7 @@ function vector.getentityup(entity)
 - `entity` - The entity to get the up vector of.
 - `returns: vector3` - The up vector.
 
-#### Server Functions (vecmath)
+#### Server Functions (vector)
 
 ##### getentitymatrix
 
@@ -1657,20 +1655,20 @@ function trace(trace_type, ...)
   - `debug` - Prefixes the message with `'SCRIPT DEBUG:'` and prints in white.
 - `...` - The arguments to print.
 
-### blips
+### CBlips
 
-blips is an object containing functions for managing blips. It provides functions for getting all blips, onscreen blips, blips by coordinates, blips by sprite, blips by type, getting blip information and removing blips.
+CBlips is an object containing functions for managing blips. It provides functions for getting all blips, onscreen blips, blips by coordinates, blips by sprite, blips by type, getting blip information and removing blips.
 
 *This is a client module, and can only be used in the client enviroment.*
 
-#### Importing the blips Module
+#### Importing CBlips
 
 ```lua
 -- Using the `require` export
 ---@module 'duff.client.blips'
 local blips = exports.duff:require 'duff.client.blips'
 
--- Attaching the blips to a local variable from the duff object
+-- Attaching the blips to a local variable from CDuff
 local blips = duff.blips
 ```
 
@@ -1782,20 +1780,20 @@ function blips.remove(blips)
 
 - `blips` - The blip handle or an array of blip handles.
 
-### streaming
+### CStreaming
 
-streaming is an object containing functions for loading game assets. It provides functions for loading animation dictionaries, animation sets, collisions, IPLs, models and particle effects.
+CStreaming is an object containing functions for loading game assets. It provides functions for loading animation dictionaries, animation sets, collisions, IPLs, models and particle effects.
 
 *This is a client module.*
 
-#### Importing the streaming Module
+#### Importing CStreaming
 
 ```lua
 -- Using the `require` export
 ---@module 'duff.client.streaming'
 local streaming = exports.duff:require 'duff.client.streaming'
 
--- Attaching the streaming to a local variable from the duff object
+-- Attaching the streaming to a local variable from CDuff
 local streaming = duff.streaming
 ```
 
@@ -1904,20 +1902,20 @@ function streaming.async.loadptfx(fx)
 - `fx` - The particle effect to load.
 - `returns: boolean` - Whether the particle effect was loaded.
 
-### scopes
+### CScopes
 
-scopes is an object containing functions for managing scope. It provides functions for getting a player's scope, triggering a scope event and creating a synced scope event.
+CScopes is an object containing functions for managing scope. It provides functions for getting a player's scope, triggering a scope event and creating a synced scope event.
 
 *This is a server module.*
 
-#### Importing the scope Module
+#### Importing CScopes
 
 ```lua
 -- Using the `require` export
 ---@module 'duff.server.scopes'
 local scopes = exports.duff:require 'duff.server.scopes'
 
--- Attaching the scope to a local variable from the duff object
+-- Attaching the scope to a local variable from CDuff
 local scopes = duff.scopes
 ```
 
@@ -1981,20 +1979,20 @@ function scopes.removesyncedscopeevent(event)
 
 - `event` - The event to remove.
 
-### zones
+### CMapZones
 
-zones is an object containing functions for managing map zones. It functions similar to [PolyZone](https://github.com/mkafrin/PolyZone) and ox_libs' CZone, but is server-side only, whilst providing the same functionality and more.
+CMapZones is an object containing functions for managing map zones. It functions similar to [PolyZone](https://github.com/mkafrin/PolyZone) and ox_libs' CZone, but is server-side only, whilst providing the same functionality and more.
 
 *This is a server module.*
 
-#### Importing the zone Module
+#### Importing CMapZones
 
 ```lua
 -- Using the `require` export
 ---@module 'duff.server.map_zones'
 local zones = exports.duff:require 'duff.server.map_zones'
 
--- Attaching the zone to a local variable from the duff object
+-- Attaching the zone to a local variable from CDuff
 local zones = duff.zones
 ```
 
@@ -2115,14 +2113,3 @@ function zone.removezoneevent(event)
 ```
 
 - `event` - The event to remove.
-
-### Support
-
-- Join my [discord](https://discord.gg/tVA58nbBuk).
-- Use the relevant support channels.
-
-### Changelog
-
-- v1.0.2 - Squashed bug where `bridge.getplayer` would return `string` for ESX users, changed `server.scope` to use Latent Events & added `checkversion` export & method.
-- v1.0.1 - Updated `shared.bridge` to use `qb-inventory`'s updated exports.
-- v1.0.0 - Initial Release.
