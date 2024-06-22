@@ -17,7 +17,7 @@
 ---@field foldright fun(list: any[], fn: function, arg: any?): any[] Reduces `list` to a single value by applying `fn` from right to left.
 ---@field setenum fun(list: any[]?): enum: any[] Returns `list` as a read-only array.
 ---@field map fun(list: any[], fn: function, in_place: boolean?): any[] Returns a new array with the results of applying `fn` to each element.
----@field filter fun(list: any[], fn: function, in_place: boolean?): any[] Returns a new array with the elements that satisfy `fn`.
+---@field filter fun(list: any[], fn?: function, in_place: boolean?): any[] Returns a new array with the elements that satisfy `fn`.
 ---@field foreach fun(list: any[], fn: function, reverse: boolean?) Iterates over `list` and calls `fn` for each element.
 ---@field reverse fun(list: any[], length: integer?): any[] Reverses the elements of `list` in place.
 do
@@ -192,7 +192,7 @@ do
   end
 
   ---@param list any[] The array to filter.
-  ---@param fn fun(val: any, i: integer): boolean The function to filter with.
+  ---@param fn? fun(val: any, i: integer): boolean The function to filter with.
   ---@param in_place boolean? Whether to filter in place.
   ---@return any[] res The filtered array.
   local function filter(list, fn, in_place)
@@ -201,14 +201,14 @@ do
     if in_place then
       local i = 1
       while i <= #list do
-        if not fn(list[i], i) then table_remove(list, i) else i += 1 end
+        if fn and not fn(list[i], i) then table_remove(list, i) else i += 1 end
       end
       return list
     end
     local res = {}
     for i = 1, #list do
       local val = list[i]
-      if fn(val, i) then res[#res + 1] = val end
+      if not fn or fn(val, i) then res[#res + 1] = val end
     end
     return res
   end
