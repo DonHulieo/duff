@@ -35,7 +35,7 @@ do
       load(asset)
       repeat Wait(0) until loaded(asset) or timer(time, 1000)
     end
-    return loaded(asset)
+    return loaded(asset) == 1
   end
 
   ---@param dict string The animation dictionary to load.
