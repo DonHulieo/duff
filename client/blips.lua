@@ -4,6 +4,7 @@
 ---@field bycoords fun(coords: vector3|vector3[], radius: number?): integer[]? Finds all active blip handles at `coords` within `radius`. <br> `coords` can be a vector3 or any array of vector3's. <br> If `radius` is not provided, it defaults to `1.0`.
 ---@field bysprite fun(sprite: integer): integer[]? Finds all active blip handles with `sprite`.
 ---@field bytype fun(id_type: integer): integer[]? Finds all active blip handles with `id_type`.
+---@field getblips fun(filter: fun(blip: integer, index: integer): boolean): integer[] Finds all active blip handles that pass `filter`.
 ---@field getinfo fun(blip: integer): {alpha: integer, coords: vector3, colour: integer, display: integer, fade: boolean, hud_colour: integer, type: integer, rotation: number, is_shortrange: boolean}? Returns information about `blip`.
 ---@field remove fun(blips: integer|integer[]) Removes `blips` from the map. <br> If `blips` is a number, it removes that blip. <br> If `blips` is an array, it removes all blips in the array.
 do
@@ -70,6 +71,12 @@ do
     return filter(get_all(), function(blip) return GetBlipInfoIdType(blip) == id_type end, true)
   end
 
+  ---@param fn fun(blip: integer, index: integer): boolean The function to filter blips.
+  ---@return integer[] blip_ids An array of all active blip handles that pass `filter`.
+  local function get_blips(fn)
+    return filter(get_all(), fn, true)
+  end
+
   ---@param blip integer The blip handle to get information about.
   ---@return {alpha: integer, coords: vector3, colour: integer, display: integer, fade: boolean, hud_colour: integer, type: integer, rotation: number, is_shortrange: boolean}? info Information about `blip`.
   local function get_info(blip)
@@ -101,5 +108,5 @@ do
     SetThisScriptCanRemoveBlipsCreatedByAnyScript(false)
   end
 
-  return {getall = get_all, onscreen = on_screen, bycoords = by_coords, bysprite = by_sprite, bytype = by_type, getinfo = get_info, remove = remove_blips}
+  return {getall = get_all, onscreen = on_screen, bycoords = by_coords, bysprite = by_sprite, bytype = by_type, getblips = get_blips, getinfo = get_info, remove = remove_blips}
 end
