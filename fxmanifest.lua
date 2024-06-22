@@ -6,9 +6,16 @@ description 'Don\'s Utility Functions for FiveM'
 version '1.1.0'
 url 'https://github.com/DonHulieo/duff'
 
-shared_scripts {--[['@ox_lib/init.lua', Uncomment this if using ox_lib]] 'shared/lib.lua'}
+local function is_res_pres(res)
+  local state = GetResourceState(res)
+  return state ~= 'missing' and state ~= 'unknown'
+end
 
---[[server_script '@oxmysql/lib/MySQL.lua' --[[Uncomment this if using oxmysql & ESX]]
+shared_scripts(is_res_pres('ox_lib') and {'@ox_lib/init.lua', 'shared/lib.lua'} or {'shared/lib.lua'})
+
+if is_res_pres('es_extended') and is_res_pres('ox_mysql') and not is_res_pres('ox_inventory') then
+  server_script '@oxmysql/lib/MySQL.lua'
+end
 
 files {'data/*.json', '**/*.lua'}
 
