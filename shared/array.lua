@@ -134,12 +134,16 @@ do
     return res
   end
 
+  ---@param fn any The value to check if it is a function.
+  ---@return boolean is_func the value is a function or not.
+  local function is_fun(fn) return type(fn) == 'function' or pcall(fn) end
+
   ---@param list any[] The array to search.
   ---@param fn fun(val: any, i: integer): boolean The function to search with.
   ---@return integer? index The index of the first element that satisfies the condition.
   local function find(list, fn)
     if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
-    if not fn then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
+    if not fn or not is_fun(fn) then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
     for i = 1, #list do
       if fn(list[i], i) then return i end
     end
@@ -151,7 +155,7 @@ do
   ---@return any res The reduced list.
   local function fold_left(list, fn, arg)
     if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
-    if not fn then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
+    if not fn or not is_fun(fn) then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
     local res = list[1]
     res = arg and fn(res, arg) or res
     for i = 2, #list do res = fn(res, list[i]) end
@@ -164,7 +168,7 @@ do
   ---@return any res The reduced list.
   local function fold_right(list, fn, arg)
     if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
-    if not fn then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
+    if not fn or not is_fun(fn) then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
     local res = list[#list]
     res = arg and fn(res, arg) or res
     for i = #list - 1, 1, -1 do res = fn(res, list[i]) end
@@ -185,7 +189,7 @@ do
   ---@return any[] res The mapped array.
   local function map(list, fn, in_place)
     if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
-    if not fn then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
+    if not fn or not is_fun(fn) then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
     local res = in_place and list or {}
     for i = 1, #list do res[i] = fn(list[i]) end
     return res
@@ -197,7 +201,7 @@ do
   ---@return any[] res The filtered array.
   local function filter(list, fn, in_place)
     if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
-    if not fn then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
+    if fn and not is_fun(fn) then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
     if in_place then
       local i = 1
       while i <= #list do
@@ -218,7 +222,7 @@ do
   ---@param reverse boolean? Whether to iterate in reverse.
   local function for_each(list, fn, reverse)
     if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
-    if not fn then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
+    if not fn or not is_fun(fn) then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
     local i, j, n = 1, #list, 1
     if reverse then i, j, n = j, 1, -1 end
     for k = i, j, n do fn(list[k], k) end
