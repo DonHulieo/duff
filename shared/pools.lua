@@ -20,7 +20,10 @@ do
 
   ---@param fn any The value to check if it is a function.
   ---@return boolean is_func the value is a function or not.
-  local function is_fun(fn) return type(fn) == 'function' or pcall(fn) end
+  local function is_fun(fn)
+    local fn_type = type(fn)
+    return fn_type == 'function' or fn_type == 'table' and (getmetatable(fn) and getmetatable(fn).__call or rawget(fn, '__cfx_functionReference'))
+  end
 
   ---@param ped_type integer|(fun(ped: integer, index: integer): boolean)? Can be a filter function or a ped type (client only). <br> If `ped_type` is a function with the signature `(ped: integer, index: integer): boolean`, it will be used to filter the peds. <br> If `ped_type` is a number, it will filter the peds by their type. <br> `ped_type` can be found [here](https://docs.fivem.net/natives/?_0xFF059E1E4C01E63C).
   ---@return integer[] peds An array of all peds, filtered by `ped_type` if provided.
