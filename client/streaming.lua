@@ -72,7 +72,7 @@ do
   local function req_collision(model)
     local param_type = type(model)
     if not model or (param_type ~= 'string' and param_type ~= 'number') then error('bad argument #1 to \'%s\' (string or number expected, got '..param_type..')', 0) end
-    model = type(model) == 'number' and model or joaat(model)
+    model = type(model) == 'number' and model or joaat(model) & 0xFFFFFFFF
     if not is_model_in_cd(model) or not is_model_in_valid(model) then error('bad argument #1 to \'%s\' (invalid model requested: '..tostring(model)..')', 0) end
     return load_asset(model, has_collision_for_model_loaded, request_collision_for_model)
   end
@@ -82,7 +82,7 @@ do
   local function async_req_collision(model)
     local param_type = type(model)
     if not model or (param_type ~= 'string' and param_type ~= 'number') then error('bad argument #1 to \'%s\' (string or number expected, got '..param_type..')', 0) end
-    model = type(model) == 'number' and model or joaat(model)
+    model = type(model) == 'number' and model or joaat(model) & 0xFFFFFFFF
     if not is_model_in_cd(model) or not is_model_in_valid(model) then error('bad argument #1 to \'%s\' (invalid model requested: '..tostring(model)..')', 0) end
     return async(req_collision, model)
   end
@@ -106,7 +106,7 @@ do
   local function req_model(model)
     local param_type = type(model)
     if not model or (param_type ~= 'string' and param_type ~= 'number') then error('bad argument #1 to \'%s\' (string or number expected, got '..param_type..')', 0) end
-    model = type(model) == 'number' and model or joaat(model)
+    model = type(model) == 'number' and model or joaat(model) & 0xFFFFFFFF
     if not is_model_in_cd(model) or not is_model_in_valid(model) then error('bad argument #1 to \'%s\' (invalid model requested: '..tostring(model)..')', 0) end
     return load_asset(model, has_model_loaded, request_model)
   end
@@ -116,7 +116,7 @@ do
   local function async_req_model(model)
     local param_type = type(model)
     if not model or (param_type ~= 'string' and param_type ~= 'number') then error('bad argument #1 to \'%s\' (string or number expected, got '..param_type..')', 0) end
-    model = type(model) == 'number' and model or joaat(model)
+    model = type(model) == 'number' and model or joaat(model) & 0xFFFFFFFF
     if not is_model_in_cd(model) or not is_model_in_valid(model) then error('bad argument #1 to \'%s\' (invalid model requested: '..tostring(model)..')', 0) end
     return async(req_model, model)
   end
