@@ -1,7 +1,9 @@
 local res_version = GetResourceMetadata('duff', 'version', 0)
 local url = GetResourceMetadata('duff', 'url', 0)
 local des = GetResourceMetadata('duff', 'description', 0)
-local require = GetCurrentResourceName() ~= 'duff' and function(path) return exports.duff:require(path) end or require
+local export = exports.duff
+local _require = require
+local require = function(...) return export['require'](nil, ...) end
 local is_server = IsDuplicityVersion() == 1
 ---@class CDuff
 ---@field _VERSION string
@@ -19,7 +21,7 @@ local is_server = IsDuplicityVersion() == 1
 ---@field scopes CScopes
 ---@field vector CVector
 ---@field zones CMapZones
-duff = {
+local duff = {
   _VERSION = res_version,
   _URL = url,
   _DESCRIPTION = des,
@@ -35,8 +37,9 @@ if not is_server then
   duff.blips = require 'duff.client.blips'
   duff.streaming = require 'duff.client.streaming'
 else
-  duff.checkversion = function(resource, version, git, repo) return exports.duff:checkversion(resource, version, git, repo) end
+  duff.checkversion = function(resource, version, git, repo) return export['checkversion'](nil, resource, version, git, repo) end
   duff.scopes = require 'duff.server.scopes'
   duff.zones = require 'duff.server.map_zones'
 end
+_ENV.duff = duff
 return duff
