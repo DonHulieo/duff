@@ -26,7 +26,7 @@ end
 ---@param file string
 ---@return boolean, function|table?
 local function safe_load(res, file)
-  return pcall(load, load_resource_file(res, file..'.lua'))
+  return pcall(load, load_resource_file(res, file..'.lua'), '@'..res..':'..file..'.lua', 't', _ENV)
 end
 
 ---@param resource string
@@ -97,9 +97,19 @@ local function find_path(name)
   if func then
     name = resource..':'..file
     package.path[name] = {resource, file}
-    package.preload[name] = load(load_resource_file(resource, file..'.lua'))
+    package.preload[name] = func
     return name, package.path[name]
   end
+end
+
+msgpack.setoption('with_hole', true) -- If a func has nil return values, this allows any leading nils to be preserved in the return values.
+
+---@param success boolean
+---@param ... any
+---@return ...
+local function helper(success, ...)
+  if not success then error(..., 0) end
+  return ...
 end
 
 ---@param file string The name of the file that the function is in.
@@ -108,20 +118,12 @@ end
 ---@return function protected_fn The protected function.
 local function protect(file, name, fn) -- Wraps a function with error handling and stack trace printing. <br> [Lua: How to call error without stack trace](https://stackoverflow.com/questions/20547499/lua-how-to-call-error-without-stack-trace?rq=3) <br> [FinalizedExceptions](http://lua-users.org/wiki/FinalizedExceptions) <br> [Lua: How to get true stack trace of an error in pcall](https://stackoverflow.com/questions/45788739/get-true-stack-trace-of-an-error-in-lua-pcall)
   return function(...)
-    local results = {
-      xpcall(fn, function(err)
-        err = '@'..file..'.lua:'..debug.getinfo(fn, 'S').linedefined..': '..string.format(err, name)
-        local trace = debug.traceback(nil, 3):sub(17):gsub('\t', '')
-        local index = trace:find('%[C%]: in function')
-        return index and err..trace:sub(1, index - 4) or trace or err
-      end, ...)
-    }
-    local success, err = results[1], results[2]
-    if not success then -- Unsure if we should actually `error` here, as if the error is from a module calling another module, it will print the called module's code as a string.
-      error(err, 0)     -- However, if we just print the error, we might lose the source of the error or at least some information.
-      return
-    end
-    return select(2, unpack(results))
+    return helper(xpcall(fn, function(err)
+      err = '@'..file..'.lua:'..debug.getinfo(fn, 'S').linedefined..': '..string.format(err, name)
+      local trace = debug.traceback(nil, 3):sub(17):gsub('\t', '')
+      local index = trace:find('%[C%]: in function')
+      return index and err..trace:sub(1, index - 4) or trace or err
+    end, ...))
   end
 end
 
