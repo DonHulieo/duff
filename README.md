@@ -143,6 +143,7 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [bycoords](#bycoords)
       - [bysprite](#bysprite)
       - [bytype](#bytype)
+      - [getblips](#getblips)
       - [getinfo](#getinfo)
       - [remove](#remove)
     - [CStreaming](#cstreaming)
@@ -873,6 +874,8 @@ function bridge.createuseableitem(name, callback)
 - `name` - The name of the item.
 - `callback` - The function to call when the item is used.
 
+**Note:** If using `ox_inventory`, the item export is in the `server.exports` table as `duff.name`.
+
 ##### additem
 
 Adds an item to the `player` inventory.
@@ -1082,40 +1085,47 @@ local pools = duff.pools
 
 ##### getpeds
 
-Returns an array of all peds in the pool, filtered by `ped_type` if client-side and provided.
+Returns an array of all peds in the pool, filtered by `ped_type` if provided.
 
 ```lua
----@param ped_type integer?
+---@param ped_type integer|(fun(ped: integer, i: integer): boolean)?
 ---@return integer[] peds
 function pools.getpeds(ped_type)
 ```
 
-- `ped_type` - The ped type to filter by (client-side only). Ped types can be found in the [Native Reference](https://docs.fivem.net/natives/?_0xFF059E1E4C01E63C).
-- `returns: integer[]` - An array of all peds.
+- `ped_type` - Can be either;
+  - `integer` - The ped type to filter by (client-side only). Found [here](https://docs.fivem.net/natives/?_0xFF059E1E4C01E63C).
+  - `function` - A function with signature `(ped: integer, i: integer) => boolean`.
+- `returns: integer[]` - An array of all peds, filtered by `ped_type` if provided.
 
 ##### getvehicles
 
 Returns an array of all vehicles in the pool, filtered by `vehicle_type` if provided.
 
 ```lua
----@param vehicle_type integer|string?
+---@param vehicle_type integer|string|(fun(vehicle: integer, i: integer): boolean)?
 ---@return integer[]? vehicles
 function pools.getvehicles(vehicle_type)
 ```
 
-- `vehicle_type` - The vehicle type to filter by. Client side filters by [class](https://docs.fivem.net/natives/?_0x29439776AAA00A62) and server side filters by [type](https://docs.fivem.net/natives/?_0xA273060E).
-- `returns: integer[]` - An array of all vehicles.
+- `vehicle_type` - Can be either;
+  - `integer` - The vehicle class to filter by (client-side only). Found [here](https://docs.fivem.net/natives/?_0x29439776AAA00A62).
+  - `string` - The vehicle type to filter by (server-side only). Found [here](https://docs.fivem.net/natives/?_0xA273060E).
+  - `function` - A function with signature `(vehicle: integer, i: integer) => boolean`.
+- `returns: integer[]` - An array of all vehicles, filtered by `vehicle_type` if provided.
 
 ##### getobjects
 
-Returns an array of all objects in the pool.
+Returns an array of all objects in the pool, filtered by `filter` if provided.
 
 ```lua
+---@param filter fun(object: integer, i: integer): boolean
 ---@return integer[]? objects
 function pools.getobjects()
 ```
 
-- `returns: integer[]` - An array of all objects.
+- `filter` - A function with signature `(object: integer, i: integer) => boolean`.
+- `returns: integer[]` - An array of all objects, filtered by `filter` if provided.
 
 ##### getclosestped
 
@@ -1123,7 +1133,7 @@ Returns the closest ped to a specified position, filtered by `ped_type` if provi
 
 ```lua
 ---@param check integer|vector|{x: number, y: number, z: number}|number[]?
----@param ped_type integer?
+---@param ped_type integer|(fun(ped: integer, i: integer): boolean)?
 ---@param radius number?
 ---@param excluding integer|integer[]?
 ---@return integer? ped, number? dist, integer[]? peds
@@ -1135,7 +1145,9 @@ function pools.getclosestped(check, ped_type, radius, excluding)
   - `table` - The table containing `x`, `y`, `z` and `w` keys.
   - `number[]` - The array containing the values.
   - `vector` - The vector to check.
-- `ped_type` - The ped type to filter by (client-side only).
+- `ped_type` - Can be either;
+  - `integer` - The ped type to filter by (client-side only). Found [here](https://docs.fivem.net/natives/?_0xFF059E1E4C01E63C).
+  - `function` - A function with signature `(ped: integer, i: integer) => boolean`.
 - `radius` - The radius to check within.
 - `excluding` - The ped or peds to ignore.
 - `returns: integer, number, integer[]` - The closest ped, the distance to the ped, and an array of all peds.
@@ -1146,7 +1158,7 @@ Returns the closest vehicle to a specified position, filtered by `vehicle_type` 
 
 ```lua
 ---@param check integer|vector|{x: number, y: number, z: number}|number[]?
----@param vehicle_type integer|string?
+---@param vehicle_type integer|string|(fun(vehicle: integer, i: integer): boolean)?
 ---@param radius number?
 ---@param excluding integer|integer[]?
 ---@return integer? vehicle, number? distance, integer[]? vehicles
@@ -1158,9 +1170,10 @@ function pools.getclosestvehicle(check, vehicle_type, radius, excluding)
   - `table` - The table containing `x`, `y`, `z` and `w` keys.
   - `number[]` - The array containing the values.
   - `vector` - The vector to check.
-- `vehicle_type` - The vehicle type to filter by, for;
-  - Client-side, this is the vehicle class.
-  - Server-side, this is the vehicle type.
+- `vehicle_type` - Can be either;
+  - `integer` - The vehicle class to filter by (client-side only). Found [here](https://docs.fivem.net/natives/?_0x29439776AAA00A62).
+  - `string` - The vehicle type to filter by (server-side only). Found [here](https://docs.fivem.net/natives/?_0xA273060E).
+  - `function` - A function with signature `(vehicle: integer, i: integer) => boolean`.
 - `radius` - The radius to check within.
 - `excluding` - The vehicle or vehicles to ignore.
 - `returns: integer, number, integer[]` - The closest vehicle, the distance to the vehicle, and an array of all vehicles.
@@ -1171,6 +1184,7 @@ Returns the closest object to a specified position, within a specified `radius`.
 
 ```lua
 ---@param check integer|vector|{x: number, y: number, z: number}|number[]?
+---@param filter (fun(object: integer, i: integer): boolean)?
 ---@param radius number?
 ---@param excluding integer|integer[]?
 ---@return integer? object, number? distance, integer[]? objects
@@ -1182,6 +1196,7 @@ function pools.getclosestobject(check, radius, excluding)
   - `table` - The table containing `x`, `y`, `z` and `w` keys.
   - `number[]` - The array containing the values.
   - `vector` - The vector to check.
+- `filter` - A function with signature `(object: integer, i: integer) => boolean`.
 - `radius` - The radius to check within.
 - `excluding` - The object or objects to ignore.
 - `returns: integer, number, integer[]` - The closest object, the distance to the object, and an array of all objects.
@@ -1193,14 +1208,15 @@ function pools.getclosestobject(check, radius, excluding)
 Returns an array of all pickups in the pool, filtered by `hash` if provided.
 
 ```lua
----@param hash string|number?
+---@param hash string|number|(fun(pickup: integer, i: integer): boolean)?
 ---@return integer[]? pickups
 function pools.getpickups(hash)
 ```
 
-- `hash` - The hash of the pickup to filter by, can be either;
-  - The name of the pickup, e.g. `prop_money_bag_01`.
-  - The hash of the pickup, e.g. `0x5099E8AF`.
+- `hash` - Can be either;
+  - `string` - The name of the pickup, e.g. `'PICKUP_WEAPON_PISTOL'`.
+  - `number` - The hash of the pickup, e.g. `4189041807` or \`PICKUP_WEAPON_PISTOL\`.
+  - `function` - A function with signature `(pickup: integer, i: integer) => boolean`.
 - `returns: integer[]` - An array of all pickups.
 
 ##### getclosestpickup
@@ -1209,7 +1225,7 @@ Returns the closest pickup to a specified position, filtered by `hash` if provid
 
 ```lua
 ---@param check integer|vector|{x: number, y: number, z: number}|number[]?
----@param hash string|number?
+---@param hash string|number|(fun(pickup: integer, i: integer): boolean)?
 ---@param radius number?
 ---@param excluding integer|integer[]?
 ---@return integer? pickup, number? distance, array? pickups
@@ -1221,9 +1237,10 @@ function pools.getclosestpickup(check, hash, radius, excluding)
   - `table` - The table containing `x`, `y`, `z` and `w` keys.
   - `number[]` - The array containing the values.
   - `vector` - The vector to check.
-- `hash` - The hash of the pickup to filter by, can be either;
-  - The name of the pickup, e.g. `prop_money_bag_01`.
-  - The hash of the pickup, e.g. `0x5099E8AF`.
+- `hash` - Can be either;
+  - `string` - The name of the pickup, e.g. `'PICKUP_WEAPON_PISTOL'`.
+  - `number` - The hash of the pickup, e.g. `4189041807` or \`PICKUP_WEAPON_PISTOL\`.
+  - `function` - A function with signature `(pickup: integer, i: integer) => boolean`.
 - `radius` - The radius to check within.
 - `excluding` - The pickup or pickups to ignore.
 - `returns: integer, number, integer[]` - The closest pickup, the distance to the pickup, and an array of all pickups.
@@ -1742,6 +1759,19 @@ function blips.bytype(type)
   - `7` - Radius.
 - `returns: integer[]` - An array of all blips with the type
 
+#### getblips
+
+Returns an array of all blips, filtered by `filter`.
+
+```lua
+---@param filter fun(blip: integer, i: integer): boolean
+---@return integer[] blip_ids
+function blips.getblips(filter)
+```
+
+- `filter` - A filter function with the signature `(ped: integer, index: integer): boolean`.
+- `returns: integer[]` - An array of all blips, that pass `filter`.
+
 #### getinfo
 
 Returns information about a blip.
@@ -1848,7 +1878,9 @@ function streaming.loadcollision(model)
 function streaming.async.loadcollision(model)
 ```
 
-- `model` - The model to load the collision for.
+- `model` - The model to load the collision for, can be either;
+  - `string` - The name of the model, e.g. `'prop_money_bag_01'`.
+  - `number` - The hash of the model, e.g. `0x5099E8AF` or \`prop_money_bag_01\`.
 - `returns: boolean` - Whether the collision was loaded.
 
 #### loadipl
@@ -1883,6 +1915,11 @@ function streaming.loadmodel(model)
 ---@return boolean loaded
 function streaming.async.loadmodel(model)
 ```
+
+- `model` - The model to load, can be either;
+  - `string` - The name of the model, e.g. `'prop_money_bag_01'`.
+  - `number` - The hash of the model, e.g. `0x5099E8AF` or \`prop_money_bag_01\`.
+- `returns: boolean` - Whether the model was loaded.
 
 #### loadptfx
 
