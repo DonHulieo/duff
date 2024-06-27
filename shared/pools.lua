@@ -10,7 +10,7 @@
 do
   local load, load_resource_file = load, LoadResourceFile
   local load_module = function(module) return load(load_resource_file('duff', 'shared/'..module..'.lua'), '@duff/shared/'..module..'.lua', 't', _ENV)() end
-  local array, vector = duff?.array or load_module('array'), duff?.vector or load_module('vector')
+  local array, vector = duff?.array or load_module 'array', duff?.vector or load_module 'vector'
   local filter = array.filter
   local to_vec, get_closest = vector.tovec, vector.getclosest
   local type = type

@@ -10,17 +10,17 @@
 ---@field getentityup fun(entity: integer): vector3 Returns the up vector of `entity`. <br> Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980).
 ---@field getoffsetfromentityinworldcoords fun(entity: integer, offset_x: number, offset_y: number, offset_z: number): vector3 Returns the world coordinates of `offset` from `entity`. <br> Credits go to: [draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297).
 do
-  local type = type
-  local string, table = string, table
-  local s_pack, s_unpack = string.pack, string.unpack
-  local t_unpack = table.unpack
-  local vector = vector
   local load, load_resource_file = load, LoadResourceFile
   local load_module = function(module) return load(load_resource_file('duff', 'shared/'..module..'.lua'), '@duff/shared/'..module..'.lua', 't', _ENV)() end
-  local does_entity_exist, get_coords, get_rot = DoesEntityExist, GetEntityCoords, GetEntityRotation
-  local array, math = duff?.array or load_module('array'), duff?.math or load_module('math')
+  local array, math = duff?.array or load_module 'array', duff?.math or load_module 'math'
+  local string, table = string, table
   local contains = array.contains
   local rad, cos, sin, huge = math.rad, math.cos, math.sin, math.huge
+  local s_pack, s_unpack = string.pack, string.unpack
+  ---@diagnostic disable-next-line: deprecated
+  local t_unpack = table.unpack or unpack
+  local vector = vector
+  local does_entity_exist, get_coords, get_rot = DoesEntityExist, GetEntityCoords, GetEntityRotation
   local is_server = IsDuplicityVersion() == 1
 
   ---@enum (key) vector_types

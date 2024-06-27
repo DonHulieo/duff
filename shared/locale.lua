@@ -7,8 +7,10 @@
 do
   local load, load_resource_file = load, LoadResourceFile
   local array = duff?.array or load(load_resource_file('duff', 'shared/array.lua'), '@duff/shared/array.lua', 't', _ENV)()
+  local table = table
   local reverse = array.reverse
-  local unpack = table.unpack
+  ---@diagnostic disable-next-line: deprecated
+  local unpack = table.unpack or unpack
   local tostring = tostring
   local FORMAT_CHARS = {c = 1, d = 1, E = 1, e = 1, f = 1, g = 1, G = 1, i = 1, o = 1, u = 1, X = 1, x = 1, s = 1, q = 1, ['%'] = 1}
   local default_locale = GetConvar('locale', 'en')
@@ -168,7 +170,7 @@ do
   local function load_file(resource, file)
     resource = resource or GetInvokingResource()
     file = file or ('locales/'..dialect) --[[@as string]]
-    local translations = safe_load(resource, file) and load(load_resource_file(resource, file..'.lua'))
+    local translations = safe_load(resource, file) and load(load_resource_file(resource, file..'.lua'), '@'..resource..'/'..file, 't', _ENV)
     if not translations then return end
     recursive_load(nil, translations())
   end

@@ -15,9 +15,9 @@ local function import(self, module)
   dir = not file and context..'/'..module..'.lua' or dir
   file = not file and load_resource_file(res, dir) or file
   if not file then return end
-  local chunk, err = load(file, '@'..res..'/'..dir, 't', _ENV)
-  if not chunk then return error('module not found ('..dir..')'..err, 2) end
-  self[module] = chunk()
+  local result, err = load(file, '@'..res..'/'..dir, 't', _ENV)
+  if not result or err then return error('module not found ('..dir..')', 2) end
+  self[module] = result()
   return self[module]
 end
 
