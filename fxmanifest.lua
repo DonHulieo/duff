@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'DonHulieo'
 description 'Don\'s Utility Functions for FiveM'
-version '1.1.1'
+version '1.1.2'
 url 'https://github.com/DonHulieo/duff'
 
 local function is_res_pres(res)
