@@ -8,12 +8,13 @@
 ---@field getinfo fun(blip: integer): {alpha: integer, coords: vector3, colour: integer, display: integer, fade: boolean, hud_colour: integer, type: integer, rotation: number, is_shortrange: boolean}? Returns information about `blip`.
 ---@field remove fun(blips: integer|integer[]) Removes `blips` from the map. <br> If `blips` is a number, it removes that blip. <br> If `blips` is an array, it removes all blips in the array.
 do
-  local require = require
-  ---@module 'duff.shared.array'
-  local array = require 'duff.shared.array'
+  local load, load_resource_file = load, LoadResourceFile
+  local load_module = function(module) return load(load_resource_file('duff', 'shared/'..module..'.lua'), '@duff/shared/'..module..'.lua', 't', _ENV)() end
+  local array, vector = duff?.array or load_module('array'), duff?.vector or load_module('vector')
   local push, filter = array.push, array.filter
+  local get_closest = vector.getclosest
   local does_blip_exist = DoesBlipExist
-  local get_closest = require('duff.shared.vector').getclosest
+  local type, error = type, error
 
   ---@return integer[] blip_ids An array of all active blip handles.
   local function get_all() -- Credits go to: [negbook](https://github.com/negbook/nbk_blips)

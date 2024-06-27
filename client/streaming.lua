@@ -13,8 +13,10 @@
 ---@field async.loadptfx fun(fx: string): boolean? Loads a particle effect asset without blocking the main thread.
 do
   local game_timer = GetGameTimer
-  local require = require
-  local timer = require('duff.shared.math').timer
+  local load, load_resource_file = load, LoadResourceFile
+  local load_module = function(module) return load(load_resource_file('duff', 'shared/'..module..'.lua'), '@duff/shared/'..module..'.lua', 't', _ENV)() end
+  local async, math = duff?.async or load_module('async'), duff?.math or load_module('math')
+  local timer = math.timer
   local type, error, tostring = type, error, tostring
   local does_anim_dict_exist, has_anim_dict_loaded, request_anim_dict = DoesAnimDictExist, HasAnimDictLoaded, RequestAnimDict
   local has_anim_set_loaded, request_anim_set = HasAnimSetLoaded, RequestAnimSet
@@ -22,8 +24,6 @@ do
   local is_ipl_active, request_ipl = IsIplActive, RequestIpl
   local is_model_in_cd, is_model_in_valid, has_model_loaded, request_model = IsModelInCdimage, IsModelValid, HasModelLoaded, RequestModel
   local has_named_ptfx_asset_loaded, request_named_ptfx_asset = HasNamedPtfxAssetLoaded, RequestNamedPtfxAsset
-  ---@module 'duff.shared.async'
-  local async = require 'duff.shared.async'
 
   ---@param asset string|number The asset to load.
   ---@param loaded function The function to check if the asset is loaded.
