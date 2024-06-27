@@ -8,15 +8,15 @@
 ---@field getclosestobject fun(check: integer|vector|{x: number, y: number, z: number}|number[]?, filter: (fun(object: integer, index: integer): boolean)?, radius: number?, excluding: integer|integer[]): integer?, number?, integer[]? Finds the closest object to `check`. <br> `check` can be an entity, vector or a table. <br> `filter` is a function used to filter the objects. <br> `radius` is the maximum distance within. <br> `excluding` is the object or array of objects to exclude from the search.
 ---@field getclosestpickup fun(check: integer|vector|{x: number, y: number, z: number}|number[]?, hash: string|number|(fun(pickup: integer, index: integer): boolean)?, radius: number?, excluding: integer|integer[]): integer?, number?, integer[]? Finds the closest pickup to `check`. <br> `check` can be an entity, vector or a table. <br> `hash` can be a function, a string or a number. <br> If `hash` is a function, it will be used to filter the pickups. <br> If `hash` is a string or number, it will filter the pickups by their hash. <br> **Note:** This is a client-only function.
 do
-  local require = require
-  local filter = require('duff.shared.array').filter
+  local load, load_resource_file = load, LoadResourceFile
+  local load_module = function(module) return load(load_resource_file('duff', 'shared/'..module..'.lua'), '@duff/shared/'..module..'.lua', 't', _ENV)() end
+  local array, vector = duff?.array or load_module('array'), duff?.vector or load_module('vector')
+  local filter = array.filter
+  local to_vec, get_closest = vector.tovec, vector.getclosest
   local type = type
   local get_pool, get_coords = GetGamePool, GetEntityCoords
   local is_server = IsDuplicityVersion() == 1
   local all_peds, all_vehs, all_objs = is_server and GetAllPeds or nil, is_server and GetAllVehicles or nil, is_server and GetAllObjects or nil
-  ---@module 'duff.shared.vector'
-  local vector = require('duff.shared.vector')
-  local to_vec, get_closest = vector.tovec, vector.getclosest
 
   ---@param fn any The value to check if it is a function.
   ---@return boolean is_func the value is a function or not.

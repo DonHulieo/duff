@@ -5,11 +5,11 @@
 ---@field translate fun(key: string, data: table?): string Translates `key` with optional `data`. <br> Returns the translation if found, or `data.default` if not.
 ---@field t fun(key: string, data: table?): string Alias for `translate`.
 do
-  local require = require
-  local reverse = require('duff.shared.array').reverse
+  local load, load_resource_file = load, LoadResourceFile
+  local array = duff?.array or load(load_resource_file('duff', 'shared/array.lua'), '@duff/shared/array.lua', 't', _ENV)()
+  local reverse = array.reverse
   local unpack = table.unpack
   local tostring = tostring
-  local load_resource_file = LoadResourceFile
   local FORMAT_CHARS = {c = 1, d = 1, E = 1, e = 1, f = 1, g = 1, G = 1, i = 1, o = 1, u = 1, X = 1, x = 1, s = 1, q = 1, ['%'] = 1}
   local default_locale = GetConvar('locale', 'en')
   local dialect = default_locale:gsub('-.+', '')

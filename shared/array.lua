@@ -25,7 +25,6 @@ do
   local table_insert, table_remove, table_sort, table_concat, table_type, next = table.insert, table.remove, table.sort, table.concat, table.type, next
   local type, error = type, error
   local math_min = math.min
-  local require = require
 
   ---@param tbl any[]|table The table to check.
   ---@return boolean? is_array Whether the table is an array.

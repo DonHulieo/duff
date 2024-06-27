@@ -15,11 +15,11 @@ do
   local s_pack, s_unpack = string.pack, string.unpack
   local t_unpack = table.unpack
   local vector = vector
-  local require = require
+  local load, load_resource_file = load, LoadResourceFile
+  local load_module = function(module) return load(load_resource_file('duff', 'shared/'..module..'.lua'), '@duff/shared/'..module..'.lua', 't', _ENV)() end
   local does_entity_exist, get_coords, get_rot = DoesEntityExist, GetEntityCoords, GetEntityRotation
-  ---@module 'duff.shared.math'
-  local math = require 'duff.shared.math'
-  local contains = require('duff.shared.array').contains
+  local array, math = duff?.array or load_module('array'), duff?.math or load_module('math')
+  local contains = array.contains
   local rad, cos, sin, huge = math.rad, math.cos, math.sin, math.huge
   local is_server = IsDuplicityVersion() == 1
 
