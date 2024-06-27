@@ -7,10 +7,10 @@
 ---@field addzoneevent fun(event: string, zone_id: integer|vector3|{x: number, y: number, z: number}|number[]|string, onEnter: fun(player: string, coords: vector3)?, onExit: fun(player: string, coords: vector3, disconnected: boolean?)?, time: integer?, player: string?) Adds an event to a zone. <br> `zone_id` can be vector3, a table with `x`, `y`, `z`, and `w` keys, an array with the same values, the name or the index of the zone. <br> `onEnter` is the function to call when a player enters the zone. <br> `onExit` is the function to call when a player exits the zone. <br> `time` is the time to wait between checks in milliseconds. <br> `player` is the player to add the event for.
 ---@field removezoneevent fun(event: string) Removes the event from the zone. <br> `event` is the name of the event.
 do
-  local ZONES = json.decode(LoadResourceFile('duff', 'data/zones.json'))
-  ---@module 'duff.shared.vector'
-  local vecmath = require 'duff.shared.vector'
-  local to_vec, is_vec = vecmath.tovec, vecmath.isvec
+  local load, load_resource_file = load, LoadResourceFile
+  local vector = duff?.vector or load(load_resource_file('duff', 'shared/vector.lua'), '@duff/shared/vector.lua', 't', _ENV)()
+  local to_vec, is_vec = vector.tovec, vector.isvec
+  local ZONES = json.decode(load_resource_file('duff', 'data/zones.json'))
   local current_resource = GetCurrentResourceName()
   local Listeners, Players = {}, GetPlayers()
 

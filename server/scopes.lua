@@ -5,9 +5,16 @@
 ---@field createsyncedscopeevent fun(event: string, owner: number|integer, time: integer?, duration: integer?, ...: any) Creates a synced scope event that triggers the `event` for the owner and all the players in the same scope as the owner. <br> The event will be triggered every `time` milliseconds and will last for `duration` milliseconds. <br> The `...` arguments are the arguments that will be passed to the event. <br> The event will be removed after `duration` milliseconds if `duration` is provided.
 ---@field removesyncedscopeevent fun(event: string) Removes the synced scope event with the name `event`.
 do
-  local tostring, unpack = tostring, table.unpack
-  local timer = require('duff.shared.math').timer
-  local client_event, create_thread, wait = TriggerLatentClientEvent, CreateThread, Wait
+  local load, load_resource_file = load, LoadResourceFile
+  local math = duff?.math or load(load_resource_file('duff', 'shared/math.lua'), '@duff/shared/math.lua', 't', _ENV)()
+  local Citizen, table = Citizen, table
+  local timer = math.timer
+  local new_thread, wait = Citizen.CreateThread, Citizen.Wait
+  ---@diagnostic disable-next-line: deprecated
+  local unpack = table.unpack or unpack
+  local type, error = type, error
+  local tostring = tostring
+  local client_event = TriggerLatentClientEvent
   local game_timer = GetGameTimer
   local current_resource = GetCurrentResourceName()
   local Scopes = {}
@@ -87,7 +94,7 @@ do
     local args = {...}
     local event_start = game_timer()
     time = time or 1000
-    create_thread(function()
+    new_thread(function()
       while Scopes.Synced[event] do
         wait(time)
         if duration and timer(event_start, duration) then Scopes.Synced[event] = nil end
