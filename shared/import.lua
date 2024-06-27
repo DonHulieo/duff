@@ -1,7 +1,8 @@
-local res_version = GetResourceMetadata('duff', 'version', 0)
-local url = GetResourceMetadata('duff', 'url', 0)
-local des = GetResourceMetadata('duff', 'description', 0)
-local export = exports.duff
+local res = 'duff'
+local res_version = GetResourceMetadata(res, 'version', 0)
+local url = GetResourceMetadata(res, 'url', 0)
+local des = GetResourceMetadata(res, 'description', 0)
+local export = exports[res]
 local _require = require
 local require = function(...) return export['require'](nil, ...) end
 local is_server = IsDuplicityVersion() == 1
@@ -41,5 +42,5 @@ else
   duff.scopes = require 'duff.server.scopes'
   duff.zones = require 'duff.server.map_zones'
 end
-_ENV.duff = duff
+_ENV[res] = duff
 return duff
