@@ -415,7 +415,7 @@ do
     Core = get_core_object()
     local result
     if is_server then
-      player = validate_source(player or source)
+      player = validate_source('triggercallback', player or source)
       if LIB == 'ox' then
         Lib = get_lib_object()
         result = Lib.callback(name, player, cb, ...)
@@ -517,7 +517,7 @@ do
   ---@return boolean added Whether the item was added to the `player`.
   local function add_item(player, item, amount) -- **Note**: This is a server-only function.
     if not is_server then error('called a server only function \'additem\'', 2) end
-    player = validate_source(player or source)
+    player = validate_source('additem', player or source)
     if not get_item(item) then error('bad argument #2 to \'additem\' (item \''..item..'\' not valid)', 2) end
     Inv = get_inv_object()
     local added = false
@@ -541,7 +541,7 @@ do
   ---@return boolean removed Whether the item was removed from the `player`.
   local function remove_item(player, item, amount) -- **Note**: This is a server-only function.
     if not is_server then error('called a server only function \'removeitem\'', 2) end
-    player = validate_source(player or source)
+    player = validate_source('removeitem', player or source)
     if not get_item(item) then error('bad argument #2 to \'removeitem\' (item \''..item..'\' not valid)', 2) end
     Inv = get_inv_object()
     local removed = false
