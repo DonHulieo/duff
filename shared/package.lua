@@ -1,5 +1,5 @@
 ---@class CPackage
----@field private path './*.lua;./*/init.lua;./*/import.lua'
+---@field private path './?.lua;./?/init.lua;./?/shared/import.lua;./?/shared.lua;./?/server.lua;./?/client.lua'
 ---@field private preload {[string]: function}
 ---@field private loaded {env: table}
 ---@field private packages {[string]: {env: table, contents: function|{[string]: function}, exported: function|{[string]: function}}}
@@ -18,7 +18,7 @@ do
   local curr_pkg = ''
 
   local package = {
-    path = './*.lua;./*/init.lua;./*/import.lua',
+    path = './?.lua;./?/init.lua;./?/shared/import.lua;./?/shared.lua;./?/server.lua;./?/client.lua',
     preload = {},
     loaded = {env = setmetatable({}, {__index = packages})}
   }
@@ -33,7 +33,7 @@ do
     local errmsg = nil
     pattern = pattern or package.path
     for subpath in pattern:gmatch('[^;]+') do
-      local file = subpath:gsub('%*', mod_path)
+      local file = subpath:gsub('%?', mod_path)
       resource, path = file:match('^./%@?(%w+%_?%w+)'), file:match('^./%@?%w+%_?%w+(.*)')
       contents = LoadResourceFile(resource, path)
       if contents then
@@ -49,7 +49,7 @@ do
           end
           break
         end
-        errmsg = (errmsg or '')..'\n\t'..err
+        errmsg = (errmsg or '')..(err and '\n\t'..err or '')
       end
     end
     return package.preload[mod_path] and mod_path or false, errmsg
@@ -76,7 +76,7 @@ do
     function(mod_name, env)
       local mod_path, err = search_path(mod_name)
       if mod_path and not err then return package.preload[mod_path] and package.preload[mod_path](env), mod_path end
-      return false, 'module \''..mod_name..'\' not found\n\t'..(err or '')
+      return false, 'module \''..mod_name..'\' not found'..(err and '\n\t'..err or '')
     end
   }
 
@@ -84,14 +84,15 @@ do
   ---@return function|{[string]: function}? module Returns the module if it was found and loaded.
   local function require(mod_name)
     if type(mod_name) ~= 'string' then error('bad argument #1 to \'require\' (string expected, got '..type(mod_name)..')', 2) end
-    local errmsg = ''
+    local errmsg = 'bad argument #1 to \'require\' (module \''..mod_name..'\' not found)'
     local module = packages[mod_name]?.exported
     if module ~= nil then return module end
     for i = 1, #searchers do
       local result, err = searchers[i](mod_name)
       if result then
-        packages[err].exported = result
-        return packages[err].exported
+        curr_pkg = err
+        packages[curr_pkg].exported = result
+        return packages[curr_pkg].exported
       elseif err then
         errmsg = errmsg..'\n\t'..err
       end
@@ -109,7 +110,7 @@ do
       module, errmsg = searchers[i](mod_name, _G)
       if module ~= false then mod_name = errmsg; errmsg = nil break end
     end
-    if module == false then error('module \''..mod_name..'\' not found\n\t'..errmsg, 2) end
+    if module == false then error('bad argument #1 to \'import\' (module \''..mod_name..'\' not found)\n\t'..errmsg, 2) end
     curr_pkg = mod_name
     if module then
       local mod_type = type(module)

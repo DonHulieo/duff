@@ -9,7 +9,7 @@ Well, this is the solution for you! This is a collection of *optimised utility m
 
 ## Features
 
-- **Require:** Emulates Lua's default require function, using package.path, package.preload and package.loaded. Also precaches all modules labled as `file` in the `fxmanifest.lua` and any modules that are imported using the `require` function.
+- **Package** A recreation of the Lua `package` library in pure Lua, allowing you to import modules using `require`, import environments using and export their methods using `import` and and setting a global namespace for your modules with `as`.
 - **Array:** A module for the creation and manipulation of consecutive integer indexed arrays, providing a number of Functional Programming methods.
 - **Async:** Allows you to call and return functions asynchronously, using promises.
 - **Bench:** Allows you to benchmark the performance of a function, and returns the time taken to execute the function in milliseconds.
@@ -32,7 +32,6 @@ Well, this is the solution for you! This is a collection of *optimised utility m
   - [Credits](#credits)
   - [Installation](#installation)
   - [Documentation](#documentation)
-    - [Require](#require)
     - [Check Version](#check-version)
     - [Importing CDuff](#importing-cduff)
     - [CArray](#carray)
@@ -91,18 +90,6 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [load](#load)
       - [loadfile](#loadfile)
       - [translate](#translate)
-    - [CPools](#cpools)
-      - [Importing CPools](#importing-cpools)
-      - [Shared Functions (pools)](#shared-functions-pools)
-        - [getpeds](#getpeds)
-        - [getvehicles](#getvehicles)
-        - [getobjects](#getobjects)
-        - [getclosestped](#getclosestped)
-        - [getclosestvehicle](#getclosestvehicle)
-        - [getclosestobject](#getclosestobject)
-      - [Client Functions (pools)](#client-functions-pools)
-        - [getpickups](#getpickups)
-        - [getclosestpickup](#getclosestpickup)
     - [CMath](#cmath)
       - [Importing the CMath](#importing-the-cmath)
       - [between](#between)
@@ -118,6 +105,25 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [tofloat](#tofloat)
       - [toint](#toint)
       - [toratio](#toratio)
+    - [CPackage](#cpackage)
+      - [Importing CPackage](#importing-cpackage)
+      - [searchpath](#searchpath)
+      - [require](#require)
+      - [import](#import)
+      - [as](#as)
+        - [as - Example](#as---example)
+    - [CPools](#cpools)
+      - [Importing CPools](#importing-cpools)
+      - [Shared Functions (pools)](#shared-functions-pools)
+        - [getpeds](#getpeds)
+        - [getvehicles](#getvehicles)
+        - [getobjects](#getobjects)
+        - [getclosestped](#getclosestped)
+        - [getclosestvehicle](#getclosestvehicle)
+        - [getclosestobject](#getclosestobject)
+      - [Client Functions (pools)](#client-functions-pools)
+        - [getpickups](#getpickups)
+        - [getclosestpickup](#getclosestpickup)
     - [CVector](#cvector)
       - [Importing CVector](#importing-cvector)
       - [Shared Functions (vector)](#shared-functions-vector)
@@ -196,23 +202,6 @@ Well, this is the solution for you! This is a collection of *optimised utility m
 
 ## Documentation
 
-### Require
-
-Require is a function that allows you to import modules, emulating Lua Default require function, using package.path, package.preload and package.loaded. It also precaches all modules labled as `file` in the `fxmanifest.lua` file and any modules that are imported using the `require` function.
-
-```lua
--- Using the `require` export
----@param path string
----@return function|{[string]: any} module
-exports.duff:require(path)
-
--- Using '@duff/shared/import.lua' in your `fxmanifest.lua`
-duff.require(path)
-```
-
-- `path` - The name of the module in dot notation, or a path relative to the resource root.
-- `returns: function|{[string]: any}` - returns a function or the module as a dictionary of functions.
-
 ### Check Version
 
 Checks a resource's version against the latest released version on GitHub.
@@ -249,9 +238,9 @@ end)
 ### Importing CDuff
 
 ```lua
--- Using the `require` export
+-- Using the `require` function from `ox_lib`
 ---@module 'duff.shared.import'
-local duff = exports.duff:require 'duff.shared.import'
+local duff = lib.require '@duff.shared.import'
 
 -- Using '@duff/shared/import.lua' in your `fxmanifest.lua`
 shared_script '@duff/shared/import.lua'
@@ -266,9 +255,9 @@ CArray is a class for the creation and manipulation of consecutive integer index
 #### Importing CArray
 
 ```lua
--- Using the `require` export
+-- Using the `require` function from `ox_lib`
 ---@module 'duff.shared.array'
-local array = exports.duff:require 'duff.shared.array'
+local array = lib.require '@duff.shared.array'
 
 -- Attaching array to a local variable from CDuff
 local array = duff.array
@@ -593,11 +582,13 @@ async is a function that allows you to call and return functions asynchronously,
 
 #### Importing async
 
-This module is not exposed in the duff object, and must be imported using the `require` function.
-
 ```lua
+-- Using the `require` function from `ox_lib`
 ---@module 'duff.shared.async'
-local async = exports.duff:require 'duff.shared.async'
+local async = lib.require '@duff.shared.async'
+
+-- Attaching async to a local variable from CDuff
+local async = duff.async
 ```
 
 #### async (function)
@@ -621,11 +612,13 @@ bench is a function that allows you to benchmark the performance of a function, 
 
 #### Importing bench
 
-This module is not exposed in the duff object, and must be imported using the `require` function.
-
 ```lua
+-- Using the `require` function from `ox_lib`
 ---@module 'duff.shared.bench'
-local bench = exports.duff:require 'duff.shared.bench'
+local bench = lib.require '@duff.shared.bench'
+
+-- Attaching bench to a local variable from CDuff
+local bench = duff.bench
 ```
 
 #### bench (function)
@@ -650,9 +643,9 @@ CBridge is a class that provides common functions between different frameworks a
 #### Importing CBridge
 
 ```lua
--- Using the `require` export
+-- Using the `require` function from `ox_lib`
 ---@module 'duff.shared.bridge'
-local bridge = exports.duff:require 'duff.shared.bridge'
+local bridge = lib.require '@duff.shared.bridge'
 
 -- Attaching the bridge to a local variable from CDuff
 local bridge = duff.bridge
@@ -940,10 +933,6 @@ function bridge.removelocalentity(entities)
 
 CLocale is an object containing functions for localisation and translation. It's based on the i18n.lua library by kikito [ref](README.md#credits), and provides a simple way to manage translations in your FiveM scripts.
 
-*This is a shared module, and can be used on both the client, server and shared enviroment.*
-
-#### Importing CLocale
-
 The module automatically uses the servers' convars to determine locale , both dialect and region. If the convars (`sets locale`) are not set, it defaults to `en`.
 
 - Interpolation
@@ -956,10 +945,14 @@ The module automatically uses the servers' convars to determine locale , both di
   - The language files are stored in the `locales` folder in the resource root.
   - The files are named after the locale they represent, e.g. `en.lua`, `en-US.lua`, `es.lua`.
 
+*This is a shared module, and can be used on both the client, server and shared enviroment.*
+
+#### Importing CLocale
+
 ```lua
--- Using the `require` export
+-- Using the `require` function from `ox_lib`
 ---@module 'duff.shared.locale'
-local locale = exports.duff:require 'duff.shared.locale'
+local locale = lib.require '@duff.shared.locale'
 
 -- Attaching the locale to a local variable from CDuff
 local locale = duff.locale
@@ -1064,187 +1057,6 @@ function locale.translate(key, data)
 - `data` - A table containing data to replace placeholders in the translation.
 - `returns: string` - The translated value.
 
-### CPools
-
-CPools is an object containing functions for managing the game's entity pools. It provides functions for getting the closest entity of a specific type, and getting all entities of a specific type.
-
-*This is a shared module, but has functions which are exclusive to their respective enviroments.*
-
-#### Importing CPools
-
-```lua
--- Using the `require` export
----@module 'duff.client.pools'
-local pools = exports.duff:require 'duff.client.pools'
-
--- Attaching the pools to a local variable from CDuff
-local pools = duff.pools
-```
-
-#### Shared Functions (pools)
-
-##### getpeds
-
-Returns an array of all peds in the pool, filtered by `ped_type` if provided.
-
-```lua
----@param ped_type integer|(fun(ped: integer, i: integer): boolean)?
----@return integer[] peds
-function pools.getpeds(ped_type)
-```
-
-- `ped_type` - Can be either;
-  - `integer` - The ped type to filter by (client-side only). Found [here](https://docs.fivem.net/natives/?_0xFF059E1E4C01E63C).
-  - `function` - A function with signature `(ped: integer, i: integer) => boolean`.
-- `returns: integer[]` - An array of all peds, filtered by `ped_type` if provided.
-
-##### getvehicles
-
-Returns an array of all vehicles in the pool, filtered by `vehicle_type` if provided.
-
-```lua
----@param vehicle_type integer|string|(fun(vehicle: integer, i: integer): boolean)?
----@return integer[]? vehicles
-function pools.getvehicles(vehicle_type)
-```
-
-- `vehicle_type` - Can be either;
-  - `integer` - The vehicle class to filter by (client-side only). Found [here](https://docs.fivem.net/natives/?_0x29439776AAA00A62).
-  - `string` - The vehicle type to filter by (server-side only). Found [here](https://docs.fivem.net/natives/?_0xA273060E).
-  - `function` - A function with signature `(vehicle: integer, i: integer) => boolean`.
-- `returns: integer[]` - An array of all vehicles, filtered by `vehicle_type` if provided.
-
-##### getobjects
-
-Returns an array of all objects in the pool, filtered by `filter` if provided.
-
-```lua
----@param filter fun(object: integer, i: integer): boolean
----@return integer[]? objects
-function pools.getobjects()
-```
-
-- `filter` - A function with signature `(object: integer, i: integer) => boolean`.
-- `returns: integer[]` - An array of all objects, filtered by `filter` if provided.
-
-##### getclosestped
-
-Returns the closest ped to a specified position, filtered by `ped_type` if provided, and within a specified `radius`.
-
-```lua
----@param check integer|vector|{x: number, y: number, z: number}|number[]?
----@param ped_type integer|(fun(ped: integer, i: integer): boolean)?
----@param radius number?
----@param excluding integer|integer[]?
----@return integer? ped, number? dist, integer[]? peds
-function pools.getclosestped(check, ped_type, radius, excluding)
-```
-
-- `check` - The value to check, can be;
-  - `integer` - The entity to get the position of.
-  - `table` - The table containing `x`, `y`, `z` and `w` keys.
-  - `number[]` - The array containing the values.
-  - `vector` - The vector to check.
-- `ped_type` - Can be either;
-  - `integer` - The ped type to filter by (client-side only). Found [here](https://docs.fivem.net/natives/?_0xFF059E1E4C01E63C).
-  - `function` - A function with signature `(ped: integer, i: integer) => boolean`.
-- `radius` - The radius to check within.
-- `excluding` - The ped or peds to ignore.
-- `returns: integer, number, integer[]` - The closest ped, the distance to the ped, and an array of all peds.
-
-##### getclosestvehicle
-
-Returns the closest vehicle to a specified position, filtered by `vehicle_type` if provided, and within a specified `radius`.
-
-```lua
----@param check integer|vector|{x: number, y: number, z: number}|number[]?
----@param vehicle_type integer|string|(fun(vehicle: integer, i: integer): boolean)?
----@param radius number?
----@param excluding integer|integer[]?
----@return integer? vehicle, number? distance, integer[]? vehicles
-function pools.getclosestvehicle(check, vehicle_type, radius, excluding)
-```
-
-- `check` - The value to check, can be;
-  - `integer` - The entity to get the position of.
-  - `table` - The table containing `x`, `y`, `z` and `w` keys.
-  - `number[]` - The array containing the values.
-  - `vector` - The vector to check.
-- `vehicle_type` - Can be either;
-  - `integer` - The vehicle class to filter by (client-side only). Found [here](https://docs.fivem.net/natives/?_0x29439776AAA00A62).
-  - `string` - The vehicle type to filter by (server-side only). Found [here](https://docs.fivem.net/natives/?_0xA273060E).
-  - `function` - A function with signature `(vehicle: integer, i: integer) => boolean`.
-- `radius` - The radius to check within.
-- `excluding` - The vehicle or vehicles to ignore.
-- `returns: integer, number, integer[]` - The closest vehicle, the distance to the vehicle, and an array of all vehicles.
-
-##### getclosestobject
-
-Returns the closest object to a specified position, within a specified `radius`.
-
-```lua
----@param check integer|vector|{x: number, y: number, z: number}|number[]?
----@param filter (fun(object: integer, i: integer): boolean)?
----@param radius number?
----@param excluding integer|integer[]?
----@return integer? object, number? distance, integer[]? objects
-function pools.getclosestobject(check, radius, excluding)
-```
-
-- `check` - The value to check, can be;
-  - `integer` - The entity to get the position of.
-  - `table` - The table containing `x`, `y`, `z` and `w` keys.
-  - `number[]` - The array containing the values.
-  - `vector` - The vector to check.
-- `filter` - A function with signature `(object: integer, i: integer) => boolean`.
-- `radius` - The radius to check within.
-- `excluding` - The object or objects to ignore.
-- `returns: integer, number, integer[]` - The closest object, the distance to the object, and an array of all objects.
-
-#### Client Functions (pools)
-
-##### getpickups
-
-Returns an array of all pickups in the pool, filtered by `hash` if provided.
-
-```lua
----@param hash string|number|(fun(pickup: integer, i: integer): boolean)?
----@return integer[]? pickups
-function pools.getpickups(hash)
-```
-
-- `hash` - Can be either;
-  - `string` - The name of the pickup, e.g. `'PICKUP_WEAPON_PISTOL'`.
-  - `number` - The hash of the pickup, e.g. `4189041807` or \`PICKUP_WEAPON_PISTOL\`.
-  - `function` - A function with signature `(pickup: integer, i: integer) => boolean`.
-- `returns: integer[]` - An array of all pickups.
-
-##### getclosestpickup
-
-Returns the closest pickup to a specified position, filtered by `hash` if provided, and within a specified `radius`.
-
-```lua
----@param check integer|vector|{x: number, y: number, z: number}|number[]?
----@param hash string|number|(fun(pickup: integer, i: integer): boolean)?
----@param radius number?
----@param excluding integer|integer[]?
----@return integer? pickup, number? distance, array? pickups
-function pools.getclosestpickup(check, hash, radius, excluding)
-```
-
-- `check` - The value to check, can be;
-  - `integer` - The entity to get the position of.
-  - `table` - The table containing `x`, `y`, `z` and `w` keys.
-  - `number[]` - The array containing the values.
-  - `vector` - The vector to check.
-- `hash` - Can be either;
-  - `string` - The name of the pickup, e.g. `'PICKUP_WEAPON_PISTOL'`.
-  - `number` - The hash of the pickup, e.g. `4189041807` or \`PICKUP_WEAPON_PISTOL\`.
-  - `function` - A function with signature `(pickup: integer, i: integer) => boolean`.
-- `radius` - The radius to check within.
-- `excluding` - The pickup or pickups to ignore.
-- `returns: integer, number, integer[]` - The closest pickup, the distance to the pickup, and an array of all pickups.
-
 ### CMath
 
 CMath is an object containing some useful math functions. Most notably, it contains a `seedrng` function which generates a random seed based on the current time, and a `random` function which generates a random number between two values which should be an improvement over the default Lua pseudo-random number generator.
@@ -1256,9 +1068,9 @@ It also imports the default Lua math functions, so you can use it as a drop-in r
 #### Importing the CMath
 
 ```lua
--- Using the `require` export
+-- Using the `require` function from `ox_lib`
 ---@module 'duff.shared.math'
-local math = exports.duff:require 'duff.shared.math'
+local math = lib.require '@duff.shared.math'
 
 -- Attaching the math to a local variable from CDuff
 local math = duff.math
@@ -1458,6 +1270,266 @@ function math.toratio(value, precision)
   - `1e-10 | 0.0000000001` is used.
 - `returns: integer, integer` - The rational number.
 
+### CPackage
+
+CPackage is a pure Lua implementation of  the `package` library in Lua, providing a way to load modules from a specific path and cache them for future use.
+
+*This is a shared module, and can be used on both the client, server and shared enviroment.*
+
+#### Importing CPackage
+
+```lua
+-- Using the `require` function from `ox_lib`
+---@module 'duff.shared.package'
+local package = lib.require '@duff.shared.package'
+
+-- Attaching the package to a local variable from CDuff
+local package = duff.package
+```
+
+#### searchpath
+
+Searches for a module in a specific path and returns the path to the module.
+
+```lua
+---@param name string
+---@param pattern string
+---@return string path, string errmsg
+function package.searchpath(name, pattern)
+```
+
+- `name` - The name of the module to search for. This has to be a dot-separated path from resource to module (e.g. `duff.shared.locale`).
+- `pattern` - The pattern to search for, it should contain a `?` which will be replaced by the module name.
+- `returns: string, string` - The path to the module, or the tried path and an error message.
+
+#### require
+
+Requires a module from a specific path and caches it for future use.
+
+```lua
+---@param name string
+---@return function|{[string]: any} module
+function package.require(name)
+```
+
+- `name` - The name of the module to require. This has to be a dot-separated path from resource to module (e.g. `duff.shared.locale`).
+- `returns: function|{[string]: any}` - The module as a dictionary of functions, or the module function.
+
+#### import
+
+Imports a file environment and if it returns a module, allows exporting specific functions from the module.
+
+```lua
+---@param path string
+---@param methods string[]
+---@return {string: any}? module
+function package.import(path, methods)
+```
+
+- `path` - The path to the module to import. This has to be a dot-separated path from resource to module (e.g. `duff.shared.locale`).
+- `methods` - The methods to export from the module.
+- `returns: {string: any}?` - The module as a dictionary of functions, the module function or nil if the file doesn't return a module.
+
+#### as
+
+Changes the name of the last module required or imported.
+
+```lua
+---@param name string
+function package.as(name)
+```
+
+- `name` - The new name of the module.
+
+##### as - Example
+
+```lua
+package.require 'duff.shared.locale' package.as 'locale' ---@cast locale CLocale
+
+locale.translate('welcome', {name = 'John'})
+```
+
+### CPools
+
+CPools is an object containing functions for managing the game's entity pools. It provides functions for getting the closest entity of a specific type, and getting all entities of a specific type.
+
+*This is a shared module, but has functions which are exclusive to their respective enviroments.*
+
+#### Importing CPools
+
+```lua
+-- Using the `require` function from `ox_lib`
+---@module 'duff.client.pools'
+local pools = lib.require '@duff.client.pools'
+
+-- Attaching the pools to a local variable from CDuff
+local pools = duff.pools
+```
+
+#### Shared Functions (pools)
+
+##### getpeds
+
+Returns an array of all peds in the pool, filtered by `ped_type` if provided.
+
+```lua
+---@param ped_type integer|(fun(ped: integer, i: integer): boolean)?
+---@return integer[] peds
+function pools.getpeds(ped_type)
+```
+
+- `ped_type` - Can be either;
+  - `integer` - The ped type to filter by (client-side only). Found [here](https://docs.fivem.net/natives/?_0xFF059E1E4C01E63C).
+  - `function` - A function with signature `(ped: integer, i: integer) => boolean`.
+- `returns: integer[]` - An array of all peds, filtered by `ped_type` if provided.
+
+##### getvehicles
+
+Returns an array of all vehicles in the pool, filtered by `vehicle_type` if provided.
+
+```lua
+---@param vehicle_type integer|string|(fun(vehicle: integer, i: integer): boolean)?
+---@return integer[]? vehicles
+function pools.getvehicles(vehicle_type)
+```
+
+- `vehicle_type` - Can be either;
+  - `integer` - The vehicle class to filter by (client-side only). Found [here](https://docs.fivem.net/natives/?_0x29439776AAA00A62).
+  - `string` - The vehicle type to filter by (server-side only). Found [here](https://docs.fivem.net/natives/?_0xA273060E).
+  - `function` - A function with signature `(vehicle: integer, i: integer) => boolean`.
+- `returns: integer[]` - An array of all vehicles, filtered by `vehicle_type` if provided.
+
+##### getobjects
+
+Returns an array of all objects in the pool, filtered by `filter` if provided.
+
+```lua
+---@param filter fun(object: integer, i: integer): boolean
+---@return integer[]? objects
+function pools.getobjects()
+```
+
+- `filter` - A function with signature `(object: integer, i: integer) => boolean`.
+- `returns: integer[]` - An array of all objects, filtered by `filter` if provided.
+
+##### getclosestped
+
+Returns the closest ped to a specified position, filtered by `ped_type` if provided, and within a specified `radius`.
+
+```lua
+---@param check integer|vector|{x: number, y: number, z: number}|number[]?
+---@param ped_type integer|(fun(ped: integer, i: integer): boolean)?
+---@param radius number?
+---@param excluding integer|integer[]?
+---@return integer? ped, number? dist, integer[]? peds
+function pools.getclosestped(check, ped_type, radius, excluding)
+```
+
+- `check` - The value to check, can be;
+  - `integer` - The entity to get the position of.
+  - `table` - The table containing `x`, `y`, `z` and `w` keys.
+  - `number[]` - The array containing the values.
+  - `vector` - The vector to check.
+- `ped_type` - Can be either;
+  - `integer` - The ped type to filter by (client-side only). Found [here](https://docs.fivem.net/natives/?_0xFF059E1E4C01E63C).
+  - `function` - A function with signature `(ped: integer, i: integer) => boolean`.
+- `radius` - The radius to check within.
+- `excluding` - The ped or peds to ignore.
+- `returns: integer, number, integer[]` - The closest ped, the distance to the ped, and an array of all peds.
+
+##### getclosestvehicle
+
+Returns the closest vehicle to a specified position, filtered by `vehicle_type` if provided, and within a specified `radius`.
+
+```lua
+---@param check integer|vector|{x: number, y: number, z: number}|number[]?
+---@param vehicle_type integer|string|(fun(vehicle: integer, i: integer): boolean)?
+---@param radius number?
+---@param excluding integer|integer[]?
+---@return integer? vehicle, number? distance, integer[]? vehicles
+function pools.getclosestvehicle(check, vehicle_type, radius, excluding)
+```
+
+- `check` - The value to check, can be;
+  - `integer` - The entity to get the position of.
+  - `table` - The table containing `x`, `y`, `z` and `w` keys.
+  - `number[]` - The array containing the values.
+  - `vector` - The vector to check.
+- `vehicle_type` - Can be either;
+  - `integer` - The vehicle class to filter by (client-side only). Found [here](https://docs.fivem.net/natives/?_0x29439776AAA00A62).
+  - `string` - The vehicle type to filter by (server-side only). Found [here](https://docs.fivem.net/natives/?_0xA273060E).
+  - `function` - A function with signature `(vehicle: integer, i: integer) => boolean`.
+- `radius` - The radius to check within.
+- `excluding` - The vehicle or vehicles to ignore.
+- `returns: integer, number, integer[]` - The closest vehicle, the distance to the vehicle, and an array of all vehicles.
+
+##### getclosestobject
+
+Returns the closest object to a specified position, within a specified `radius`.
+
+```lua
+---@param check integer|vector|{x: number, y: number, z: number}|number[]?
+---@param filter (fun(object: integer, i: integer): boolean)?
+---@param radius number?
+---@param excluding integer|integer[]?
+---@return integer? object, number? distance, integer[]? objects
+function pools.getclosestobject(check, radius, excluding)
+```
+
+- `check` - The value to check, can be;
+  - `integer` - The entity to get the position of.
+  - `table` - The table containing `x`, `y`, `z` and `w` keys.
+  - `number[]` - The array containing the values.
+  - `vector` - The vector to check.
+- `filter` - A function with signature `(object: integer, i: integer) => boolean`.
+- `radius` - The radius to check within.
+- `excluding` - The object or objects to ignore.
+- `returns: integer, number, integer[]` - The closest object, the distance to the object, and an array of all objects.
+
+#### Client Functions (pools)
+
+##### getpickups
+
+Returns an array of all pickups in the pool, filtered by `hash` if provided.
+
+```lua
+---@param hash string|number|(fun(pickup: integer, i: integer): boolean)?
+---@return integer[]? pickups
+function pools.getpickups(hash)
+```
+
+- `hash` - Can be either;
+  - `string` - The name of the pickup, e.g. `'PICKUP_WEAPON_PISTOL'`.
+  - `number` - The hash of the pickup, e.g. `4189041807` or \`PICKUP_WEAPON_PISTOL\`.
+  - `function` - A function with signature `(pickup: integer, i: integer) => boolean`.
+- `returns: integer[]` - An array of all pickups.
+
+##### getclosestpickup
+
+Returns the closest pickup to a specified position, filtered by `hash` if provided, and within a specified `radius`.
+
+```lua
+---@param check integer|vector|{x: number, y: number, z: number}|number[]?
+---@param hash string|number|(fun(pickup: integer, i: integer): boolean)?
+---@param radius number?
+---@param excluding integer|integer[]?
+---@return integer? pickup, number? distance, array? pickups
+function pools.getclosestpickup(check, hash, radius, excluding)
+```
+
+- `check` - The value to check, can be;
+  - `integer` - The entity to get the position of.
+  - `table` - The table containing `x`, `y`, `z` and `w` keys.
+  - `number[]` - The array containing the values.
+  - `vector` - The vector to check.
+- `hash` - Can be either;
+  - `string` - The name of the pickup, e.g. `'PICKUP_WEAPON_PISTOL'`.
+  - `number` - The hash of the pickup, e.g. `4189041807` or \`PICKUP_WEAPON_PISTOL\`.
+  - `function` - A function with signature `(pickup: integer, i: integer) => boolean`.
+- `radius` - The radius to check within.
+- `excluding` - The pickup or pickups to ignore.
+- `returns: integer, number, integer[]` - The closest pickup, the distance to the pickup, and an array of all pickups.
+
 ### CVector
 
 CVector is an object containing functions for vector math. It provides functions for vector operations, conversions and checks.
@@ -1467,9 +1539,9 @@ CVector is an object containing functions for vector math. It provides functions
 #### Importing CVector
 
 ```lua
--- Using the `require` export
+-- Using the `require` function from `ox_lib`
 ---@module 'duff.shared.vector'
-local vector = exports.duff:require 'duff.shared.vector'
+local vector = lib.require '@duff.shared.vector'
 
 -- Attaching the vecmath to a local variable from CDuff
 local vector = duff.vector
@@ -1647,10 +1719,12 @@ trace is a function that prints a message to the console with the file name, lin
 
 #### Importing trace
 
-This module is not exposed in the duff object, and must be imported using the `require` function.
-
 ```lua
-local trace = exports.duff:require 'duff.shared.trace'
+-- Using the `require` function from `ox_lib`
+local trace = lib.require '@duff.shared.trace'
+
+-- Attaching the trace to a local variable from CDuff
+local trace = duff.trace
 ```
 
 #### trace (function)
@@ -1681,9 +1755,9 @@ CBlips is an object containing functions for managing blips. It provides functio
 #### Importing CBlips
 
 ```lua
--- Using the `require` export
+-- Using the `require` function from `ox_lib`
 ---@module 'duff.client.blips'
-local blips = exports.duff:require 'duff.client.blips'
+local blips = lib.require '@duff.client.blips'
 
 -- Attaching the blips to a local variable from CDuff
 local blips = duff.blips
@@ -1819,9 +1893,9 @@ CStreaming is an object containing functions for loading game assets. It provide
 #### Importing CStreaming
 
 ```lua
--- Using the `require` export
+-- Using the `require` function from `ox_lib`
 ---@module 'duff.client.streaming'
-local streaming = exports.duff:require 'duff.client.streaming'
+local streaming = lib.require '@duff.client.streaming'
 
 -- Attaching the streaming to a local variable from CDuff
 local streaming = duff.streaming
@@ -1948,9 +2022,9 @@ CScopes is an object containing functions for managing scope. It provides functi
 #### Importing CScopes
 
 ```lua
--- Using the `require` export
+-- Using the `require` function from `ox_lib`
 ---@module 'duff.server.scopes'
-local scopes = exports.duff:require 'duff.server.scopes'
+local scopes = lib.require '@duff.server.scopes'
 
 -- Attaching the scope to a local variable from CDuff
 local scopes = duff.scopes
@@ -2025,9 +2099,9 @@ CMapZones is an object containing functions for managing map zones. It functions
 #### Importing CMapZones
 
 ```lua
--- Using the `require` export
+-- Using the `require` function from `ox_lib`
 ---@module 'duff.server.map_zones'
-local zones = exports.duff:require 'duff.server.map_zones'
+local zones = lib.require '@duff.server.map_zones'
 
 -- Attaching the zone to a local variable from CDuff
 local zones = duff.zones
