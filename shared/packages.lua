@@ -4,7 +4,7 @@
 ---@field private package {path: './*.lua;./*/import.lua;./*/init.lua', preload: {[string]: function}, loaded: {env: table}}
 ---@field searchpath fun(mod_name: string, pattern: string?): string, string? -- Returns the path to the module, and an error message if the module was not found. <br> This function is based on the Lua [`package.searchpath`](https://github.com/lua/lua/blob/c1dc08e8e8e22af9902a6341b4a9a9a7811954cc/loadlib.c#L474), [Lua Modules Loader](http://lua-users.org/wiki/LuaModulesLoader) by @lua-users & ox_lib's [`package.searchpath`](https://github.com/overextended/ox_lib/blob/cdf840fc68ace1f4befc78555a7f4f59d2c4d020/imports/require/shared.lua#L50).
 ---@field require fun(mod_name: string): function|{[string]: function} -- Returns the module if it was found and loaded. <br> `mod_name` has to be a dot-separated path to the module. <br> For example, `duff.import`.
----@field import fun(sym: string, methods: string[]?): (function|{[string]: function})? -- Imports a lua file's methods into the global environment. <br> If the file is a module, it returns the module and imports `methods` (if provided) or the module into the global environment.
+---@field import fun(sym: string, methods: string[]?): function|{[string]: function}? -- Imports a lua file's methods into the global environment. <br> If the file is a module, it returns the module and imports `methods` (if provided) or the module into the global environment.
 ---@field as fun(name: string) -- Changes the imported module's name to the provided name.
 do
   local curr_res = GetCurrentResourceName()
@@ -23,6 +23,7 @@ do
   ---@param pattern string? A pattern to search for the module. <br> This has to be a string with a semicolon-separated list of paths. <br> For example, `./?.lua;./?/init.lua`.
   ---@return string mod_path, string? errmsg The path to the module, and an error message if the module was not found.
   local function search_path(mod_name, pattern) -- Based on the Lua [`package.searchpath`](https://github.com/lua/lua/blob/c1dc08e8e8e22af9902a6341b4a9a9a7811954cc/loadlib.c#L474) function, [Lua Modules Loader](http://lua-users.org/wiki/LuaModulesLoader) by @lua-users & ox_lib's [`package.searchpath`](https://github.com/overextended/ox_lib/blob/cdf840fc68ace1f4befc78555a7f4f59d2c4d020/imports/require/shared.lua#L50) function.
+    if type(mod_name) ~= 'string' then error('bad argument #1 to \'search_path\' (string expected, got '..type(mod_name)..')', 2) end
     local mod_path = mod_name:gsub('%.', '/')
     local resource, path, contents = '', '', ''
     local errmsg = nil
@@ -32,14 +33,14 @@ do
       resource, path = file:match('^./%@?(%w+%_?%w+)'), file:match('^./%@?%w+%_?%w+(.*)')
       contents = LoadResourceFile(resource, path)
       if not contents then break end
-      local module, err = load(contents, '@'..resource..'/'..path, 'bt', _ENV)
+      local module, err = load(contents, '@@'..resource..'/'..path, 'bt', _ENV)
       if module then
         mod_path = resource..path:gsub('%/', '.'):gsub('.lua', '')
         package.preload[mod_path] = function(env)
           packages[mod_path] = packages[mod_path] or {}
           packages[mod_path].env = setmetatable({}, {__index = env or _ENV})
           packages[mod_path].contents = module
-          if debug_mode then print(('^3[duff]^7 - ^2loaded module^7 ^5\'%s\'^7'):format(mod_path)) end
+          if debug_mode then print('^3[duff]^7 - ^2loaded module^7 ^5\''..mod_path..'\'^7') end
           return packages[mod_path].contents()
         end
         break
@@ -77,13 +78,14 @@ do
   ---@param mod_name string The name of the module to require. <br> This has to be a dot-separated path to the module. <br> For example, `duff.import`.
   ---@return function|{[string]: function}? module Returns the module if it was found and loaded.
   local function require(mod_name)
+    if type(mod_name) ~= 'string' then error('bad argument #1 to \'require\' (string expected, got '..type(mod_name)..')', 2) end
     local errmsg = ''
     local module = packages[mod_name]?.exported
     if module ~= nil then return module end
     for i = 1, #package.searchers do
       local result, err = package.searchers[i](mod_name)
-      if result then
-        packages[err].exported = result or result == nil
+      if result ~= false then
+        packages[err].exported = result
         return packages[err].exported
       elseif err then
         errmsg = errmsg..'\n\t'..err
@@ -95,6 +97,7 @@ do
   ---@param mod_name string  The name of the module to import. <br> This has to be a dot-separated path to the module. <br> For example, `duff.import`.
   ---@param methods string[]? A list of methods to import from the module.
   local function import(mod_name, methods) -- Imports a lua file's methods into the global environment. <br> If the file is a module, it returns the module and imports `methods` (if provided) or the module into the global environment.
+    if type(mod_name) ~= 'string' then error('bad argument #1 to \'import\' (string expected, got '..type(mod_name)..')', 2) end
     local module, errmsg = nil, nil
     for i = 2, #package.searchers do
       ---@diagnostic disable-next-line: redundant-parameter
@@ -127,7 +130,7 @@ do
   local function as(name) -- Changes the imported module's name to the provided name.
     if not curr_pkg then error('no package loaded', 2) end
     local module = packages[curr_pkg].exported
-    if not module then error('no module loaded', 2) end
+    if not module then error('module \''..curr_pkg..'\' not loaded', 2) end
     _G[name] = {}
     for k, v in pairs(module) do
       _G[name][k] = v

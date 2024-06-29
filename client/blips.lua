@@ -10,7 +10,7 @@
 do
   local load, load_resource_file = load, LoadResourceFile
   local require = duff?.packages.require or load(load_resource_file('duff', 'shared/packages.lua'), '@duff/shared/packages.lua', 'bt', _ENV)().require
-  local array, vector = require 'duff.shared.array', require 'duff.shared.vector'
+  local array, vector = duff?.array or require 'duff.shared.array', duff?.vector or require 'duff.shared.vector'
   local push, filter = array.push, array.filter
   local get_closest = vector.getclosest
   local does_blip_exist = DoesBlipExist
@@ -42,7 +42,7 @@ do
   ---@return integer[]? blip_ids An array of all active blip handles at `coords` within `radius`.
   local function by_coords(coords, radius)
     local param_type = type(coords)
-    if not coords or (param_type ~= 'vector3' and param_type ~= 'table') then error('bad argument to \'%s\' (expected vector3 or table, got '..param_type, 0) end
+    if not coords or (param_type ~= 'vector3' and param_type ~= 'table') then error('bad argument to \'bycoords\' (expected vector3 or table, got '..param_type, 2) end
     radius = radius or 1.0
     return filter(get_all(), function(blip_id)
       local blip_coords = GetBlipCoords(blip_id)
@@ -59,7 +59,7 @@ do
   ---@param sprite integer The sprite to search for.
   ---@return integer[]? blip_ids An array of all active blip handles with `sprite`.
   local function by_sprite(sprite)
-    if not sprite or type(sprite) ~= 'number' then error('bad argument to \'%s\' (expected number, got '..type(sprite), 0) end
+    if not sprite or type(sprite) ~= 'number' then error('bad argument to \'bysprite\' (expected number, got '..type(sprite), 2) end
     return filter(get_all(), function(blip) return GetBlipSprite(blip) == sprite end, true)
   end
 
@@ -68,21 +68,29 @@ do
   ---@param id_type integer The blip type to search for. <br> Can be; `1`, `2`, `3`, `4`, `5`, `6`, `7`. <br> See [GetBlipInfoIdType](https://docs.fivem.net/natives/?_0xBE9B0959FFD0779B) for more information.
   ---@return integer[]? blip_ids An array of all active blip handles with `id_type`.
   local function by_type(id_type)
-    if not id_types[id_type] then error('bad argument to \'%s\' (expected number, got '..type(id_type), 0) end
+    if not id_types[id_type] then error('bad argument to \'bytype\' (expected number, got '..type(id_type), 2) end
     return filter(get_all(), function(blip) return GetBlipInfoIdType(blip) == id_type end, true)
+  end
+
+  ---@param fn any The value to check if it is a function.
+  ---@return boolean is_func the value is a function or not.
+  local function is_fun(fn)
+    local fn_type = type(fn)
+    return fn_type == 'function' or fn_type == 'table' and (getmetatable(fn) and getmetatable(fn).__call or rawget(fn, '__cfx_functionReference'))
   end
 
   ---@param fn fun(blip: integer, index: integer): boolean The function to filter blips.
   ---@return integer[] blip_ids An array of all active blip handles that pass `filter`.
   local function get_blips(fn)
+    if not is_fun(fn) then error('bad argument to \'getblips\' (expected function, got '..type(fn), 2) end
     return filter(get_all(), fn, true)
   end
 
   ---@param blip integer The blip handle to get information about.
   ---@return {alpha: integer, coords: vector3, colour: integer, display: integer, fade: boolean, hud_colour: integer, type: integer, rotation: number, is_shortrange: boolean}? info Information about `blip`.
   local function get_info(blip)
-    if not blip or type(blip) ~= 'number' then error('bad argument to \'%s\' (expected number, got '..type(blip), 0) end
-    if not does_blip_exist(blip) then error('bad argument to \'%s\' (blip does not exist)', 0) end
+    if not blip or type(blip) ~= 'number' then error('bad argument to \'getinfo\' (expected number, got '..type(blip), 2) end
+    if not does_blip_exist(blip) then error('bad argument to \'getinfo\' (blip does not exist)', 0) end
     return {
       alpha = GetBlipAlpha(blip),
       coords = GetBlipCoords(blip),
@@ -99,7 +107,7 @@ do
   ---@param blip_ids integer|integer[] The blip handle(s) to remove. <br> If `blip_ids` is a number, it removes that blip. <br> If `blip_ids` is an array, it removes all blips in the array.
   local function remove_blips(blip_ids)
     local param_type = type(blip_ids)
-    if not blip_ids or (param_type ~= 'number' and param_type ~= 'table') then error('bad argument to \'%s\' (expected number or table, got '..param_type, 0) end
+    if not blip_ids or (param_type ~= 'number' and param_type ~= 'table') then error('bad argument to \'remove\' (expected number or table, got '..param_type, 2) end
     blip_ids = param_type == 'table' and blip_ids or {blip_ids--[[@as integer]]} --[[@as integer[]=]]
     SetThisScriptCanRemoveBlipsCreatedByAnyScript(true)
     for i = 1, #blip_ids do

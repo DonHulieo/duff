@@ -12,7 +12,7 @@
 do
   local load, load_resource_file = load, LoadResourceFile
   local require = duff?.packages.require or load(load_resource_file('duff', 'shared/packages.lua'), '@duff/shared/packages.lua', 'bt', _ENV)().require
-  local array, math = require 'duff.shared.array', require 'duff.shared.math'
+  local array, math = duff?.array or require 'duff.shared.array', duff?.math or require 'duff.shared.math'
   local string, table = string, table
   local contains = array.contains
   local rad, cos, sin, huge = math.rad, math.cos, math.sin, math.huge
@@ -36,7 +36,7 @@ do
   ---@return string binary `value` converted to a binary string.
   local function to_binary(value)
     local vec_type = type(value)
-    if not vector_types[vec_type] then error('bad argument to \'%s\' (expected vector, got '..vec_type..')', 0) end
+    if not vector_types[vec_type] then error('bad argument to \'tobin\' (expected vector, got '..vec_type..')', 2) end
     return s_pack(vector_types[vec_type], t_unpack(value))
   end
 
@@ -46,7 +46,7 @@ do
   ---@return number|vector vector `value` converted to a vector.
   local function from_binary(value)
     local len = #value
-    if not len or not vector_res[len] then error('bad argument to \'%s\' (expected binary string, got '..type(value)..')', 0) end
+    if not len or not vector_res[len] then error('bad argument to \'frombin\' (expected binary string, got '..type(value)..')', 2) end
     return vector(t_unpack({s_unpack(vector_res[len], value)}, 1, len / 8))
   end
 
@@ -54,7 +54,7 @@ do
   ---@return number|vector2|vector3|vector4 vector `tbl` converted to a vector.
   local function tbl_to_vector(tbl) -- Original concept by: [Swkeep](https://github.com/swkeep).
     local param_type = type(tbl)
-    if param_type ~= 'table' then error('bad argument to \'%s\' (expected table, got '..param_type..')', 0) end
+    if param_type ~= 'table' then error('bad argument to \'tovec\' (expected table, got '..param_type..')', 3) end
     tbl = not tbl[1] and {tbl.x, tbl.y, tbl.z, tbl.w} or tbl
     return vector(t_unpack(tbl))
   end
@@ -62,8 +62,8 @@ do
   ---@param entity integer The entity to retrieve the coordinates from.
   ---@return vector3 coords `coords` of the entity.
   local function ent_to_vector(entity)
-    if not math.isint(entity) then error('bad argument to \'%s\' (expected integer, got '..type(entity)..')', 0) end
-    if not does_entity_exist(entity) then error('bad argument to \'%s\' (entity does not exist)', 0) end
+    if not math.isint(entity) then error('bad argument to \'tovec\' (expected integer, got '..type(entity)..')', 3) end
+    if not does_entity_exist(entity) then error('bad argument to \'tovec\' (entity does not exist)', 3) end
     return get_coords(entity)
   end
 
@@ -78,39 +78,26 @@ do
     (param_type == 'number' and ent_to_vector(value)) or 0
   end
 
-  ---@param value any The value to check.
-  ---@param types string[] The types to check against.
-  ---@param arg integer The argument number.
-  ---@return boolean|string `true` if `value` is one of the types in `types`, otherwise an error message.
-  local function check_types(value, types, arg)
-    local value_type = type(value)
-    local err = 'bad argument #'..arg..' to \'%s\' (expected '..table.concat(types, ', ', 1, #types - 1)..' or '..types[#types]..', got '..value_type..')'
-    for i = 1, #types do
-      local found_type = types[i]
-      if value_type == found_type then return true end
-      if found_type == 'vector' and is_vector(value_type) then return true end
-    end
-    return err
-  end
-
   ---@param check integer|vector|{x: number, y: number, z: number?, w: number?}|number[] The value to check.
   ---@param tbl (integer|vector|{x: number, y: number, z: number?, w: number?}|number[])[] The list of vectors to check against.
   ---@param radius number? The maximum distance within.
   ---@param excluding any|any[]? The entity, vector or group of either to exclude from the search.
   ---@return integer|vector|{x: number, y: number, z: number?, w: number?}|number[]? closest, number? dist, (integer|vector)[]? closests <br> `closest` is the closest value to `check`. <br>  `dist` is the distance to the closest value. <br> `closests` is an array of all vectors within `radius`.
   local function get_closest(check, tbl, radius, excluding) -- Find the closest vector in `tbl` to `check`.
-    if check_types(check, {'number', 'table', 'vector'}, 1) ~= true then error(check_types(check, {'number', 'table', 'vector'}, 1), 0) end
-    if table.type(tbl) ~= 'array' then error('bad argument #2 to \'%s\' (expected array, got '..(table.type(tbl) or type(tbl))..')', 0) end
+    local check_type = type(check)
+    if check_type ~= 'number' and check_type ~= 'table' and not is_vector(check_type) then error('bad argument #1 to \'getclosest\' (expected number, vector or table, got '..check_type..')', 2) end
+    if table.type(tbl) ~= 'array' then error('bad argument #2 to \'getclosest\' (expected array, got '..(table.type(tbl) or type(tbl))..')', 2) end
     local coords = to_vector(check) --[[@as vector|integer]]
-    tbl = type(tbl) == 'table' and tbl or {tbl}
-    local closest, dist, closests = nil, radius or huge, {}
-    local exc_type = type(excluding)
+    local closest, dist, closests = nil, huge, {}
+    excluding = excluding and (type(excluding) == 'table' and excluding or {excluding}) or excluding
     for i = 1, #tbl do
       local found = tbl[i]
-      if not excluding or (exc_type == 'table' and not contains(excluding, nil, found) or found ~= excluding) then
+      if not excluding or not contains(excluding, nil, found) then
         local distance = #(coords - to_vector(found) --[[@as vector]])
-        if distance < dist then closest, dist = found, distance end
-        closests[#closests + 1] = found
+        if distance < (radius or dist) then
+          closest, dist = found, distance
+          closests[#closests + 1] = found
+        end
       end
     end
     return closest, dist, closests
@@ -119,7 +106,7 @@ do
   ---@param entity integer The entity to retrieve the matrix from.
   ---@return vector3 forward, vector3 right, vector3 up, vector3 pos <br> `forward` vector. <br> `right` vector. <br> `up` vector. <br> `pos` vector of the entity.
   local function sv_get_entity_matrix(entity) -- Credits go to: [draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297)
-    if not is_server then error('called a server only function \'%s\'', 0) end
+    if not is_server then error('called a server only function \'getentitymatrix\'', 2) end
     local coords = ent_to_vector(entity)
     local rot = get_rot(entity)
     local x, y, z = rot.x, rot.y, rot.z
@@ -142,7 +129,7 @@ do
   ---@param entity integer The entity to retrieve the forward vector from.
   ---@return vector3 forward `forward` vector of the entity.
   local function get_entity_forward_vec(entity)
-    if not is_server then error('called a server only function \'%s\'', 0) end
+    if not is_server then error('called a server only function \'getentityforward\'', 2) end
     local forward = get_entity_matrix(entity)
     return forward
   end
@@ -150,7 +137,7 @@ do
   ---@param entity integer The entity to retrieve the right vector from.
   ---@return vector3? right `right` vector of the entity.
   local function sv_get_entity_right_vec(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
-    if not is_server then error('called a server only function \'%s\'', 0) end
+    if not is_server then error('called a server only function \'getentityright\'', 2) end
     local _, right = get_entity_matrix(entity)
     return right
   end
@@ -158,7 +145,7 @@ do
   ---@param entity integer The entity to retrieve the up vector from.
   ---@return vector3 up `up` vector of the entity.
   local function sv_get_entity_up_vec(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
-    if not is_server then error('called a server only function \'%s\'', 0) end
+    if not is_server then error('called a server only function \'getentityup\'', 2) end
     local _, _, up = get_entity_matrix(entity)
     return up
   end
@@ -169,7 +156,7 @@ do
   ---@param offset_z number The offset on the z-axis.
   ---@return vector3 offset The world coordinates of the entity with the offset.
   local function get_offset_entity_worldcoords(entity, offset_x, offset_y, offset_z) -- Credits go to: [draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297)
-    if not is_server then error('called a server only function \'%s\'', 0) end
+    if not is_server then error('called a server only function \'getoffsetfromentityinworldcoords\'', 2) end
     local forward, right, up, pos = get_entity_matrix(entity)
     local x = offset_x * forward.x + offset_y * right.x + offset_z * up.x + pos.x
     local y = offset_x * forward.y + offset_y * right.y + offset_z * up.y + pos.y
@@ -180,7 +167,7 @@ do
   ---@param entity integer The entity to retrieve the right vector from.
   ---@return vector3 right `right` vector of the entity.
   local function get_entity_right_vec(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
-    if is_server then error('called a client only function \'%s\'', 0) end
+    if is_server then error('called a client only function \'getentityright\'', 2) end
     local _, right = get_entity_matrix(entity)
     return right
   end
@@ -188,7 +175,7 @@ do
   ---@param entity integer The entity to retrieve the up vector from.
   ---@return vector3 up `up` vector of the entity.
   local function get_entity_up_vec(entity) -- Credits go to: [VenomXNL](https://forum.cfx.re/t/getentityupvector-and-getentityrightvector-to-complement-getentityforwardvector-xnl-getentityupvector-xnl-getentityrightvector/3968980)
-    if is_server then error('called a client only function \'%s\'', 0) end
+    if is_server then error('called a client only function \'getentityup\'', 2) end
     local _, _, up = get_entity_matrix(entity)
     return up
   end

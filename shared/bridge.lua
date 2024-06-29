@@ -20,6 +20,8 @@
 ---@field addlocalentity fun(entities: integer|integer[], options: {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: fun(entity: number, distance: number)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]}) Adds a target to `entities` with the specified `options`. <br> **Note**: This is a client-only function.
 ---@field removelocalentity fun(entities: integer|integer[], targets: string|string[]?) Removes the target from `entities` with the specified `targets`. <br> **Note**: This is a client-only function.
 do
+  local load, load_resource_file = load, LoadResourceFile
+  local packages = duff?.packages or load(load_resource_file('duff', 'shared/packages.lua'), '@duff/shared/packages.lua', 'bt', _ENV)()
   local get_resource_state = GetResourceState
   local Frameworks = {['es_extended'] = 'esx', ['qb-core'] = 'qb'}
   local Inventories = {['ox_inventory'] = 'ox', ['qb-inventory'] = 'qb'}
@@ -68,7 +70,7 @@ do
   local function consume_export(table, export_type)
     if not table or not table[export_type] then return end
     local export = table[export_type]
-    if not export then error('error calling \'%s\' ('..export_type..' export not valid)', 0) end
+    if not export then error(export_type..' export not valid', 2) end
     return export.method and exports[export.resource][export.method]() or exports[export.resource]
   end
 
@@ -118,47 +120,49 @@ do
     INV = {resource = get_key(Inventories, INVENTORY), method = for_each(NO_METHODS.INV, function(_, value) return value == INVENTORY end) == nil and EXPORTS.INV[INVENTORY] or nil},
     TARG = {resource = get_key(Targets, TARGET), method = for_each(NO_METHODS.TARGET, function(_, value) return value == TARGET end) == nil and EXPORTS.TARG[TARGET] or nil}
   }
-  local Core, Lib, Inv = consume_export(EXPORTS, 'CORE') --[[@as QBCore|table]], consume_export(EXPORTS, 'LIB'), consume_export(EXPORTS, 'INV') --[[@as ox_inventory|table]]
+  local Core, Lib, Inv = consume_export(EXPORTS, 'CORE') --[[@as QBCore|table]], consume_export(EXPORTS, 'LIB'), consume_export(EXPORTS, 'INV') --[[@as ox_inventory|table?]]
   local PlayerData = nil
 
   ---@return string FRAMEWORK The name of the framework being used.
   local function get_framework()
-    if not FRAMEWORK then error('error calling \'%s\' (framework not valid)', 0) end
+    if not FRAMEWORK then error('framework is invalid', 2) end
     return FRAMEWORK
   end
 
   ---@return string INVENTORY The name of the inventory system being used.
   local function get_inventory()
-    if not INVENTORY then error('error calling \'%s\' (inventory system not valid)', 0) end
+    if not INVENTORY then error('inventory system is invalid', 2) end
     return INVENTORY
   end
 
   ---@return QBCore|table Core The shared object for the framework being used.
   local function get_core_object()
-    if not FRAMEWORK then error('error calling \'%s\' (framework not valid)', 0) end
+    if not FRAMEWORK then error('framework is invalid', 2) end
     Core = Core or consume_export(EXPORTS, 'CORE')
-    if not Core then error('error calling \'%s\' (core object not valid)', 0) end
+    if not Core then error('core object is invalid', 2) end
     return Core
   end
 
   ---@return table Lib The library object being used.
   local function get_lib_object()
-    if not LIB then error('error calling \'%s\' (library not valid)', 0) end
+    if not LIB then error('library is invalid', 2) end
     if Lib then return Lib end
     if LIB == 'ox' then
+      if not Lib then packages.import('ox_lib.init') end
       Lib = lib
     end
-    if type(Lib) ~= 'table' then error('error calling \'%s\' (library object not valid)', 0) end
+    if type(Lib) ~= 'table' then error('library object is invalid', 2) end
     return Lib
   end
 
+  ---@param func_name string The name of the function calling this function.
   ---@param player integer|string? The source of the player.
   ---@param arg number? The argument number.
   ---@return integer player The source of the player.
-  local function validate_source(player, arg)
+  local function validate_source(func_name, player, arg)
     player = player or source
     local param_type = type(player)
-    if param_type ~= 'number' and param_type ~= 'string' then error('bad argument #'..(arg or 1)..' to \'%s\' (player or source not valid)', 0) end
+    if param_type ~= 'number' and param_type ~= 'string' then error('bad argument #'..(arg or 1)..' to \''..func_name..'\' (player or source is invalid)', 3) end
     return type(player) ~= 'number' and tonumber(player) or player
   end
 
@@ -168,7 +172,7 @@ do
     Core = get_core_object()
     local player_data = nil
     if is_server then
-      player = validate_source(player or source, 1)
+      player = validate_source('getplayer', player or source, 1)
       if FRAMEWORK == 'esx' then
         player_data = Core.GetPlayerFromId(player)
       elseif FRAMEWORK == 'qb' then
@@ -186,7 +190,7 @@ do
         player_data = PlayerData
       end
     end
-    if not player_data then error('error calling \'%s\' (player data not valid)', 0) end
+    if not player_data then error('error calling \'getplayer\' (player data is invalid)', 2) end
     return player_data
   end
 
@@ -194,10 +198,11 @@ do
   -- Add the job type to the job_types enum if it is not already present, as well as any additional jobs that should be considered part of that job type.
   ---@enum job_types
   local job_types = {['leo'] = {['police'] = true, ['fib'] = true, ['sheriff'] = true}, ['ems'] = {['ambulance'] = true, ['fire'] = true}}
+  ---@param func_name string The name of the function calling this function.
   ---@param data table The job data to convert.
   ---@return {name: string, label: string, grade: number, grade_name: string, grade_label: string, job_type: string, salary: number} job_data The converted job data.
-  local function convert_job_data(data)
-    if not data then error('error calling \'%s\' (attempting to convert nil job data)', 0) end
+  local function convert_job_data(func_name, data)
+    if not data then error('error calling \''..func_name..'\' (attempting to convert nil job data)', 3) end
     local job_data = {name = data.name, label = data.label, grade = 0, grade_name = '', grade_label = '', job_type = '', salary = 0}
     if FRAMEWORK == 'esx' then
       job_data.grade = data.grade
@@ -213,7 +218,7 @@ do
       job_data.job_type = data.type or for_each(job_types, function(_, value) return value[data.name] end) or ''
       job_data.salary = data.payment
     end
-    if not next(job_data) then error('error calling \'%s\' (job data not valid)', 0) end
+    if not next(job_data) then error('error calling \''..func_name..'\' (job data not valid)', 3) end
     return job_data
   end
 
@@ -226,7 +231,7 @@ do
   }
 
   for event_type, event in pairs(EVENTS) do
-    if event then
+    if event then ---@cast event -table
       RegisterNetEvent(event, function(...)
         if event_type == 'LOAD' then
           PlayerData = get_player_data()
@@ -234,11 +239,11 @@ do
           PlayerData = nil
         elseif event_type == 'JOBDATA' then
           if not PlayerData then return end
-          PlayerData.job = convert_job_data(...)
+          PlayerData.job = convert_job_data(event, ...)
         elseif event_type == 'PLAYERDATA' then
           PlayerData = ...
         elseif event_type == 'OBJECTUPDATE' then
-          if not validate_source(source) then return end
+          if not validate_source(event, source) then return end
           Core = get_core_object()
         end
       end)
@@ -266,7 +271,7 @@ do
         identifier = player_data.citizenid
       end
     end
-    if not identifier then error('error calling \'%s\' (identifier for player \''..player..'\' not valid)', 0) end
+    if not identifier then error('error calling \'getidentifier\' (identifier for player \''..player..'\' not valid)', 2) end
     return identifier
   end
 
@@ -311,7 +316,7 @@ do
       end
     end
     if not found_data then return end
-    return convert_job_data(found_data)
+    return convert_job_data('getjob', found_data)
   end
 
   ---@param player integer|string? The `player` to retrieve the gang data for. <br> `player` is a server-side only argument, and is the player's server ID. <br> If `player` is nil, the source is used.
@@ -346,7 +351,7 @@ do
     local gang_data = get_gang_data(player or source or nil)
     if not job_data and not gang_data then return false end
     groups = type(groups) == 'table' and groups or {groups}
-    if not groups or type(groups) ~= 'table' then error('bad argument #2 to \'%s\' (string or table expected, got '..type(groups)..')', 0) end
+    if not groups or type(groups) ~= 'table' then error('bad argument #2 to \'doesplayerhavegroup\' (string or table expected, got '..type(groups)..')', 2) end
     for i = 1, #groups do
       local group = groups[i]
       if job_data and (job_data.name == group or job_data.label == group or job_data.job_type == group) then return true end
@@ -434,9 +439,13 @@ do
 
   ---@return ox_inventory|table Inv The inventory object being used.
   local function get_inv_object()
-    if not INVENTORY then error('error calling \'%s\' (inventory system not valid)', 0) end
-    Inv = Inv or FRAMEWORK ~= 'esx' and consume_export(EXPORTS, 'INV') or {}
-    if not Inv then error('error calling \'%s\' (inventory object not valid)', 0) end
+    if not INVENTORY then error('inventory system is invalid', 2) end
+    if FRAMEWORK == 'esx' and not MySQL then
+      packages.import('oxmysql.lib.MySQL')
+    else
+      Inv = Inv or consume_export(EXPORTS, 'INV')
+    end
+    if not Inv then error('inventory object is invalid', 2) end
     return Inv
   end
 
@@ -446,30 +455,29 @@ do
 
   ---@return {[string]: {name: string, label: string, weight: number, useable: boolean, unique: boolean}} Items A table of all items available in the inventory system.
   local function get_all_items() -- **Note**: This is a server-only function.
-    if not is_server then error('called a server only function \'%s\'', 0) end
+    if not is_server then error('called a server only function \'getallitems\'', 2) end
     Core, Inv = get_core_object(), get_inv_object()
     if Items then return Items end
     if not Items then Items = {} end
     local found_items = nil
     if INVENTORY == 'ox' then
       found_items = Inv:Items()
-      if not found_items then error('error calling \'%s\' (items not valid)', 0) end
+      if not found_items then error('error calling \'getallitems\' (items not valid)', 2) end
       for name, data in pairs(found_items) do
         local client_data, server_data = data.client, data.server
         local useable = not data.consume and (client_data?.status or client_data?.useTime or client_data?.export or server_data?.export) or data.consume == 1
         Items[name] = {name = name, label = data.label, weight = data.weight or 0, useable = useable, unique = data.stack == nil and true or data.stack}
       end
     elseif INVENTORY == 'esx' then
-      MySQL.Async.fetchAll('SELECT * FROM items', {}, function(result)
-        if not result then error('error calling \'%s\' (items not valid)', 0) end
-        for _, item in ipairs(result) do
-          local name = item.name
-          Items[name] = {name = name, label = item.label, weight = item.weight, useable = Core.GetUsableItems()[name] ~= nil, unique = item.rare}
-        end
-      end)
+      found_items = MySQL.Sync.fetchAll('SELECT * FROM items')
+      if not found_items then error('error calling \'getallitems\' (items not valid)', 2) end
+      for _, item in ipairs(found_items) do
+        local name = item.name
+        Items[name] = {name = name, label = item.label, weight = item.weight, useable = Core.GetUsableItems()[name] ~= nil, unique = item.rare}
+      end
     elseif INVENTORY == 'qb' then
       found_items = Core.Shared.Items
-      if not found_items then error('error calling \'%s\' (items not valid)', 0) end
+      if not found_items then error('error calling \'getallitems\' (items not valid)', 2) end
       for name, item in pairs(found_items) do
         Items[name] = {name = name, label = item.label, weight = item.weight, useable = item.useable, unique = item.unique}
       end
@@ -480,8 +488,8 @@ do
   ---@param item string The name of the item to retrieve.
   ---@return {name: string, label: string, weight: number, useable: boolean, unique: boolean}? item_data The data for the specified `item`.
   local function get_item(item) -- **Note**: This is a server-only function.
-    if not is_server then error('called a server only function \'%s\'', 0) end
-    if not item or type(item) ~= 'string' then error('bad argument #1 to \'%s\' (string expected, got '..type(item)..')', 0) end
+    if not is_server then error('called a server only function \'getitem\'', 2) end
+    if not item or type(item) ~= 'string' then error('bad argument #1 to \'getitem\' (string expected, got '..type(item)..')', 2) end
     Items = Items or get_all_items()
     return Items[item]
   end
@@ -489,8 +497,8 @@ do
   ---@param name string The item's `name` to create a useable item callback for.
   ---@param cb fun(src: number|string) The function to call when the item is used.
   local function create_useable_item(name, cb)
-    if not is_server then error('called a server only function \'%s\'', 0) end
-    if not get_item(name) then error('bad argument #1 to \'%s\' (item \''..name..'\' not valid)', 0) end
+    if not is_server then error('called a server only function \'createuseableitem\'', 2) end
+    if not get_item(name) then error('bad argument #1 to \'createuseableitem\' (item \''..name..'\' not valid)', 2) end
     if INVENTORY == 'ox' then
       exports(name, function(event, _, inventory)
         if event ~= 'usingItem' then return end
@@ -508,9 +516,9 @@ do
   ---@param amount number? The amount of the item to add. <br> If `amount` is nil, the default amount is 1.
   ---@return boolean added Whether the item was added to the `player`.
   local function add_item(player, item, amount) -- **Note**: This is a server-only function.
-    if not is_server then error('called a server only function \'%s\'', 0) end
+    if not is_server then error('called a server only function \'additem\'', 2) end
     player = validate_source(player or source)
-    if not get_item(item) then error('bad argument #2 to \'%s\' (item \''..item..'\' not valid)', 0) end
+    if not get_item(item) then error('bad argument #2 to \'additem\' (item \''..item..'\' not valid)', 2) end
     Inv = get_inv_object()
     local added = false
     amount = amount or 1
@@ -532,9 +540,9 @@ do
   ---@param amount number? The amount of the item to remove. <br> If `amount` is nil, the default amount is 1.
   ---@return boolean removed Whether the item was removed from the `player`.
   local function remove_item(player, item, amount) -- **Note**: This is a server-only function.
-    if not is_server then error('called a server only function \'%s\'', 0) end
+    if not is_server then error('called a server only function \'removeitem\'', 2) end
     player = validate_source(player or source)
-    if not get_item(item) then error('bad argument #2 to \'%s\' (item \''..item..'\' not valid)', 0) end
+    if not get_item(item) then error('bad argument #2 to \'removeitem\' (item \''..item..'\' not valid)', 2) end
     Inv = get_inv_object()
     local removed = false
     amount = amount or 1
@@ -557,21 +565,21 @@ do
 
   ---@return ox_target|table Target The target object being used.
   local function get_targ_object() -- **Note**: This is a client-only function.
-    if is_server then error('called a client only function \'%s\'', 0) end
-    if not TARGET then error('error calling \'%s\' (target system not valid)', 0) end
+    if is_server then error('called a client only function', 2) end
+    if not TARGET then error('target system is invalid', 2) end
     Target = Target or consume_export(EXPORTS, 'TARG')
-    if not Target then error('error calling \'%s\' (target object not valid)', 0) end
+    if not Target then error('target object not valid', 2) end
     return Target
   end
 
   ---@param entities integer|integer[] The entity or entities to add a target to
   ---@param options {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: fun(entity: integer, distance: number)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?} The options for the target.
   local function add_local_entity(entities, options) -- **Note**: This is a client-only function.
-    if is_server then error('called a client only function \'%s\'', 0) end
+    if is_server then error('called a client only function \'addlocalentity\'', 2) end
     Target = get_targ_object()
-    if not entities or (type(entities) ~= 'number' and type(entities) ~= 'table') then error('bad argument #1 to \'%s\' (number or table expected, got '..type(entities)..')', 0) end
-    if not options or type(options) ~= 'table' then error('bad argument #2 to \'%s\' (table expected, got '..type(options)..')', 0) end
-    if not options.label or type(options.label) ~= 'string' then error('bad argument #2 to \'%s\' (options must contain a label)', 0) end
+    if not entities or (type(entities) ~= 'number' and type(entities) ~= 'table') then error('bad argument #1 to \'addlocalentity\' (number or table expected, got '..type(entities)..')', 2) end
+    if not options or type(options) ~= 'table' then error('bad argument #2 to \'addlocalentity\' (table expected, got '..type(options)..')', 2) end
+    if not options.label or type(options.label) ~= 'string' then error('bad argument #2 to \'addlocalentity\' (options must contain a label)', 2) end
     if TARGET == 'ox' then
       Target:addLocalEntity(entities, {
         {
@@ -611,10 +619,10 @@ do
   ---@param entities integer|integer[] The entity or entities to remove a target from.
   ---@param targets string|string[]?
   local function remove_local_entity(entities, targets) -- **Note**: This is a client-only function.
-    if is_server then error('called a client only function \'%s\'', 0) end
+    if is_server then error('called a client only function \'removelocalentity\'', 2) end
     Target = get_targ_object()
-    if not entities or (type(entities) ~= 'number' and type(entities) ~= 'table') then error('bad argument #1 to \'%s\' (number or table expected, got '..type(entities)..')', 0) end
-    if targets and (type(targets) ~= 'string' and type(targets) ~= 'table') then error('bad argument #2 to \'%s\' (string or table expected, got '..type(targets)..')', 0) end
+    if not entities or (type(entities) ~= 'number' and type(entities) ~= 'table') then error('bad argument #1 to \'removelocalentity\' (number or table expected, got '..type(entities)..')', 2) end
+    if targets and (type(targets) ~= 'string' and type(targets) ~= 'table') then error('bad argument #2 to \'removelocalentity\' (string or table expected, got '..type(targets)..')', 2) end
     if TARGET == 'ox' then
       Target:removeLocalEntity(entities, targets)
     elseif TARGET == 'qb' then
@@ -624,7 +632,7 @@ do
 
   --------------------- OBJECT ---------------------
 
-  bridge = {
+  local bridge = {
     _DATA = {FRAMEWORK = FRAMEWORK, LIB = LIB, INVENTORY = INVENTORY, EXPORTS = EXPORTS, EVENTS = EVENTS},
     getframework = get_framework,
     getinventory = get_inventory,

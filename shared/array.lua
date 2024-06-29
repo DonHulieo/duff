@@ -37,7 +37,7 @@ do
   ---@param ... any? Additional values to push.
   ---@return any[] list The array with the values pushed.
   local function push(list, arg, ...)
-    if not is_array(list) then error('bad argument #1 to \'%s\' (array or empty table expected, got '..table_type(list)..' table)', 0) end
+    if not is_array(list) then error('bad argument #1 to \'push\' (array or empty table expected, got '..table_type(list)..' table)', 2) end
     if not arg then return list end
     list[#list + 1] = arg
     if select('#', ...) > 0 then
@@ -51,8 +51,8 @@ do
   ---@param tbl any[] The array to push.
   ---@return any[] list The array with the values pushed.
   local function push_array(list, tbl)
-    if not is_array(list) then error('bad argument #1 to \'%s\' (array or empty table expected, got '..table_type(list)..' table)', 0) end
-    if not is_array(tbl) or not tbl[1] then error('bad argument #2 to \'%s\' (filled array expected, got '..table_type(tbl)..' table)', 0) end
+    if not is_array(list) then error('bad argument #1 to \'pusharray\' (array or empty table expected, got '..table_type(list)..' table)', 2) end
+    if not is_array(tbl) or not tbl[1] then error('bad argument #2 to \'pusharray\' (filled array expected, got '..table_type(tbl)..' table)', 2) end
     for i = 1, #tbl do list[#list + 1] = tbl[i] end
     return list
   end
@@ -61,10 +61,10 @@ do
   ---@param index integer? The index to peek at.
   ---@return any value The value at the specified index.
   local function peek(list, index)
-    if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
+    if not is_array(list) or not list[1] then error('bad argument #1 to \'peek\' (filled array expected, got '..table_type(list)..' table)', 2) end
     index = index or 1
     local len = #list
-    if index <= 0 or index > #list then error('bad argument #2 to \'%s\' (index out of range)', 0) end
+    if index <= 0 or index > #list then error('bad argument #2 to \'peek\' (index out of range)', 0) end
     local function do_peek(n, offset)
       if n <= 0 or offset >= len then return end
       return list[len - offset], do_peek(n - 1, offset + 1)
@@ -76,9 +76,9 @@ do
   ---@param index integer? The index to peek at.
   ---@return any[] values The values at the specified index.
   local function peek_array(list, index)
-    if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
+    if not is_array(list) or not list[1] then error('bad argument #1 to \'peekarray\' (filled array expected, got '..table_type(list)..' table)', 2) end
     index = index or 1
-    if index <= 0 or index > #list then error('bad argument #2 to \'%s\' (index out of range)', 0) end
+    if index <= 0 or index > #list then error('bad argument #2 to \'peekarray\' (index out of range)', 2) end
     local len, res = #list, {}
     for i = 1, math_min(index, len) do res[i] = list[len - i + 1] end
     return res
@@ -88,9 +88,9 @@ do
   ---@param index integer? The index to pop.
   ---@return any value, any[] list The value at the specified index and the array with the value removed.
   local function pop(list, index)
-    if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
+    if not is_array(list) or not list[1] then error('bad argument #1 to \'pop\' (filled array expected, got '..table_type(list)..' table)', 2) end
     index = index or 1
-    if index <= 0 or index > #list then error('bad argument #2 to \'%s\' (index out of range)', 0) end
+    if index <= 0 or index > #list then error('bad argument #2 to \'pop\' (index out of range)', 2) end
     local value = list[index]
     value = table_remove(list, index)
     return value and value, value and pop(list, index - 1)
@@ -100,9 +100,9 @@ do
   ---@param index integer? The index to pop.
   ---@return any[] values The values at the specified index.
   local function pop_array(list, index)
-    if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
+    if not is_array(list) or not list[1] then error('bad argument #1 to \'poparray\' (filled array expected, got '..table_type(list)..' table)', 2) end
     index = index or 1
-    if index <= 0 or index > #list then error('bad argument #2 to \'%s\' (index out of range)', 0) end
+    if index <= 0 or index > #list then error('bad argument #2 to \'poparray\' (index out of range)', 2) end
     local res = {}
     for i = 1, math_min(index, #list) do res[i] = table_remove(list, i) end
     return res
@@ -113,8 +113,8 @@ do
   ---@param value any? The value to check.
   ---@return boolean contains Whether the array contains the key or value.
   local function contains(list, key, value)
-    if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
-    if not key and not value then error('bad argument #2 to \'%s\' (key or value expected, got nil)', 0) end
+    if not is_array(list) or not list[1] then error('bad argument #1 to \'contains\' (filled array expected, got '..table_type(list)..' table)', 2) end
+    if not key and not value then error('bad argument #2 to \'contains\' (key or value expected, got nil)', 2) end
     if not key and value then
       for i = 1, #list do
         if list[i] == value then return true end
@@ -127,7 +127,7 @@ do
   ---@param list any[] The array to copy.
   ---@return any[] copy_list The copied array.
   local function copy(list)
-    if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
+    if not is_array(list) or not list[1] then error('bad argument #1 to \'copy\' (filled array expected, got '..table_type(list)..' table)', 2) end
     local res = {}
     for i = 1, #list do res[i] = list[i] end
     return res
@@ -144,8 +144,8 @@ do
   ---@param fn fun(val: any, i: integer): boolean The function to search with.
   ---@return integer? index The index of the first element that satisfies the condition.
   local function find(list, fn)
-    if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
-    if not fn or not is_fun(fn) then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
+    if not is_array(list) or not list[1] then error('bad argument #1 to \'find\' (filled array expected, got '..table_type(list)..' table)', 2) end
+    if not fn or not is_fun(fn) then error('bad argument #2 to \'find\' (function expected, got '..type(fn)..')', 2) end
     for i = 1, #list do
       if fn(list[i], i) then return i end
     end
@@ -156,8 +156,8 @@ do
   ---@param arg any? The initial value.
   ---@return any res The reduced list.
   local function fold_left(list, fn, arg)
-    if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
-    if not fn or not is_fun(fn) then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
+    if not is_array(list) or not list[1] then error('bad argument #1 to \'foldleft\' (filled array expected, got '..table_type(list)..' table)', 2) end
+    if not fn or not is_fun(fn) then error('bad argument #2 to \'foldleft\' (function expected, got '..type(fn)..')', 2) end
     local res = list[1]
     res = arg and fn(res, arg) or res
     for i = 2, #list do res = fn(res, list[i]) end
@@ -169,8 +169,8 @@ do
   ---@param arg any? The initial value.
   ---@return any res The reduced list.
   local function fold_right(list, fn, arg)
-    if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
-    if not fn or not is_fun(fn) then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
+    if not is_array(list) or not list[1] then error('bad argument #1 to \'foldright\' (filled array expected, got '..table_type(list)..' table)', 2) end
+    if not fn or not is_fun(fn) then error('bad argument #2 to \'foldright\' (function expected, got '..type(fn)..')', 2) end
     local res = list[#list]
     res = arg and fn(res, arg) or res
     for i = #list - 1, 1, -1 do res = fn(res, list[i]) end
@@ -190,8 +190,8 @@ do
   ---@param in_place boolean? Whether to map in place.
   ---@return any[] res The mapped array.
   local function map(list, fn, in_place)
-    if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
-    if not fn or not is_fun(fn) then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
+    if not is_array(list) or not list[1] then error('bad argument #1 to \'map\' (filled array expected, got '..table_type(list)..' table)', 2) end
+    if not fn or not is_fun(fn) then error('bad argument #2 to \'map\' (function expected, got '..type(fn)..')', 2) end
     local res = in_place and list or {}
     for i = 1, #list do res[i] = fn(list[i]) end
     return res
@@ -202,8 +202,8 @@ do
   ---@param in_place boolean? Whether to filter in place.
   ---@return any[] res The filtered array.
   local function filter(list, fn, in_place)
-    if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
-    if fn and not is_fun(fn) then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
+    if not is_array(list) or not list[1] then error('bad argument #1 to \'filter\' (filled array expected, got '..table_type(list)..' table)', 2) end
+    if fn and not is_fun(fn) then error('bad argument #2 to \'filter\' (function expected, got '..type(fn)..')', 2) end
     if in_place then
       local i = 1
       while i <= #list do
@@ -223,8 +223,8 @@ do
   ---@param fn fun(val: any, i: integer) The function to call for each element.
   ---@param reverse boolean? Whether to iterate in reverse.
   local function for_each(list, fn, reverse)
-    if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
-    if not fn or not is_fun(fn) then error('bad argument #2 to \'%s\' (function expected, got '..type(fn)..')', 0) end
+    if not is_array(list) or not list[1] then error('bad argument #1 to \'foreach\' (filled array expected, got '..table_type(list)..' table)', 2) end
+    if not fn or not is_fun(fn) then error('bad argument #2 to \'foreach\' (function expected, got '..type(fn)..')', 2) end
     local i, j, n = 1, #list, 1
     if reverse then i, j, n = j, 1, -1 end
     for k = i, j, n do fn(list[k], k) end
@@ -234,7 +234,7 @@ do
   ---@param length integer? The length to reverse.
   ---@return any[] list The reversed array.
   local function reverse(list, length)
-    if not is_array(list) or not list[1] then error('bad argument #1 to \'%s\' (filled array expected, got '..table_type(list)..' table)', 0) end
+    if not is_array(list) or not list[1] then error('bad argument #1 to \'reverse\' (filled array expected, got '..table_type(list)..' table)', 2) end
     if length and length <= 1 or #list <= 1 then return list end
     local i, j = 1, length and length or #list
     while i < j do

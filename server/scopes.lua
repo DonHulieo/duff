@@ -35,7 +35,7 @@ do
   ---@return {[string]: boolean} Scope Returns the scope of `player` or the source player if `player` is not provided.
   local function get_player_scope(player) -- Credits go to: [PichotM](https://gist.github.com/PichotM/44542ebdd5eba659055fbe1e09ae6b21)
     local src = ensure_string(player or source)
-    if not src or type(src) ~= 'string' then error('bad argument #1 to \'%s\' (string expected, got '..type(src)..')', 0) end
+    if not src or type(src) ~= 'string' then error('bad argument #1 to \'getplayerscope\' (string expected, got '..type(src)..')', 2) end
     Scopes[src] = Scopes[src] or {}
     return Scopes[src]
   end
@@ -112,6 +112,7 @@ do
 
   ---@param event string The event to remove.
   local function remove_synced_scope_event(event)
+    if not Scopes.Synced or not Scopes.Synced[event] then error('bad argument #1 to \'remove_synced_scope_event\' (event does not exist)', 2) end
     Scopes.Synced[event] = nil
   end
 

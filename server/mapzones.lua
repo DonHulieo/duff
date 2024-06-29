@@ -45,7 +45,7 @@ do
   local function contains(coords)
     local param_type = type(coords)
     coords = param_type ~= 'vector3' and to_vec(coords) or coords --[[@as vector3]]
-    if not coords or not is_vec(coords) then error('bad argument #1 to \'%s\' (vector3 or table expected, got '..param_type..')', 0) end
+    if not coords or not is_vec(coords) then error('bad argument #1 to \'contains\' (vector3 or table expected, got '..param_type..')', 2) end
     local does_contain, index = false, 0
     for i = 1, #ZONES do
       if check_bounds(i, coords) then does_contain, index = true, i break end
@@ -56,12 +56,14 @@ do
   ---@param index integer The index of the zone.
   ---@return {Name: string, DisplayName: string, Bounds: {Minimum: {X: number, Y: number, Z: number}, Maximum: {X: number, Y: number, Z: number}}}? zone Returns the zone data.
   local function get_zone(index)
+    if type(index) ~= 'number' then error('bad argument #1 to \'getzone\' (number expected, got '..type(index)..')', 2) end
     return ZONES[index]
   end
 
   ---@param coords vector3|{x: number, y: number, z: number}|number[] The value to check. <br> Can be vector3, a table with `x`, `y`, `z`, and `w` keys or an array with the same values.
   ---@return string name Returns the name of the zone.
   local function get_name_of_zone(coords)
+    if not coords or not is_vec(coords) then error('bad argument #1 to \'getzonename\' (vector3 or table expected, got '..type(coords)..')', 2) end
     local bool, index = contains(coords)
     return bool and ZONES[index].Name:upper() or 'UNKNOWN'
   end
@@ -69,6 +71,7 @@ do
   ---@param coords vector3|{x: number, y: number, z: number}|number[] The value to check. <br> Can be vector3, a table with `x`, `y`, `z`, and `w` keys or an array with the same values.
   ---@return integer index Returns the index of the zone.
   local function get_index_of_zone(coords)
+    if not coords or not is_vec(coords) then error('bad argument #1 to \'getzoneindex\' (vector3 or table expected, got '..type(coords)..')', 2) end
     local bool, index = contains(coords)
     return bool and index or 0
   end
@@ -76,7 +79,7 @@ do
   ---@param name string The name of the zone.
   ---@return integer index Returns the index of the zone.
   local function get_index_from_name(name)
-    if type(name) ~= 'string' then error('bad argument #1 to \'%s\' (string expected, got '..type(name)..')', 0) end
+    if type(name) ~= 'string' then error('bad argument #1 to \'getzonefromname\' (string expected, got '..type(name)..')', 2) end
     local index = 0
     name = name:upper()
     for i = 1, #ZONES do
@@ -110,12 +113,12 @@ do
   ---@param time integer? The time to wait between checks in milliseconds.
   ---@param player string? The player to add the event for.
   local function add_zone_event(event, zone_id, onEnter, onExit, time, player)
-    if not event or type(event) ~= 'string' then error('bad argument #1 to \'%s\' (string expected, got '..type(event)..')', 0) end
+    if not event or type(event) ~= 'string' then error('bad argument #1 to \'addzoneevent\' (string expected, got '..type(event)..')', 2) end
     local zone_id_type = type(zone_id)
-    if not zone_id or not (is_vec(zone_id --[[@as table|number[]|vector3]]) or zone_id_type == 'string') then error('bad argument #2 to \'%s\' (vector3 or string expected, got '..zone_id_type..')', 0) end
+    if not zone_id or not (is_vec(zone_id --[[@as table|number[]|vector3]]) or zone_id_type == 'string') then error('bad argument #2 to \'addzoneevent\' (vector3 or string expected, got '..zone_id_type..')', 2) end
     local index = zone_id_type == 'number' and zone_id and zone_id_type ~= 'string' and get_index_of_zone(zone_id --[[@as number[]|vector3|{x: number, y: number, z: number}]]) or get_index_from_name(zone_id --[[@as string]])
-    if index == 0 or not ZONES[index] then error('bad argument #2 to \'%s\' (zone not found)', 0) end
-    if Listeners[event] then error('bad argument #1 to \'%s\' (event \''..event..'\' already exists)', 0) end
+    if index == 0 or not ZONES[index] then error('bad argument #2 to \'addzoneevent\' (zone not found)', 2) end
+    if Listeners[event] then error('bad argument #1 to \'addzoneevent\' (event \''..event..'\' already exists)', 2) end
     Listeners[event] = {players = {}}
     local sleep = time or 500
     CreateThread(function()
@@ -159,7 +162,7 @@ do
 
   ---@param event string The name of the event.
   local function remove_zone_event(event)
-    if not event or type(event) ~= 'string' then error('bad argument #1 to \'%s\' (string expected, got '..type(event)..')', 0) end
+    if not event or type(event) ~= 'string' then error('bad argument #1 to \'removezoneevent\' (string expected, got '..type(event)..')', 2) end
     if Listeners[event] then Listeners[event] = nil end
   end
 

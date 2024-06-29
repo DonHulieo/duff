@@ -7,7 +7,8 @@
 do
   local current_resource = GetCurrentResourceName()
   local load, load_resource_file = load, LoadResourceFile
-  local array = duff?.array or load(load_resource_file('duff', 'shared/array.lua'), '@duff/shared/array.lua', 'bt', _ENV)()
+  local require = duff?.packages.require or load(load_resource_file('duff', 'shared/packages.lua'), '@duff/shared/packages.lua', 'bt', _ENV)().require
+  local array = duff?.array or require 'duff.shared.array'
   local table = table
   local reverse = array.reverse
   ---@diagnostic disable-next-line: deprecated
@@ -134,8 +135,8 @@ do
   ---@param key string A dot-separated key.
   ---@param value string A phrase to set.
   local function set(key, value)
-    if not key or type(key) ~= 'string' then error('bad argument #1 to \'%s\' (string expected, got '..type(key)..')', 0) end
-    if not value or type(value) ~= 'string' then error('bad argument #2 to \'%s\' (string expected, got '..type(value)..')', 0) end
+    if not key or type(key) ~= 'string' then error('bad argument #1 to \'set\' (string expected, got '..type(key)..')', 2) end
+    if not value or type(value) ~= 'string' then error('bad argument #2 to \'set\' (string expected, got '..type(value)..')', 2) end
     local path, length = split(key)
     local result = storage
     for i = 1, length - 1 do
@@ -171,16 +172,16 @@ do
   local function load_file(resource, file)
     resource = resource or current_resource
     file = file or ('locales/'..dialect) --[[@as string]]
-    local translations = safe_load(resource, file) and load(load_resource_file(resource, file..'.lua'), '@'..resource..'/'..file, 't', _ENV)
-    if not translations then return end
-    recursive_load(nil, translations())
+    local translations = require(resource..'.'..file:gsub('/', '.')) --[[@as {[string]: string}]]
+    if not translations then error('unable to load translations from \'@'..resource..'/'..file..'.lua\'', 2) end
+    recursive_load(nil, translations)
   end
 
   ---@param key string The key to translate.
   ---@param data table? The data to interpolate.
   ---@return string string The translated phrase.
   local function translate(key, data)
-    if not key or type(key) ~= 'string' then error('bad argument #1 to \'%s\' (string expected, got '..type(key)..')', 0) end
+    if not key or type(key) ~= 'string' then error('bad argument #1 to \'translate\' (string expected, got '..type(key)..')', 2) end
     data = data or {}
     if not next(storage) then load_file() end
     local used_locale = data.locale or default_locale

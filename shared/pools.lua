@@ -10,7 +10,7 @@
 do
   local load, load_resource_file = load, LoadResourceFile
   local require = duff?.packages.require or load(load_resource_file('duff', 'shared/packages.lua'), '@duff/shared/packages.lua', 'bt', _ENV)().require
-  local array, vector = require 'duff.shared.array', require 'duff.shared.vector'
+  local array, vector = duff?.array or require 'duff.shared.array', duff?.vector or require 'duff.shared.vector'
   local filter = array.filter
   local to_vec, get_closest = vector.tovec, vector.getclosest
   local type = type
@@ -28,11 +28,10 @@ do
   ---@param ped_type integer|(fun(ped: integer, index: integer): boolean)? Can be a filter function or a ped type (client only). <br> If `ped_type` is a function with the signature `(ped: integer, index: integer): boolean`, it will be used to filter the peds. <br> If `ped_type` is a number, it will filter the peds by their type. <br> `ped_type` can be found [here](https://docs.fivem.net/natives/?_0xFF059E1E4C01E63C).
   ---@return integer[] peds An array of all peds, filtered by `ped_type` if provided.
   local function get_peds(ped_type)
-    local param_type = type(ped_type)
     local is_func = is_fun(ped_type)
     if is_server then
-      if not all_peds then error('error calling \'%s\' (native at index _0xB8584FEF not found)', 0) end ---@cast all_peds -?
-      if ped_type and not is_func then --[[@cast ped_type -function]] error('bad argument #1 to \'%s\' (expected nil or function, got '..type(ped_type)..')', 0) end
+      if not all_peds then error('error calling \'getpeds\' (native at index _0xB8584FEF not found)', 2) end ---@cast all_peds -?
+      if ped_type and not is_func then --[[@cast ped_type -function]] error('bad argument #1 to \'getpeds\' (expected nil or function, got '..type(ped_type)..')', 2) end
     end
     local def_filter = not is_func --[[@cast ped_type +integer|-function]] and function(ped, index) return not ped_type or GetPedType(ped) == ped_type end or ped_type  --[[@as fun(ped: integer, index: integer): boolean]]
     return filter(is_server and all_peds() or get_pool('CPed'), def_filter, true)
@@ -45,11 +44,11 @@ do
     local is_func = is_fun(vehicle_type)
     local def_filter ---@type fun(vehicle: integer, index: integer): boolean
     if is_server then
-      if not all_vehs then error('error calling \'%s\' (native at index _0x332169F5 not found)', 0) end ---@cast all_vehs -?
-      if vehicle_type and not is_func and param_type ~= 'string' then --[[@cast vehicle_type -function]] error('bad argument #1 to \'%s\' (expected nil, string or function, got '..type(vehicle_type)..')', 0) end
+      if not all_vehs then error('error calling \'getvehicles\' (native at index _0x332169F5 not found)', 2) end ---@cast all_vehs -?
+      if vehicle_type and not is_func and param_type ~= 'string' then --[[@cast vehicle_type -function]] error('bad argument #1 to \'getvehicles\' (expected nil, string or function, got '..type(vehicle_type)..')', 2) end
       def_filter = not is_func --[[@cast vehicle_type +integer|-function]] and function(vehicle, index) return not vehicle_type or GetVehicleType(vehicle) == vehicle_type end or vehicle_type --[[@as fun(vehicle: integer, index: integer): boolean]]
     else
-      if vehicle_type and not is_func and param_type ~= 'number' then --[[@cast vehicle_type -function]] error('bad argument #1 to \'%s\' (expected nil, number or function, got '..type(vehicle_type)..')', 0) end
+      if vehicle_type and not is_func and param_type ~= 'number' then --[[@cast vehicle_type -function]] error('bad argument #1 to \'getvehicles\' (expected nil, number or function, got '..type(vehicle_type)..')', 2) end
       def_filter = not is_func --[[@cast vehicle_type +integer|-function]] and function(vehicle, index) return not vehicle_type or GetVehicleClass(vehicle) == vehicle_type end or vehicle_type --[[@as fun(vehicle: integer, index: integer): boolean]]
     end
     return filter(is_server --[[@cast all_vehs -?]] and all_vehs() --[[@as integer[]=]] or get_pool('CVehicle'), def_filter, true)
@@ -58,8 +57,8 @@ do
   ---@param filter_fn (fun(object: integer, index: integer): boolean)? The function to filter the objects. <br> If not provided, all objects will be returned.
   ---@return integer[] objects An array of all objects, filtered by `filter_fn` if provided.
   local function get_objects(filter_fn)
-    if is_server and not all_objs then error('error calling \'%s\' (native at index _0x6886C3FE not found)', 0) end ---@cast all_objs -?
-    if filter_fn and not is_fun(filter_fn) then error('bad argument #1 to \'%s\' (expected nil or function, got '..type(filter_fn)..')', 0) end
+    if is_server and not all_objs then error('error calling \'getobjects\' (native at index _0x6886C3FE not found)', 2) end ---@cast all_objs -?
+    if filter_fn and not is_fun(filter_fn) then error('bad argument #1 to \'getobjects\' (expected nil or function, got '..type(filter_fn)..')', 2) end
     return filter(is_server and all_objs() or get_pool('CObject'), filter_fn, true)
   end
 
@@ -71,7 +70,7 @@ do
     local is_str = param_type == 'string'
     local is_num = param_type == 'number'
     local is_func = is_fun(hash)
-    if hash and not is_str and not is_num and not is_func then error('bad argument #1 to \'%s\' (expected nil, string, number or function, got '..param_type..')', 0) end
+    if hash and not is_str and not is_num and not is_func then error('bad argument #1 to \'getpickups\' (expected nil, string, number or function, got '..param_type..')', 2) end
     local hash_key = param_type == 'string' and joaat(hash) or param_type == 'number' and hash or nil
     local def_filter = not is_func and function(pickup, index) return not hash_key or GetPickupHash(pickup) == hash_key end or hash --[[@as fun(pickup: integer, index: integer): boolean]]
     return filter(get_pool('CPickup'), def_filter, true)
@@ -84,7 +83,7 @@ do
   ---@return integer? ped, number? dist, integer[]? peds The closest ped to `check`, the distance to the closest ped and an array of all peds within `radius`.
   local function get_closest_ped(check, ped_type, radius, excluding)
     check = check and to_vec(check) or not is_server and get_coords(PlayerPedId()) --[[@as vector3]]
-    if not check then error('bad argument #1 to \'%s\' (entity, vector or table expected, got '..type(check)..')', 0) end
+    if not check then error('bad argument #1 to \'getclosestped\' (entity, vector or table expected, got '..type(check)..')', 2) end
     local ped, dist, peds = get_closest(check, get_peds(ped_type --[[@as any]]), radius, excluding)
     return ped --[[@as integer]], dist, peds
   end
@@ -96,7 +95,7 @@ do
   ---@return integer? veh, number? dist, integer[]? vehs
   local function get_closest_vehicle(check, vehicle_type, radius, excluding)
     check = check and to_vec(check) or not is_server and get_coords(PlayerPedId()) --[[@as vector3]]
-    if not check then error('bad argument #1 to \'%s\' (entity, vector or table expected, got '..type(check)..')', 0) end
+    if not check then error('bad argument #1 to \'getclosestvehicle\' (entity, vector or table expected, got '..type(check)..')', 2) end
     local veh, dist, vehs = get_closest(check, get_vehicles(vehicle_type --[[@as any]]), radius, excluding)
     return veh --[[@as integer]], dist, vehs
   end
@@ -108,7 +107,7 @@ do
   ---@return integer? obj, number? dist, integer[]? objs
   local function get_closest_object(check, filter_fn, radius, excluding)
     check = check and to_vec(check) or not is_server and get_coords(PlayerPedId()) --[[@as vector3]]
-    if not check then error('bad argument #1 to \'%s\' (entity, vector or table expected, got '..type(check)..')', 0) end
+    if not check then error('bad argument #1 to \'getclosestobject\' (entity, vector or table expected, got '..type(check)..')', 2) end
     local obj, dist, objs = get_closest(check, get_objects(filter_fn), radius, excluding)
     return obj --[[@as integer]], dist, objs
   end
@@ -119,7 +118,7 @@ do
   ---@param excluding string|number|(string|number)[]? The pickup or array of pickups to exclude from the search.
   ---@return integer? pickup, number? dist, integer[]? pickups The closest pickup to `check`, the distance to the closest pickup and an array of all pickups within `radius`.
   local function get_closest_pickup(check, hash, radius, excluding) -- **Note**: This is a client-only function.
-    if is_server then error('called a client only function \'%s\'', 0) end
+    if is_server then error('called a client only function \'getclosestpickup\'', 2) end
     check = check and to_vec(check) or get_coords(PlayerPedId()) --[[@as vector3]]
     local pickup, dist, pickups = get_closest(check, get_pickups(hash --[[@as any]]), radius, excluding)
     return pickup --[[@as integer]], dist, pickups
