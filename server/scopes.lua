@@ -6,7 +6,7 @@
 ---@field removesyncedscopeevent fun(event: string) Removes the synced scope event with the name `event`.
 do
   local load, load_resource_file = load, LoadResourceFile
-  local math = duff?.math or load(load_resource_file('duff', 'shared/math.lua'), '@duff/shared/math.lua', 't', _ENV)()
+  local math = duff?.math or load(load_resource_file('duff', 'shared/math.lua'), '@duff/shared/math.lua', 'bt', _ENV)()
   local Citizen, table = Citizen, table
   local timer = math.timer
   local new_thread, wait = Citizen.CreateThread, Citizen.Wait

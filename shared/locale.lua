@@ -5,8 +5,9 @@
 ---@field translate fun(key: string, data: table?): string Translates `key` with optional `data`. <br> Returns the translation if found, or `data.default` if not.
 ---@field t fun(key: string, data: table?): string Alias for `translate`.
 do
+  local current_resource = GetCurrentResourceName()
   local load, load_resource_file = load, LoadResourceFile
-  local array = duff?.array or load(load_resource_file('duff', 'shared/array.lua'), '@duff/shared/array.lua', 't', _ENV)()
+  local array = duff?.array or load(load_resource_file('duff', 'shared/array.lua'), '@duff/shared/array.lua', 'bt', _ENV)()
   local table = table
   local reverse = array.reverse
   ---@diagnostic disable-next-line: deprecated
@@ -168,7 +169,7 @@ do
   ---@param resource string? The resource name.
   ---@param file string? The file path.
   local function load_file(resource, file)
-    resource = resource or GetInvokingResource()
+    resource = resource or current_resource
     file = file or ('locales/'..dialect) --[[@as string]]
     local translations = safe_load(resource, file) and load(load_resource_file(resource, file..'.lua'), '@'..resource..'/'..file, 't', _ENV)
     if not translations then return end

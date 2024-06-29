@@ -17,6 +17,8 @@ if is_res_pres('es_extended') and is_res_pres('ox_mysql') and not is_res_pres('o
   server_script '@oxmysql/lib/MySQL.lua'
 end
 
+debug_mode 'true'
+
 files {'data/*.json', '**/*.lua'}
 
 lua54 'yes'

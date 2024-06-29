@@ -14,8 +14,8 @@
 do
   local game_timer = GetGameTimer
   local load, load_resource_file = load, LoadResourceFile
-  local load_module = function(module) return load(load_resource_file('duff', 'shared/'..module..'.lua'), '@duff/shared/'..module..'.lua', 't', _ENV)() end
-  local async, math = duff?.async or load_module('async'), duff?.math or load_module('math')
+  local require = duff?.packages.require or load(load_resource_file('duff', 'shared/packages.lua'), '@duff/shared/packages.lua', 'bt', _ENV)().require
+  local async_fn, math = require 'duff.shared.async', require 'duff.shared.math'
   local timer = math.timer
   local type, error, tostring = type, error, tostring
   local does_anim_dict_exist, has_anim_dict_loaded, request_anim_dict = DoesAnimDictExist, HasAnimDictLoaded, RequestAnimDict
@@ -50,7 +50,7 @@ do
   ---@return boolean? loaded Whether the animation dictionary was loaded.
   local function async_req_anim_dict(dict)
     if not dict or type(dict) ~= 'string' then error('bad argument #1 to \'%s\' (string expected, got '..type(dict)..')', 0) end
-    return async(req_anim_dict, dict)
+    return async_fn(req_anim_dict, dict)
   end
 
   ---@param set string The animation set to load.
@@ -64,7 +64,7 @@ do
   ---@return boolean? loaded Whether the animation set was loaded.
   local function async_req_anim_set(set)
     if not set or type(set) ~= 'string' then error('bad argument #1 to \'%s\' (string expected, got '..type(set)..')', 0) end
-    return async(req_anim_set, set)
+    return async_fn(req_anim_set, set)
   end
 
   ---@param model string|number The model to load collision for.
@@ -84,7 +84,7 @@ do
     if not model or (param_type ~= 'string' and param_type ~= 'number') then error('bad argument #1 to \'%s\' (string or number expected, got '..param_type..')', 0) end
     model = type(model) == 'number' and model or joaat(model) & 0xFFFFFFFF
     if not is_model_in_cd(model) or not is_model_in_valid(model) then error('bad argument #1 to \'%s\' (invalid model requested: '..tostring(model)..')', 0) end
-    return async(req_collision, model)
+    return async_fn(req_collision, model)
   end
 
   ---@param ipl string The IPL to load.
@@ -98,7 +98,7 @@ do
   ---@return boolean? loaded Whether the IPL was loaded.
   local function async_req_ipl(ipl)
     if not ipl or type(ipl) ~= 'string' then error('bad argument #1 to \'%s\' (string expected, got '..type(ipl)..')', 0) end
-    return async(req_ipl, ipl)
+    return async_fn(req_ipl, ipl)
   end
 
   ---@param model string|number The model to load.
@@ -118,7 +118,7 @@ do
     if not model or (param_type ~= 'string' and param_type ~= 'number') then error('bad argument #1 to \'%s\' (string or number expected, got '..param_type..')', 0) end
     model = type(model) == 'number' and model or joaat(model) & 0xFFFFFFFF
     if not is_model_in_cd(model) or not is_model_in_valid(model) then error('bad argument #1 to \'%s\' (invalid model requested: '..tostring(model)..')', 0) end
-    return async(req_model, model)
+    return async_fn(req_model, model)
   end
 
   ---@param fx string The particle effect asset to load.
@@ -132,7 +132,7 @@ do
   ---@return boolean? loaded Whether the particle effect asset was loaded.
   local function async_req_ptfx(fx)
     if not fx or type(fx) ~= 'string' then error('bad argument #1 to \'%s\' (string expected, got '..type(fx)..')', 0) end
-    return async(req_ptfx, fx)
+    return async_fn(req_ptfx, fx)
   end
 
   return {

@@ -11,8 +11,8 @@
 ---@field getoffsetfromentityinworldcoords fun(entity: integer, offset_x: number, offset_y: number, offset_z: number): vector3 Returns the world coordinates of `offset` from `entity`. <br> Credits go to: [draobrehtom](https://forum.cfx.re/t/how-to-use-get-offset-from-entity-in-world-coords-on-server-side/4502297).
 do
   local load, load_resource_file = load, LoadResourceFile
-  local load_module = function(module) return load(load_resource_file('duff', 'shared/'..module..'.lua'), '@duff/shared/'..module..'.lua', 't', _ENV)() end
-  local array, math = duff?.array or load_module 'array', duff?.math or load_module 'math'
+  local require = duff?.packages.require or load(load_resource_file('duff', 'shared/packages.lua'), '@duff/shared/packages.lua', 'bt', _ENV)().require
+  local array, math = require 'duff.shared.array', require 'duff.shared.math'
   local string, table = string, table
   local contains = array.contains
   local rad, cos, sin, huge = math.rad, math.cos, math.sin, math.huge

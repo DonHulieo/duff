@@ -9,8 +9,8 @@
 ---@field remove fun(blips: integer|integer[]) Removes `blips` from the map. <br> If `blips` is a number, it removes that blip. <br> If `blips` is an array, it removes all blips in the array.
 do
   local load, load_resource_file = load, LoadResourceFile
-  local load_module = function(module) return load(load_resource_file('duff', 'shared/'..module..'.lua'), '@duff/shared/'..module..'.lua', 't', _ENV)() end
-  local array, vector = duff?.array or load_module('array'), duff?.vector or load_module('vector')
+  local require = duff?.packages.require or load(load_resource_file('duff', 'shared/packages.lua'), '@duff/shared/packages.lua', 'bt', _ENV)().require
+  local array, vector = require 'duff.shared.array', require 'duff.shared.vector'
   local push, filter = array.push, array.filter
   local get_closest = vector.getclosest
   local does_blip_exist = DoesBlipExist
