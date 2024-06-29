@@ -172,9 +172,9 @@ do
   local function load_file(resource, file)
     resource = resource or current_resource
     file = file or ('locales/'..dialect) --[[@as string]]
-    local translations = require(resource..'.'..file:gsub('/', '.')) --[[@as {[string]: string}]]
-    if not translations then error('unable to load translations from \'@'..resource..'/'..file..'.lua\'', 2) end
-    recursive_load(nil, translations)
+    local translations, err = load(load_resource_file(resource, file..'.lua'), '@'..resource..'/'..file..'.lua', 'bt', _ENV)
+    if not translations or err then error('unable to load translations from \'@'..resource..'/'..file..'.lua\'\n\t'..(err and err), 2) end
+    recursive_load(nil, translations())
   end
 
   ---@param key string The key to translate.
