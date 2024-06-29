@@ -21,7 +21,7 @@
 ---@field removelocalentity fun(entities: integer|integer[], targets: string|string[]?) Removes the target from `entities` with the specified `targets`. <br> **Note**: This is a client-only function.
 do
   local load, load_resource_file = load, LoadResourceFile
-  local packages = duff?.packages or load(load_resource_file('duff', 'shared/packages.lua'), '@duff/shared/packages.lua', 'bt', _ENV)()
+  local packages = duff?.package or load(load_resource_file('duff', 'shared/package.lua'), '@duff/shared/package.lua', 'bt', _ENV)()
   local get_resource_state = GetResourceState
   local Frameworks = {['es_extended'] = 'esx', ['qb-core'] = 'qb'}
   local Inventories = {['ox_inventory'] = 'ox', ['qb-inventory'] = 'qb'}
@@ -148,7 +148,7 @@ do
     if not LIB then error('library is invalid', 2) end
     if Lib then return Lib end
     if LIB == 'ox' then
-      if not Lib then packages.import('ox_lib.init') end
+      if not Lib then packages.import('ox_lib') end
       Lib = lib
     end
     if type(Lib) ~= 'table' then error('library object is invalid', 2) end
@@ -440,7 +440,7 @@ do
   ---@return ox_inventory|table Inv The inventory object being used.
   local function get_inv_object()
     if not INVENTORY then error('inventory system is invalid', 2) end
-    if FRAMEWORK == 'esx' and not MySQL then
+    if INVENTORY == 'esx' and not MySQL then
       packages.import('oxmysql.lib.MySQL')
     else
       Inv = Inv or consume_export(EXPORTS, 'INV')

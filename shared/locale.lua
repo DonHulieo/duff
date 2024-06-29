@@ -7,7 +7,7 @@
 do
   local current_resource = GetCurrentResourceName()
   local load, load_resource_file = load, LoadResourceFile
-  local require = duff?.packages.require or load(load_resource_file('duff', 'shared/packages.lua'), '@duff/shared/packages.lua', 'bt', _ENV)().require
+  local require = duff?.package.require or load(load_resource_file('duff', 'shared/package.lua'), '@duff/shared/package.lua', 'bt', _ENV)().require
   local array = duff?.array or require 'duff.shared.array'
   local table = table
   local reverse = array.reverse

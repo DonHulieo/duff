@@ -9,7 +9,7 @@
 ---@field getclosestpickup fun(check: integer|vector|{x: number, y: number, z: number}|number[]?, hash: string|number|(fun(pickup: integer, index: integer): boolean)?, radius: number?, excluding: integer|integer[]): integer?, number?, integer[]? Finds the closest pickup to `check`. <br> `check` can be an entity, vector or a table. <br> `hash` can be a function, a string or a number. <br> If `hash` is a function, it will be used to filter the pickups. <br> If `hash` is a string or number, it will filter the pickups by their hash. <br> **Note:** This is a client-only function.
 do
   local load, load_resource_file = load, LoadResourceFile
-  local require = duff?.packages.require or load(load_resource_file('duff', 'shared/packages.lua'), '@duff/shared/packages.lua', 'bt', _ENV)().require
+  local require = duff?.package.require or load(load_resource_file('duff', 'shared/package.lua'), '@duff/shared/package.lua', 'bt', _ENV)().require
   local array, vector = duff?.array or require 'duff.shared.array', duff?.vector or require 'duff.shared.vector'
   local filter = array.filter
   local to_vec, get_closest = vector.tovec, vector.getclosest

@@ -39,8 +39,6 @@ do
     return module
   end
 
-  if is_server then SetConvarReplicated('locale', GetConvar('locale', 'en')) end
-
   ---@class CDuff
   ---@field _VERSION string
   ---@field _URL string
@@ -54,7 +52,7 @@ do
   ---@field bridge CBridge
   ---@field locale CLocale
   ---@field math CMath
-  ---@field packages CPackages
+  ---@field package CPackage
   ---@field pools CPools
   ---@field streaming CStreaming
   ---@field scopes CScopes

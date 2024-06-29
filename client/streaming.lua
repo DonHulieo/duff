@@ -15,7 +15,7 @@
 do
   local game_timer = GetGameTimer
   local load, load_resource_file = load, LoadResourceFile
-  local require = duff?.packages.require or load(load_resource_file('duff', 'shared/packages.lua'), '@duff/shared/packages.lua', 'bt', _ENV)().require
+  local require = duff?.package.require or load(load_resource_file('duff', 'shared/package.lua'), '@duff/shared/package.lua', 'bt', _ENV)().require
   local async_fn, math = duff?.async or require 'duff.shared.async', duff?.math or require 'duff.shared.math'
   local timer = math.timer
   local type, error = type, error
