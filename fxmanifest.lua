@@ -3,12 +3,12 @@ game 'gta5'
 
 author 'DonHulieo'
 description 'Don\'s Utility Functions for FiveM'
-version '1.1.2'
+version '1.1.3'
 url 'https://github.com/DonHulieo/duff'
 
 server_script 'server/init.lua'
 
-debug_mode 'true'
+debug_mode 'false'
 
 files {'data/*.json', '**/*.lua'}
 
