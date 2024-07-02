@@ -17,7 +17,8 @@ do
   ---@param resource string
   local function deinit_zones(resource)
     if resource ~= current_resource then return end
-    Listeners, Players = nil, {}
+    table.wipe(Players)
+    Listeners = nil
   end
 
   ---@param string any The string to check.
@@ -116,7 +117,7 @@ do
     if not event or type(event) ~= 'string' then error('bad argument #1 to \'addzoneevent\' (string expected, got '..type(event)..')', 2) end
     local zone_id_type = type(zone_id)
     if not zone_id or not (is_vec(zone_id --[[@as table|number[]|vector3]]) or zone_id_type == 'string') then error('bad argument #2 to \'addzoneevent\' (vector3 or string expected, got '..zone_id_type..')', 2) end
-    local index = zone_id_type == 'number' and zone_id and zone_id_type ~= 'string' and get_index_of_zone(zone_id --[[@as number[]|vector3|{x: number, y: number, z: number}]]) or get_index_from_name(zone_id --[[@as string]])
+    local index = zone_id_type == 'number' and zone_id or zone_id_type ~= 'string' and get_index_of_zone(zone_id --[[@as number[]|vector3|{x: number, y: number, z: number}]]) or get_index_from_name(zone_id --[[@as string]])
     if index == 0 or not ZONES[index] then error('bad argument #2 to \'addzoneevent\' (zone not found)', 2) end
     if Listeners[event] then error('bad argument #1 to \'addzoneevent\' (event \''..event..'\' already exists)', 2) end
     Listeners[event] = {players = {}}
