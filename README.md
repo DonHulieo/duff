@@ -867,7 +867,7 @@ function bridge.createuseableitem(name, callback)
 - `name` - The name of the item.
 - `callback` - The function to call when the item is used.
 
-**Note:** If using `ox_inventory`, the item export is in the `server.exports` table as `duff.name`.
+**Note:** If using `ox_inventory`, the item export is in the `server.exports` table as `your_resource.name`.
 
 ##### additem
 
