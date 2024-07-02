@@ -16,7 +16,7 @@ do
     dir = not file and context..'/'..module..'.lua' or dir
     file = not file and load_resource_file(res, dir) or file
     if not file then return end
-    local result, err = load(file, '@@'..res..'/'..dir, 'bt', _ENV)
+    local result, err = load(file, '@@'..res..'/'..dir, 't', _ENV)
     if not result or err then return error('error occured loading module \''..module..'\''..(err and '\n\t'..err or ''), 3) end
     CDuff[module] = result()
     if debug_mode then print('^3[duff]^7 - ^2loaded `duff` module^7 ^5\''..module..'\'^7') end

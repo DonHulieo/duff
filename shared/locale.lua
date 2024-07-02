@@ -7,7 +7,7 @@
 do
   local current_resource = GetCurrentResourceName()
   local load, load_resource_file = load, LoadResourceFile
-  local require = duff?.package.require or load(load_resource_file('duff', 'shared/package.lua'), '@duff/shared/package.lua', 'bt', _ENV)().require
+  local require = duff?.package.require or load(load_resource_file('duff', 'shared/package.lua'), '@duff/shared/package.lua', 't', _ENV)().require
   local array = duff?.array or require 'duff.shared.array'
   local table = table
   local reverse = array.reverse
@@ -168,13 +168,12 @@ do
   end
 
   ---@param resource string? The resource name.
-  ---@param file string? The file path.
+  ---@param file string? The name of the file to load. <br> This has to be a dot-notated path to the file. <br> The default is `locales.<dialect>`.
   local function load_file(resource, file)
     resource = resource or current_resource
-    file = file or ('locales/'..dialect) --[[@as string]]
-    local translations, err = load(load_resource_file(resource, file..'.lua'), '@'..resource..'/'..file..'.lua', 'bt', _ENV)
-    if not translations or err then error('unable to load translations from \'@'..resource..'/'..file..'.lua\'\n\t'..(err and err), 2) end
-    recursive_load(nil, translations())
+    file = file or ('locales.'..dialect) --[[@as string]]
+    local translations = require(resource..'.'..file)
+    recursive_load(nil, translations)
   end
 
   ---@param key string The key to translate.

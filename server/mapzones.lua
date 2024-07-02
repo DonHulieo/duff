@@ -8,7 +8,7 @@
 ---@field removezoneevent fun(event: string) Removes the event from the zone. <br> `event` is the name of the event.
 do
   local load, load_resource_file = load, LoadResourceFile
-  local vector = duff?.vector or load(load_resource_file('duff', 'shared/vector.lua'), '@duff/shared/vector.lua', 'bt', _ENV)()
+  local vector = duff?.vector or load(load_resource_file('duff', 'shared/vector.lua'), '@duff/shared/vector.lua', 't', _ENV)()
   local to_vec, is_vec = vector.tovec, vector.isvec
   local ZONES = json.decode(load_resource_file('duff', 'data/zones.json'))
   local current_resource = GetCurrentResourceName()
