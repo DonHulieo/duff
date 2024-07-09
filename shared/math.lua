@@ -28,9 +28,9 @@ do
   ---@param max number The maximum value.
   ---@return boolean is_between `true` if `val` is between `min` and `max`, `false` otherwise.
   local function between(val, min, max)
-    if not val or type(val) ~= 'number' then error('bad argument #1 to \'%s\' (number expected, got '..type(val)..')', 0) end
-    if not min or type(min) ~= 'number' then error('bad argument #2 to \'%s\' (number expected, got '..type(min)..')', 0) end
-    if not max or type(max) ~= 'number' then error('bad argument #3 to \'%s\' (number expected, got '..type(max)..')', 0) end
+    if not val or type(val) ~= 'number' then error('bad argument #1 to \'between\' (number expected, got '..type(val)..')', 2) end
+    if not min or type(min) ~= 'number' then error('bad argument #2 to \'between\' (number expected, got '..type(min)..')', 2) end
+    if not max or type(max) ~= 'number' then error('bad argument #3 to \'between\' (number expected, got '..type(max)..')', 2) end
     return val >= min and val <= max
   end
 
@@ -39,16 +39,16 @@ do
   ---@param max number The maximum value.
   ---@return number clamped `val` clamped between `min` and `max`.
   local function clamp(val, min, max)
-    if not val or type(val) ~= 'number' then error('bad argument #1 to \'%s\' (number expected, got '..type(val)..')', 0) end
-    if not min or type(min) ~= 'number' then error('bad argument #2 to \'%s\' (number expected, got '..type(min)..')', 0) end
-    if not max or type(max) ~= 'number' then error('bad argument #3 to \'%s\' (number expected, got '..type(max)..')', 0) end
+    if not val or type(val) ~= 'number' then error('bad argument #1 to \'clamp\' (number expected, got '..type(val)..')', 2) end
+    if not min or type(min) ~= 'number' then error('bad argument #2 to \'clamp\' (number expected, got '..type(min)..')', 2) end
+    if not max or type(max) ~= 'number' then error('bad argument #3 to \'clamp\' (number expected, got '..type(max)..')', 2) end
     return val < min and min or val > max and max or val
   end
 
   ---@param val integer|number The value to check.
   ---@return boolean is_integer `true` if `val` is an integer.
   local function is_integer(val)
-    if not val or type(val) ~= 'number' then error('bad argument #1 to \'%s\' (number expected, got '..type(val)..')', 0) end
+    if not val or type(val) ~= 'number' then error('bad argument #1 to \'isint\' (number expected, got '..type(val)..')', 2) end
     return val % 1 == 0
   end
 
@@ -56,8 +56,8 @@ do
   ---@param den integer The denominator.
   ---@return integer gcd The Greatest Common Divisor of `num` and `den`.
   local function g_c_d(num, den)
-    if not num or not is_integer(num) then error('bad argument #1 to \'%s\' (integer expected, got '..type(num)..')', 0) end
-    if not den or not is_integer(den) then error('bad argument #2 to \'%s\' (integer expected, got '..type(den)..')', 0) end
+    if not num or not is_integer(num) then error('bad argument #1 to \'gcd\' (integer expected, got '..type(num)..')', 2) end
+    if not den or not is_integer(den) then error('bad argument #2 to \'gcd\' (integer expected, got '..type(den)..')', 2) end
     while den ~= 0 do
       num, den = den, num % den
     end
@@ -67,21 +67,21 @@ do
   ---@param val number The value to check.
   ---@return boolean is_half `true` if `val` is a half number. <br> e.g. `1.5`, `-1.5`.
   local function is_half(val)
-    if not val or type(val) ~= 'number' then error('bad argument #1 to \'%s\' (number expected, got '..type(val)..')', 0) end
+    if not val or type(val) ~= 'number' then error('bad argument #1 to \'ishalf\' (number expected, got '..type(val)..')', 2) end
     return val % 1 == .5
   end
 
   ---@param val number The value to check.
   ---@return integer sign `1` if `val` is positive, `-1` if `val` is negative.
   local function sign(val)
-    if not val or type(val) ~= 'number' then error('bad argument #1 to \'%s\' (number expected, got '..type(val)..')', 0) end
+    if not val or type(val) ~= 'number' then error('bad argument #1 to \'sign\' (number expected, got '..type(val)..')', 2) end
     return val > 0 and 1 or -1
   end
 
   ---@param val number The value to convert.
   ---@return integer int The converted value.
   local function to_int(val) -- Converts a `float` to `integer` following the round half away from zero rule. <br> eg. `1.5 -> 2`, `-1.5 -> -2` <br> [Rounding Half Toward Zero](https://en.wikipedia.org/wiki/Rounding#Rounding_half_toward_zero)
-    if not val or type(val) ~= 'number' then error('bad argument #1 to \'%s\' (number expected, got '..type(val)..')', 0) end
+    if not val or type(val) ~= 'number' then error('bad argument #1 to \'toint\' (number expected, got '..type(val)..')', 2) end
     local half, pos = val % 1 >= .5, sign(val) == 1
     return half and (pos and math_floor(val+.5) or math_floor(val-.5)) or math_floor(val)
   end
@@ -90,8 +90,8 @@ do
   ---@param increment number? The increment to round to.
   ---@return number|integer rounded `val` rounded to the nearest number. <br> `increment` if provided, rounds to the nearest multiple of `increment`.
   local function round(val, increment)
-    if not val or type(val) ~= 'number' then error('bad argument #1 to \'%s\' (number expected, got '..type(val)..')', 0) end
-    if increment and (type(increment) ~= 'number' or increment < 1) then error('bad argument #2 to \'%s\' (number greater than 0 expected, got '..type(increment)..')', 0) end
+    if not val or type(val) ~= 'number' then error('bad argument #1 to \'round\' (number expected, got '..type(val)..')', 2) end
+    if increment and (type(increment) ~= 'number' or increment < 1) then error('bad argument #2 to \'round\' (number greater than 0 expected, got '..type(increment)..')', 2) end
     if increment then return round(val / increment) * increment end
     return to_int(val)
   end
@@ -107,8 +107,8 @@ do
   ---@param n integer? Maximum if m and n are provided.
   ---@return integer number A random number between `m` and `n`.
   local function random(m, n)
-    if not m or not is_integer(m) then error('bad argument #1 to \'%s\' (integer expected, got '..type(m)..')', 0) end
-    if n and not is_integer(n) then error('bad argument #2 to \'%s\' (integer expected, got '..type(n)..')', 0) end
+    if not m or not is_integer(m) then error('bad argument #1 to \'random\' (integer expected, got '..type(m)..')', 2) end
+    if n and not is_integer(n) then error('bad argument #2 to \'random\' (integer expected, got '..type(n)..')', 2) end
     m, n = not n and 1 or m, not n and m or n
     return math_floor(math_random() * (n - m + 1) + m)
   end
@@ -117,8 +117,8 @@ do
   ---@param limit integer The limit to check against.
   ---@return boolean has_exceeded `true` if `time` has exceeded `limit` in milliseconds.
   local function timer(time, limit)
-    if not time or not is_integer(time) then error('bad argument #1 to \'timer\' (integer expected, got '..type(time)..')', 0) end
-    if not limit or not is_integer(limit) then error('bad argument #2 to \'timer\' (integer expected, got '..type(limit)..')', 0) end
+    if not time or not is_integer(time) then error('bad argument #1 to \'timer\' (integer expected, got '..type(time)..')', 2) end
+    if not limit or not is_integer(limit) then error('bad argument #2 to \'timer\' (integer expected, got '..type(limit)..')', 2) end
     local current = game_timer()
     return current - time > limit
   end
@@ -127,8 +127,8 @@ do
   ---@param den integer? The denominator.
   ---@return number float The `num` or `num/den` as a float.
   local function to_float(num, den) -- Converts an integer to float if `den` is not provided. <br> Converts a rational number to a float if `den` is provided.
-    if not num or not is_integer(num) then error('bad argument #1 to \'tofloat\' (integer expected, got '..type(num)..')', 0) end
-    if den and not is_integer(den) then error('bad argument #2 to \'%s\' (integer expected, got '..type(den)..')', 0) end
+    if not num or not is_integer(num) then error('bad argument #1 to \'tofloat\' (integer expected, got '..type(num)..')', 2) end
+    if den and not is_integer(den) then error('bad argument #2 to \'tofloat\' (integer expected, got '..type(den)..')', 2) end
     return not den and num + 0.0 or num / den
   end
 
@@ -136,8 +136,10 @@ do
   ---@param precision number? The maximum error allowed in the conversion.
   ---@return integer num, integer den The float as a rational number.
   local function to_rational(float, precision)
-    if not float or type(float) ~= 'number' then error('bad argument #1 to \'%s\' (number expected, got '..type(float)..')', 0) end
-    if precision and (type(precision) ~= 'number' or precision < 1e-10) then error('bad argument #2 to \'%s\' (number greater than 1e-10 expected, got '..type(precision)..')', 0) end
+    if not float or type(float) ~= 'number' then error('bad argument #1 to \'toratio\' (number expected, got '..type(float)..')', 2) end
+    if precision and (type(precision) ~= 'number' or precision < 1e-10) then
+      error('bad argument #2 to \'toratio\' (number greater than 1e-10 expected, got '..(type(precision) ~= 'number' and type(precision) or precision)..')', 2)
+    end
     local is_neg = sign(float) == -1
     float = is_neg and -float or float
     precision =  precision or 1e-10
@@ -157,7 +159,7 @@ do
     return is_neg and -num or num, math_floor(k1 / divisor)
   end
 
-  local CMath = {
+  return setmetatable({
     between = between,
     clamp = clamp,
     gcd = g_c_d,
@@ -171,7 +173,5 @@ do
     tofloat = to_float,
     toint = to_int,
     toratio = to_rational
-  }
-  for k, v in pairs(math) do CMath[not CMath[k] and k or '_'..k] = v end
-  return CMath
+  }, {__index = math})
 end
