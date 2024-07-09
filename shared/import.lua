@@ -48,6 +48,7 @@ do
   ---@field array CArray
   ---@field blips CBlips
   ---@field bridge CBridge
+  ---@field bin CBin
   ---@field locale CLocale
   ---@field math CMath
   ---@field package CPackage
