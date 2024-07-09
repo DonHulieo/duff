@@ -7,10 +7,10 @@ do
   local is_server = IsDuplicityVersion() == 1
   local context = is_server and 'server' or 'client'
 
-  ---@param CDuff CDuff
+  ---@param duff CDuff
   ---@param module string
   ---@return function?
-  local function import(CDuff, module)
+  local function import(duff, module)
     local dir = 'shared/'..module..'.lua'
     local file = load_resource_file(res, dir)
     dir = not file and context..'/'..module..'.lua' or dir
@@ -18,20 +18,20 @@ do
     if not file then return end
     local result, err = load(file, '@@'..res..'/'..dir, 't', _ENV)
     if not result or err then return error('error occured loading module \''..module..'\''..(err and '\n\t'..err or ''), 3) end
-    CDuff[module] = result()
+    duff[module] = result()
     if debug_mode then print('^3[duff]^7 - ^2loaded `duff` module^7 ^5\''..module..'\'^7') end
-    return CDuff[module]
+    return duff[module]
   end
 
-  ---@param CDuff CDuff
+  ---@param duff CDuff
   ---@param index string
   ---@param ... any
   ---@return function
-  local function call(CDuff, index, ...)
-    local module = rawget(CDuff, index) or import(CDuff, index)
+  local function call(duff, index, ...)
+    local module = rawget(duff, index) or import(duff, index)
     if not module then
       local method = function(...) return export[index](...) end
-      if not ... then CDuff[index] = method end
+      if not ... then duff[index] = method end
       module = method
     end
     return module
