@@ -1,6 +1,11 @@
 ---@class module<T>: {[string]: function}
 ---@class CPackage
 ---@field private curr_pkg string
+---@field private packages {[string]: {env: table, contents: (fun(): module|function), exported: module|function}}
+---@field private does_res_exist fun(res_name: string): boolean
+---@field private setfenv fun(fn: function, env: table): function
+---@field private bld_mod_preload_cache fun(mod_name: string, contents: function)
+---@field private load_module fun(mod_name: string, env: table?): module|function|table|false, string
 ---@field path './?.lua;./?/init.lua;./?/shared/import.lua;'
 ---@field preload {[string]: fun(env: table?): module|function} -- Returns the module if it was found and loaded.
 ---@field loaded {[string]: {env: table, contents: (fun(): module|function), exported: module|function}} -- Returns the module if it was found and loaded.
@@ -40,6 +45,18 @@ do
     return fn
   end
 
+  ---@param mod_name string
+  ---@param contents function
+  local function bld_mod_preload_cache(mod_name, contents)
+    preload[mod_name] = function(env_to_set)
+      packages[mod_name] = packages[mod_name] or {}
+      packages[mod_name].env = env_to_set or _ENV
+      packages[mod_name].contents = env_to_set and setfenv(contents, env_to_set) or contents
+      if debug_mode then print('^3[duff]^7 - ^2loaded module^7 ^5\''..mod_name..'\'^7') end
+      return packages[mod_name].contents()
+    end
+  end
+
   ---@param mod_name string The name of the module to search for. <br> This has to be a dot-separated path to the module. <br> For example, `duff.import`.
   ---@param pattern string? A pattern to search for the module. <br> This has to be a string with a semicolon-separated list of paths. <br> For example, `./?.lua;./?/init.lua`.
   ---@return string mod_path, string? errmsg The path to the module, and an error message if the module was not found.
@@ -57,15 +74,9 @@ do
       if preload[mod_name] then return mod_name end
       contents = LoadResourceFile(resource, dir)
       if contents then
-        local module_fn, err = load(contents, '@@'..resource..'/'..dir, 't', _ENV)
+        local module_fn, err = load(contents, '@@'..resource..dir, 't', _ENV)
         if module_fn then
-          preload[mod_name] = function(env)
-            packages[mod_name] = packages[mod_name] or {}
-            packages[mod_name].env = env or _ENV
-            packages[mod_name].contents = env and setfenv(module_fn, env) or module_fn
-            if debug_mode then print('^3[duff]^7 - ^2loaded module^7 ^5\''..mod_name..'\'^7') end
-            return packages[mod_name].contents()
-          end
+          bld_mod_preload_cache(mod_name, module_fn)
           break
         end
         errmsg = (errmsg or '')..(err and '\n\t'..err or '')
@@ -80,7 +91,11 @@ do
     ---@return module|function|table|false result, string errmsg
     function(mod_name)
       local success, contents = pcall(_require, mod_name)
-      if success then return contents, mod_name end
+      if success then
+        mod_name = mod_name:match('([^%.]+)$')
+        bld_mod_preload_cache(mod_name, function() return contents end)
+        return preload[mod_name](), mod_name
+      end
       return false, contents
     end,
     ---@param mod_name string
