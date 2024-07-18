@@ -17,8 +17,10 @@
 ---@field createuseableitem fun(name: string, cb: fun(src: number|string)) Creates a useable item, `name` that calls the `cb` function when used. <br> **Note**: This is a server-only function.
 ---@field additem fun(player: integer|string?, item: string, amount: integer): boolean? Adds `item` to the player's inventory. <br> **Note**: This is a server-only function.
 ---@field removeitem fun(player: integer|string?, item: string, amount: integer): boolean? Removes `item` from the player's inventory. <br> **Note**: This is a server-only function.
----@field addlocalentity fun(entities: integer|integer[], options: {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: fun(entity: number, distance: number)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]}) Adds a target to `entities` with the specified `options`. <br> **Note**: This is a client-only function.
+---@field addlocalentity fun(entities: integer|integer[], options: {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: (fun(entity: number, distance: number): boolean?)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]}) Adds a target to `entities` with the specified `options`. <br> **Note**: This is a client-only function.
 ---@field removelocalentity fun(entities: integer|integer[], targets: string|string[]?) Removes the target from `entities` with the specified `targets`. <br> **Note**: This is a client-only function.
+---@field addboxzone fun(data: {center: vector3, size: vector3, heading: number?, debug: boolean?}, options: {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: (fun(entity: integer, distance: number): boolean?)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?}): integer|string Adds a box zone with the specified `data` and `options`. <br> **Note**: This is a client-only function. 
+---@field removezone fun(id: integer|string) Removes the zone with the specified `id`. <br> **Note**: This is a client-only function.
 do
   local load, load_resource_file = load, LoadResourceFile
   local package = duff?.package or load(load_resource_file('duff', 'shared/package.lua'), '@duff/shared/package.lua', 't', _ENV)()
@@ -572,6 +574,41 @@ do
     return Target
   end
 
+  ---@param options {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: fun(entity: integer, distance: number)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?} The options for the target.
+  ---@return {name: string, label: string, icon: string?, distance: number, items: string?, canInteract: fun(entity: integer, distance: number)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?} converted_options The converted options for the target.
+  local function convert_target_options(options)
+    return TARGET == 'ox' and {
+      {
+        name = options.name or options.label,
+        label = options.label,
+        icon = options.icon,
+        distance = options.distance or 2.5,
+        items = options.item,
+        canInteract = options.canInteract,
+        onSelect = options.onSelect,
+        event = options.event_type == 'client' and options.event or nil,
+        serverEvent = options.event_type == 'server' and options.event or nil,
+        command = options.event_type == 'command' and options.event or nil,
+        groups = merge_arrays(options.jobs, options.gangs)
+      }
+    } or {
+      options = {
+        {
+          type = options.event_type,
+          event = options.event,
+          icon = options.icon,
+          label = options.label,
+          item = options.item,
+          canInteract = options.canInteract,
+          action = options.onSelect,
+          job = options.jobs,
+          gang = options.gangs
+        }
+      },
+      distance = options.distance or 2.5
+    }
+  end
+
   ---@param entities integer|integer[] The entity or entities to add a target to
   ---@param options {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: fun(entity: integer, distance: number)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?} The options for the target.
   local function add_local_entity(entities, options) -- **Note**: This is a client-only function.
@@ -581,38 +618,9 @@ do
     if not options or type(options) ~= 'table' then error('bad argument #2 to \'addlocalentity\' (table expected, got '..type(options)..')', 2) end
     if not options.label or type(options.label) ~= 'string' then error('bad argument #2 to \'addlocalentity\' (options must contain a label)', 2) end
     if TARGET == 'ox' then
-      Target:addLocalEntity(entities, {
-        {
-          name = options.name or options.label,
-          label = options.label,
-          icon = options.icon,
-          distance = options.distance or 2.5,
-          items = options.item,
-          canInteract = options.canInteract,
-          onSelect = options.onSelect,
-          event = options.event_type == 'client' and options.event or nil,
-          serverEvent = options.event_type == 'server' and options.event or nil,
-          command = options.event_type == 'command' and options.event or nil,
-          groups = merge_arrays(options.jobs, options.gangs)
-        }
-      })
+      Target:addLocalEntity(entities, convert_target_options(options))
     elseif TARGET == 'qb' then
-      Target:AddTargetEntity(entities, {
-        options = {
-          {
-            type = options.event_type,
-            event = options.event,
-            icon = options.icon,
-            label = options.label,
-            item = options.item,
-            canInteract = options.canInteract,
-            action = options.onSelect,
-            job = options.jobs,
-            gang = options.gangs
-          }
-        },
-        distance = options.distance or 2.5
-      })
+      Target:AddTargetEntity(entities, convert_target_options(options))
     end
   end
 
@@ -627,6 +635,53 @@ do
       Target:removeLocalEntity(entities, targets)
     elseif TARGET == 'qb' then
       Target:RemoveTargetEntity(entities, targets)
+    end
+  end
+
+  ---@param data {center: vector3, size: vector3, heading: number?, debug: boolean?} The data for the box zone.
+  ---@param options {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: (fun(entity: integer, distance: number): boolean?)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?} The options for the target.
+  ---@return integer|string? box_zone The ID of the box zone (if using the ox_target system).
+  local function add_box_zone(data, options)
+    if is_server then error('called a client only function \'addboxzone\'', 2) end
+    Target = get_targ_object()
+    if not data or type(data) ~= 'table' then error('bad argument #1 to \'addboxzone\' (table expected, got '..type(data)..')', 2) end
+    if not data.center or type(data.center) ~= 'vector3' then error('bad argument #1 to \'addboxzone\' (center vector3 expected, got '..type(data.center)..')', 2) end
+    if not data.size or type(data.size) ~= 'vector3' then error('bad argument #1 to \'addboxzone\' (size vector3 expected, got '..type(data.size)..')', 2) end
+    if not options or type(options) ~= 'table' then error('bad argument #2 to \'addboxzone\' (table expected, got '..type(options)..')', 2) end
+    if not options.label or type(options.label) ~= 'string' then error('bad argument #2 to \'addboxzone\' (options must contain a label)', 2) end
+    if TARGET == 'ox' then
+      return Target:addBoxZone({
+        coords = data.center,
+        size = data.size,
+        rotation = data.heading or 0,
+        debug = data.debug or false,
+        options = convert_target_options(options)
+      })
+    elseif TARGET == 'qb' then
+      local name = options.name or options.label
+      local size = data.size
+      local center = data.center
+      local min_z, max_z = center.z - size.z / 2, center.z + size.z / 2
+      Target:AddBoxZone(name, data.center, size.x, size.y, {
+        name = name,
+        heading = data.heading or 0,
+        debugPoly = data.debug or false,
+        minZ = min_z,
+        maxZ = max_z,
+      }, convert_target_options(options))
+      return name
+    end
+  end
+
+  ---@param id string|integer The ID of the box zone to remove.
+  local function remove_zone(id)
+    if is_server then error('called a client only function \'removezone\'', 2) end
+    Target = get_targ_object()
+    if not id or (type(id) ~= 'string' and type(id) ~= 'number') then error('bad argument #1 to \'removeboxzone\' (string or number expected, got '..type(id)..')', 2) end
+    if TARGET == 'ox' then
+      Target:removeZone(id)
+    elseif TARGET == 'qb' then
+      Target:RemoveZone(id)
     end
   end
 
@@ -659,6 +714,8 @@ do
   else
     bridge.addlocalentity = add_local_entity
     bridge.removelocalentity = remove_local_entity
+    bridge.addboxzone = add_box_zone
+    bridge.removezone = remove_zone
   end
 
   return bridge
