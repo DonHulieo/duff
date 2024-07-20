@@ -1,43 +1,43 @@
----@type fun(fns: {[string]: function}, lim: integer) Benchmarks a `function` for `lim` iterations. <br> Prints the average time taken compared to other `functions`. <br> Based on this [benchmarking snippet](https://gist.github.com/thelindat/939fb0aef8b80a077f76f1a850b2a53d#file-benchmark-lua) by @thelindat.
+---@type fun(unit: time_units, dec_places: integer?, iterations: integer?, fn: function, ...: any) Benchmarks a function for a given number of iterations, finding the average execution time and printing the results.
 do
   local is_server = IsDuplicityVersion() == 1
-  local time = is_server and os.nanotime or GetBenchmarkTime
+  local type, error = type, error
+  local os, string = os, string
+  local time = is_server and os.clock or GetNetworkTimeAccurate
+  local format = string.format
+  local print = print
+  local getmeta, get = getmetatable, rawget
 
-  ---@param fn any The value to check if it is a function.
+  ---@param fn function The value to check if it is a function.
   ---@return boolean is_func the value is a function or not.
   local function is_fun(fn)
     local fn_type = type(fn)
-    return fn_type == 'function' or fn_type == 'table' and rawget(fn, '__cfx_functionReference')
+    return fn_type == 'function' or fn_type == 'table' and (getmeta(fn) and getmeta(fn).__call or get(fn, '__cfx_functionReference'))
   end
 
-  ---@param name string The name of the function.
+  ---@enum (key) time_units
+  local time_units = {
+    ['S'] = is_server and 1 or 10,
+    ['ms'] = is_server and 1e3 or 1,
+    ['us'] = is_server and 1e6 or 1e3,
+    ['ns'] = is_server and 1e9 or 1e6
+  }
+
+  ---@param unit time_units The unit of time to display the results in.
+  ---@param dec_places integer? The number of decimal places to display the results to. <br> If `dec_places` is not provided, it defaults to `2`.
+  ---@param iterations integer? The number of iterations to run the benchmark for. <br> If `iterations` is not provided, it defaults to `1000`.
   ---@param fn function The function to benchmark.
-  ---@param lim integer The number of iterations.
-  ---@return number avg_time The average time taken per iteration.
-  local function bench_fn(name, fn, lim)
-    if not is_fun(fn) then error('bad argument #1 to \'bench\' (function expected, got '..type(fn)..')', 3) end
-    if not pcall(fn) then error('bad argument #1 to \'bench\' (error occurred in function \''..name..'\')', 3) end
-    local start = 0
-    if not is_server then Wait(0)
-    else start = time() end
-    for _ = 1, lim do fn() end
-    return not is_server and time() or (time() - start) / lim
-  end
-
-  ---@param fns {[string]: function} A table of functions to benchmark.
-  ---@param lim integer The number of iterations.
-  return function(fns, lim) -- Credits go to: [@thelindat](https://gist.github.com/thelindat/939fb0aef8b80a077f76f1a850b2a53d#file-benchmark-lua)
-    if not fns or type(fns) ~= 'table' then error('bad argument #1 to \'bench\' (table expected, got '..type(fns)..')', 2) end
-    if not lim or lim < 0 then error('bad argument #2 to \'bench\' (positive integer expected, got '..type(lim)..')', 2) end
-    print('Average time (ms) for '..lim..' iterations:')
-    local results = {}
-    for k, v in pairs(fns) do
-      results[#results + 1] = {k, bench_fn(k, v, lim)}
+  ---@param ... any The arguments to pass to the function.
+  return function(unit, dec_places, iterations, fn, ...)
+    if type(unit) ~= 'string' or not time_units[unit] then error('bad argument #2 to \'bench\' (string expected, got '..type(unit)..')', 2) end
+    if not is_fun(fn) then error('bad argument #1 to \'bench\' (function expected, got '..type(fn)..')', 2) end
+    dec_places, iterations = dec_places or 2, iterations or 1e6
+    local elapsed, multi = 0, time_units[unit]
+    for _ = 1, iterations do
+      local start = time()
+      fn(...)
+      elapsed += (time() - start)
     end
-    table.sort(results, function(a, b) return a[2] < b[2] end)
-    for i = 1, #results do
-      local result = results[i]
-      print(('#%d - %.4f\t(%s)'):format(i, is_server and result[2] / 1e6 or result[2], result[1]))
-    end
+    print(format('Benchmark results:\n\t- %d function calls\n\t- %.'..dec_places..'f %s elapsed\n\t- %.'..dec_places..'f %s avg execution time.', iterations, elapsed * multi, unit, (elapsed / iterations) * multi, unit))
   end
 end
