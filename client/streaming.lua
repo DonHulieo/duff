@@ -4,6 +4,8 @@
 ---@field async.loadanimdict fun(dict: string): boolean? Loads an animation dictionary without blocking the main thread.
 ---@field loadanimset fun(set: string): boolean Loads an animation set.
 ---@field async.loadanimset fun(set: string): boolean? Loads an animation set without blocking the main thread.
+---@field loadaudio fun(bank: string, networked: boolean): boolean Loads an audio bank.
+---@field async.loadaudio fun(bank: string, networked: boolean): boolean? Loads an audio bank without blocking the main thread.
 ---@field loadcollision fun(model: string|number): boolean Loads collision for a model.
 ---@field async.loadcollision fun(model: string|number): boolean? Loads collision for a model without blocking the main thread.
 ---@field loadipl fun(ipl: string): boolean Loads an IPL.
@@ -86,6 +88,26 @@ do
     return async_fn(req_anim_set, set)
   end
 
+  ---@param bank string The audio bank to load.
+  ---@param networked boolean Whether the audio bank is networked.
+  ---@return boolean loaded Whether the audio bank was loaded.
+  local function req_audio_bank(bank, networked)
+    if not is_valid('loadaudio', bank, 'string') then return false end
+    return load_asset(bank, RequestScriptAudioBank, function()
+      if not HintScriptAudioBank(bank, networked) then return false end
+      ---@diagnostic disable-next-line: redundant-parameter
+      return RequestScriptAudioBank(bank, networked, (1 << (0-128)))
+    end)
+  end
+
+  ---@param bank string The audio bank to load.
+  ---@param networked boolean Whether the audio bank is networked.
+  ---@return boolean? loaded Whether the audio bank was loaded.
+  local function async_req_audio_bank(bank, networked)
+    if not is_valid('async.loadaudio', bank, 'string') then return false end
+    return async_fn(req_audio_bank, bank, networked)
+  end
+
   ---@param model string|number The model to load collision for.
   ---@return boolean loaded Whether the collision was loaded.
   local function req_collision(model)
@@ -158,6 +180,7 @@ do
     async = {
       loadanimdict = async_req_anim_dict,
       loadanimset = async_req_anim_set,
+      loadaudio = async_req_audio_bank,
       loadcollision = async_req_collision,
       loadipl = async_req_ipl,
       loadmodel = async_req_model,
@@ -165,6 +188,7 @@ do
     },
     loadanimdict = req_anim_dict,
     loadanimset = req_anim_set,
+    loadaudio = req_audio_bank,
     loadcollision = req_collision,
     loadipl = req_ipl,
     loadmodel = req_model,
