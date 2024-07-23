@@ -5,6 +5,7 @@
 ---@field ishalf fun(val: number): boolean Returns true if `val` is a half number. <br> e.g. `1.5`, `-1.5`
 ---@field isint fun(val: number): boolean Returns true if `val` is an integer.
 ---@field sign fun(val: number): integer Returns `1` if `val` is positive, `-1` if `val` is negative.
+---@field lerp fun(a: number, b: number, t: number): number Interpolates between `a` and `b` by the ratio `t`.
 ---@field round fun(val: number, increment: integer?): integer `val` rounded to the nearest integer. <br> `increment` if provided, rounds to the nearest multiple of `increment`.
 ---@field seedrng fun(): integer Seeds the random number generator with a unique seed based on the current time.
 ---@field random fun(m: integer , n: integer?): integer `m` minimum or maximum (from 1). <br> `n` maximum if m and n are provided. <br> Returns a random number between `m` and `n`.
@@ -76,6 +77,13 @@ do
   local function sign(val)
     if not val or type(val) ~= 'number' then error('bad argument #1 to \'sign\' (number expected, got '..type(val)..')', 2) end
     return val > 0 and 1 or -1
+  end
+
+  ---@param a number The first value to interpolate.
+  ---@param b number The second value to interpolate.
+  ---@param t number The interpolation value.
+  local function lerp(a, b, t)
+    return (1 - t) * a + t * b
   end
 
   ---@param val number The value to convert.
@@ -166,6 +174,7 @@ do
     ishalf = is_half,
     isint = is_integer,
     sign = sign,
+    lerp = lerp,
     round = round,
     seedrng = seed_rng,
     random = random,
