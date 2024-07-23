@@ -9,7 +9,7 @@ Well, this is the solution for you! This is a collection of *optimised utility m
 
 ## Features
 
-- **Package** A recreation of the Lua `package` library in pure Lua, allowing you to import modules using `require`, import environments using and export their methods using `import` and and setting a global namespace for your modules with `as`.
+- **Package** A recreation of the Lua `package` library in pure Lua, allowing you to load modules using `require`, import environments using and export their methods using `import` and changing the namespace of your modules with `as`.
 - **Array:** A module for the creation and manipulation of consecutive integer indexed arrays, providing a number of Functional Programming methods.
 - **Async:** Allows you to call and return functions asynchronously, using promises.
 - **Bench:** Allows you to benchmark the performance of a function, and returns the time taken to execute the function in milliseconds.
@@ -84,6 +84,8 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [Client Functions (bridge)](#client-functions-bridge)
         - [addlocalentity](#addlocalentity)
         - [removelocalentity](#removelocalentity)
+        - [addboxzone](#addboxzone)
+        - [removezone](#removezone)
     - [CLocale](#clocale)
       - [Importing CLocale](#importing-clocale)
       - [set](#set)
@@ -97,6 +99,7 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [gcd](#gcd)
       - [ishalf](#ishalf)
       - [isint](#isint)
+      - [lerp](#lerp)
       - [round](#round)
       - [sign](#sign)
       - [seedrng](#seedrng)
@@ -108,6 +111,7 @@ Well, this is the solution for you! This is a collection of *optimised utility m
     - [CPackage](#cpackage)
       - [Importing CPackage](#importing-cpackage)
       - [searchpath](#searchpath)
+      - [loaders](#loaders)
       - [require](#require)
       - [import](#import)
       - [as](#as)
@@ -156,6 +160,7 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [Importing CStreaming](#importing-cstreaming)
       - [loadanimdict](#loadanimdict)
       - [loadanimset](#loadanimset)
+      - [loadaudio](#loadaudio)
       - [loadcollision](#loadcollision)
       - [loadipl](#loadipl)
       - [loadmodel](#loadmodel)
@@ -625,16 +630,22 @@ local bench = duff.bench
 
 Benchmarks a `function` for `lim` iterations and returns the time taken to execute the function in milliseconds. Then prints the average time taken compared to other `functions`.
 
-This is based on this [benchmarking snippet](https://gist.github.com/thelindat/939fb0aef8b80a077f76f1a850b2a53d#file-benchmark-lua) by @thelindat.
+This was originally based on this [benchmarking snippet](https://gist.github.com/thelindat/939fb0aef8b80a077f76f1a850b2a53d#file-benchmark-lua) by @thelindat, but for better client-side compatibility and per function benchmarking it has been heavily modified.
 
 ```lua
----@param funcs {[string]: function}
----@param lim integer
-function bench(funcs, lim)
+  ---@param unit time_units
+  ---@param dec_places integer?
+  ---@param iterations integer?
+  ---@param fn function
+  ---@param ... any
+function bench(unit, dec_places, iterations, fn, ...)
 ```
 
-- `funcs` - A table of functions to benchmark.
-- `lim` - The number of iterations to run the benchmark.
+- `unit` - The unit of time to display the results in. Can be `ms` (milliseconds), `s` (seconds), `us` (microseconds) or `ns` (nanoseconds).
+- `dec_places` - The number of decimal places to display the results to. If not provided, it defaults to `2`.
+- `iterations` - The number of iterations to run the benchmark for. If not provided, it defaults to `1000`.
+- `fn` - The function to benchmark.
+- `...` - The arguments to pass to the function.
 
 ### CBridge
 
@@ -818,7 +829,6 @@ Triggers a callback function.
 ---@param name string
 ---@param callback function
 ---@param ... any
----@return any result
 function bridge.triggercallback(player, name, callback, ...)
 ```
 
@@ -826,7 +836,6 @@ function bridge.triggercallback(player, name, callback, ...)
 - `name` - The name of the callback.
 - `callback` - The function to call when the callback is received.
 - `...` - The arguments to pass to the callback.
-- `returns: any` - The result of the callback.
 
 #### Server Functions (bridge)
 
@@ -911,12 +920,23 @@ Adds a local target entity.
 
 ```lua
 ---@param entities integer|integer[]
----@param options {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: fun(entity: integer, distance: number)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?}
+---@param options {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: (fun(entity: integer, distance: number): boolean?)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?}[]
 function bridge.addlocalentity(entities, options)
 ```
 
 - `entities` - The entity or entities to add.
-- `options` - The options for the entity.
+- `options` - The options for the entity. `options` is an array of tables with the following fields;
+  - `name` - The name of the target or `nil`.
+  - `label` - The label of the target.
+  - `icon` - The icon of the target or `nil`.
+  - `distance` - The distance of the target or `nil`.
+  - `item` - The item of the target or `nil`.
+  - `canInteract` - The function to check if the player can interact with the target or `nil`.
+  - `onSelect` - The function to call when the target is selected or `nil`.
+  - `event_type` - The event type of the target or `nil`.
+  - `event` - The event of the target or `nil`.
+  - `jobs` - The jobs that can interact with the target or `nil`.
+  - `gangs` - The gangs that can interact with the target or `nil`.
 
 ##### removelocalentity
 
@@ -928,6 +948,47 @@ function bridge.removelocalentity(entities)
 ```
 
 - `entities` - The entity or entities to remove the target from.
+
+##### addboxzone
+
+Adds a target box zone.
+
+```lua
+---@param data {center: vector3, size: vector3, heading: number?, debug: boolean?}
+---@param options {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: (fun(entity: integer, distance: number): boolean?)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?}[]
+---@return integer|string? box_zone
+function bridge.addboxzone(data, options)
+```
+
+- `data` - The data for the box zone. The data contains the following fields:
+  - `center` - The center of the box zone.
+  - `size` - The size of the box zone.
+  - `heading` - The heading of the box zone or `nil`.
+  - `debug` - Whether to show debug markers for the box zone or `nil`.
+- `options` - The options for the target. `options` is an array of tables with the following fields;
+  - `name` - The name of the target or `nil`.
+  - `label` - The label of the target.
+  - `icon` - The icon of the target or `nil`.
+  - `distance` - The distance of the target or `nil`.
+  - `item` - The item of the target or `nil`.
+  - `canInteract` - The function to check if the player can interact with the target or `nil`.
+  - `onSelect` - The function to call when the target is selected or `nil`.
+  - `event_type` - The event type of the target or `nil`.
+  - `event` - The event of the target or `nil`.
+  - `jobs` - The jobs that can interact with the target or `nil`.
+  - `gangs` - The gangs that can interact with the target or `nil`.
+- `returns: integer|string` - The ID of the box zone. If using `ox_target`, the integer ID of the box zone is returned. If using `qb-target`, the string name of the box zone is returned.
+
+##### removezone
+
+Removes a target zone.
+
+```lua
+---@param zone integer|string
+function bridge.removezone(zone)
+```
+
+- `zone` - The zone to remove. If using `ox_target`, the integer ID of the zone is used. If using `qb-target`, the string name of the zone is used.
 
 ### CLocale
 
@@ -1151,6 +1212,23 @@ function math.isint(value)
 - `value` - The value to check.
 - `returns: boolean` - Whether the value is an integer.
 
+#### lerp
+
+Linearly interpolates between two values.
+
+```lua
+---@param a number
+---@param b number
+---@param t number
+---@return number lerp
+function math.lerp(a, b, t)
+```
+
+- `a` - The start value.
+- `b` - The end value.
+- `t` - The interpolation value.
+- `returns: number` - The interpolated value.
+
 #### round
 
 ```lua
@@ -1301,6 +1379,15 @@ function package.searchpath(name, pattern)
 - `name` - The name of the module to search for. This has to be a dot-separated path from resource to module (e.g. `duff.shared.locale`).
 - `pattern` - The pattern to search for, it should contain a `?` which will be replaced by the module name.
 - `returns: string, string` - The path to the module, or the tried path and an error message.
+
+#### loaders
+
+A table containing the loaders for the package. You can add custom loaders to this table, much like the `package.loaders` table in Lua.
+
+```lua
+---@type (fun(mod_name: string, env: table?): module|function|false, string)[]
+package.loaders
+```
 
 #### require
 
@@ -1912,7 +1999,7 @@ function streaming.loadanimdict(dict)
 
 ---@async
 ---@param dict string
----@return boolean loaded
+---@return boolean? loaded
 function streaming.async.loadanimdict(dict)
 ```
 
@@ -1930,12 +2017,33 @@ function streaming.loadanimset(set)
 
 ---@async
 ---@param set string
----@return boolean loaded
+---@return boolean? loaded
 function streaming.async.loadanimset(set)
 ```
 
 - `set` - The animation set to load.
 - `returns: boolean` - Whether the animation set was loaded.
+
+#### loadaudio
+
+Loads a Ambient, Mission or Script audio bank.
+
+```lua
+---@param bank string
+---@param networked boolean?
+---@return boolean loaded
+function streaming.loadaudio(bank, networked)
+
+---@async
+---@param bank string
+---@param networked boolean?
+---@return boolean? loaded
+function streaming.async.loadaudio(bank, networked)
+```
+
+- `bank` - The audio bank to load.
+- `networked` - Whether the audio bank is networked.
+- `returns: boolean` - Whether the audio bank was loaded.
 
 #### loadcollision
 
@@ -1948,7 +2056,7 @@ function streaming.loadcollision(model)
 
 ---@async
 ---@param model string|number
----@return boolean loaded
+---@return boolean? loaded
 function streaming.async.loadcollision(model)
 ```
 
@@ -1968,7 +2076,7 @@ function streaming.loadipl(ipl)
 
 ---@async
 ---@param ipl string
----@return boolean loaded
+---@return boolean? loaded
 function streaming.async.loadipl(ipl)
 ```
 
@@ -1986,7 +2094,7 @@ function streaming.loadmodel(model)
 
 ---@async
 ---@param model string|number
----@return boolean loaded
+---@return boolean? loaded
 function streaming.async.loadmodel(model)
 ```
 
@@ -2006,7 +2114,7 @@ function streaming.loadptfx(fx)
 
 ---@async
 ---@param fx string
----@return boolean loaded
+---@return boolean? loaded
 function streaming.async.loadptfx(fx)
 ```
 
