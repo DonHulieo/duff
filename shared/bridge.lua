@@ -11,7 +11,7 @@
 ---@field doesplayerhavegroup fun(player: integer|string?, groups: string|string[]): boolean? Returns whether `player` has the specified group(s). <br> If `player` is nil, the source's (server) or client's (client) player group(s) are checked.
 ---@field isplayerdowned fun(player: integer|string?): boolean Returns whether the `player` is downed. <br> If `player` is nil, the source's (server) or client's (client) player downed status is checked.
 ---@field createcallback fun(name: string, cb: function) Creates a callback, `name` that triggers the `cb` function when called.
----@field triggercallback fun(player: integer|string?, name: string, cb: function, ...: any): any? Triggers the callback, `name` with the specified arguments. <br> If triggered from the server, the `player` argument is required and is the client to trigger the callback for.
+---@field triggercallback fun(player: integer|string?, name: string, cb: function, ...: any) Triggers the callback, `name` with the specified arguments. <br> If triggered from the server, the `player` argument is required and is the client to trigger the callback for.
 ---@field getallitems fun(): {[string]: {name: string, label: string, weight: number, useable: boolean, unique: boolean}}? Returns a table of all items available in the inventory system. <br> **Note**: This is a server-only function.
 ---@field getitem fun(name: string): {name: string, label: string, weight: number, usable: boolean, unique: boolean}? Returns the item data for `item`. <br> **Note**: This is a server-only function.
 ---@field createuseableitem fun(name: string, cb: fun(src: number|string)) Creates a useable item, `name` that calls the `cb` function when used. <br> **Note**: This is a server-only function.
@@ -122,7 +122,7 @@ do
     INV = {resource = get_key(Inventories, INVENTORY), method = for_each(NO_METHODS.INV, function(_, value) return value == INVENTORY end) == nil and EXPORTS.INV[INVENTORY] or nil},
     TARG = {resource = get_key(Targets, TARGET), method = for_each(NO_METHODS.TARGET, function(_, value) return value == TARGET end) == nil and EXPORTS.TARG[TARGET] or nil}
   }
-  local Core, Lib, Inv = consume_export(EXPORTS, 'CORE') --[[@as QBCore|table]], consume_export(EXPORTS, 'LIB'), consume_export(EXPORTS, 'INV') --[[@as ox_inventory|table?]]
+  local Core, Lib, Inv = consume_export(EXPORTS, 'CORE') --[[@as table]], consume_export(EXPORTS, 'LIB'), consume_export(EXPORTS, 'INV') --[[@as ox_inventory|table?]]
   local PlayerData = nil
 
   ---@return string FRAMEWORK The name of the framework being used.
@@ -137,7 +137,7 @@ do
     return INVENTORY
   end
 
-  ---@return QBCore|table Core The shared object for the framework being used.
+  ---@return table Core The shared object for the framework being used.
   local function get_core_object()
     if not FRAMEWORK then error('framework is invalid', 2) end
     Core = Core or consume_export(EXPORTS, 'CORE')
@@ -412,31 +412,24 @@ do
   ---@param name string The name of the callback to trigger.
   ---@param cb function The function to call when the callback is received.
   ---@param ... any Additional arguments to pass to the callback.
-  ---@return any result The result of the callback.
   local function trigger_callback(player, name, cb, ...)
     Core = get_core_object()
-    local result
     if is_server then
       player = validate_source('triggercallback', player or source)
       if LIB == 'ox' then
         Lib = get_lib_object()
-        result = Lib.callback(name, player, cb, ...)
       elseif FRAMEWORK == 'esx' then
-        result = Core.TriggerClientCallback(player, name, cb, ...)
+        Core.TriggerClientCallback(player, name, cb, ...)
       elseif FRAMEWORK == 'qb' then
-        result = Core.Functions.TriggerClientCallback(name, player, cb, ...)
       end
     else
       if LIB == 'ox' then
         Lib = get_lib_object()
-        result = Lib.callback(name, false, cb, ...)
       elseif FRAMEWORK == 'esx' then
-        result = Core.TriggerServerCallback(name, cb, ...)
       elseif FRAMEWORK == 'qb' then
-        result = Core.Functions.TriggerCallback(name, cb, ...)
+        Core.Functions.TriggerCallback(name, cb, ...)
       end
     end
-    return result
   end
 
   ---@return ox_inventory|table Inv The inventory object being used.
