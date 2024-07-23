@@ -43,7 +43,7 @@ do
   ---@field _DESCRIPTION string
   ---@field _DEBUG boolean
   ---@field async fun(func: function, ...: any): any Calls and returns the result of a function asynchronously.
-  ---@field bench fun(fns: {[string]: function}, lim: integer) Benchmarks a `function` for `lim` iterations. <br> Prints the average time taken compared to other `functions`. <br> Based on this [benchmarking snippet](https://gist.github.com/thelindat/939fb0aef8b80a077f76f1a850b2a53d#file-benchmark-lua) by @thelindat.
+  ---@field bench fun(unit: time_units, dec_places: integer?, iterations: integer?, fn: function, ...: any) Benchmarks a function for a given number of iterations, finding the average execution time and printing the results.
   ---@field checkversion fun(resource: string?, version: string?, git: string, repo: string?): promise Returns a promise that resolves with a table containing the version information.
   ---@field array CArray
   ---@field blips CBlips
