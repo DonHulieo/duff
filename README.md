@@ -9,19 +9,19 @@ Well, this is the solution for you! This is a collection of *optimised utility m
 
 ## Features
 
-- **Package** A recreation of the Lua `package` library in pure Lua, allowing you to load modules using `require`, import environments using and export their methods using `import` and changing the namespace of your modules with `as`.
-- **Array:** A module for the creation and manipulation of consecutive integer indexed arrays, providing a number of Functional Programming methods.
-- **Async:** Allows you to call and return functions asynchronously, using promises.
-- **Bench:** Allows you to benchmark the performance of a function, and returns the time taken to execute the function in milliseconds.
+- **Package** A recreation of the Lua `package` library in pure lua, allowing you to import and use modules in your scripts.
+- **Array:** A FP array class for the creation and manipulation of consecutive integer indexed arrays, similar to the Array class in JavaScript.
+- **Async:** A function that allows you to call and return functions asynchronously, using promises.
+- **Bench:** Benches the performance of a function, and returns the time taken to execute the function.
 - **Bridge:** Provides common functions between different frameworks and libraries for use in creating cross-framework scripts.
-- **Locale:** Contains functions for localisation and translation, based on the i18n.lua library by kikito.
-- **Math:** Contains some useful math functions, including a `seedrng` function which generates a random seed based on the current time, and an improvement to the default lua `random` function.
-- **Vector:** Contains some useful vector functions, including a `getclosest` function which finds the closest vector3 in an array to a given vector3.
-- **Blips:** Contains functions for managing blips, including `getall`, `onscreen`, `bycoords`, `bysprite`, `bytype`, `getinfo` and `remove`.
-- **Pools:** Contains functions for managing entity pools, including `getpeds`, `getvehicles`, `getobjects`, `getpickups`, `getclosestped`, `getclosestvehicle`, `getclosestobject` and `getclosestpickup`.
-- **Streaming:** Contains functions for managing streaming, including `loadanimdict`, `loadanimset`, `loadcollision`, `loadipl`, `loadmodel` and `loadptfx`.
-- **Scope:** Contains functions for managing scope, including `getplayerscope`, `triggerscopeevent`, `createsyncedscopeevent` and `removesyncedscopeevent`.
-- **Zone:** Contains functions for management of map zones similar to PolyZone but is server-side only, including `contains`, `getzone`, `getzonename`, `getzoneindex`, `addzoneevent` and `removezoneevent`.
+- **Locale:** A localisation and translation module, based on the i18n.lua library by kikito.
+- **Math:** An addition to the lua math library, expanding of some of the functions and adding some new ones. Most notably, an improved `math.random` function.
+- **Vector:** A vector class for the creation and manipulation of vectors, as well as exposing functions to the server environment not normally available.
+- **Blips:** A blip helper class for managing blips, aiding in the retrieval and removal of blips.
+- **Pools:** A pool class for managing pools, aiding in the retrieval of peds, vehicles, objects and pickups.
+- **Streaming:** A streaming class for loading various game assets, including animations, audio, collisions, ipls, models and ptfx.
+- **Scope:** A scope class for manipulating players scopes, allowing triggering events around a player and their scope.
+- **Zone:** A server-side zone class for GTA V's map zones, allowing you to check if a player is in a specific zone, and trigger events based on that.
 
 ## Table of Contents
 
@@ -110,8 +110,11 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [toratio](#toratio)
     - [CPackage](#cpackage)
       - [Importing CPackage](#importing-cpackage)
-      - [searchpath](#searchpath)
+      - [path](#path)
+      - [preload](#preload)
+      - [loaded](#loaded)
       - [loaders](#loaders)
+      - [searchpath](#searchpath)
       - [require](#require)
       - [import](#import)
       - [as](#as)
@@ -253,7 +256,7 @@ shared_script '@duff/shared/import.lua'
 
 ### CArray
 
-CArray is a class for the creation and manipulation of consecutive integer indexed arrays. It provides a number of Functional Programming methods, and is designed to be used in a similar way to the Array class in JavaScript.
+CArray is a functional programming array class for the creation and manipulation of consecutive integer indexed arrays, similar to the Array class in JavaScript.
 
 *This is a shared module, and can be used on both the client, server and shared enviroment.*
 
@@ -1365,6 +1368,42 @@ local package = lib.require '@duff.shared.package'
 local package = duff.package
 ```
 
+#### path
+
+The possible paths to search for modules. This is a string containing a semicolon-separated list of paths, editing this will change the paths that package will search for modules.
+
+```lua
+---@type './?.lua;./?/init.lua;./?/shared/import.lua;'
+package.path
+```
+
+#### preload
+
+A table containing the preloaded modules for the package. You can add custom modules to this table, much like the `package.preload` table in Lua.
+
+```lua
+---@type {[string]: fun(env: table?): module|function}
+package.preload
+```
+
+#### loaded
+
+A table containing the loaded modules for the package. You can add custom modules to this table, much like the `package.loaded` table in Lua.
+
+```lua
+---@type {[string]: {env: table, contents: (fun(): module|function), exported: module|function}}
+package.loaded
+```
+
+#### loaders
+
+A table containing the loaders for the package. You can add custom loaders to this table, much like the `package.loaders` table in Lua.
+
+```lua
+---@type (fun(mod_name: string, env: table?): module|function|false, string)[]
+package.loaders
+```
+
 #### searchpath
 
 Searches for a module in a specific path and returns the path to the module.
@@ -1379,15 +1418,6 @@ function package.searchpath(name, pattern)
 - `name` - The name of the module to search for. This has to be a dot-separated path from resource to module (e.g. `duff.shared.locale`).
 - `pattern` - The pattern to search for, it should contain a `?` which will be replaced by the module name.
 - `returns: string, string` - The path to the module, or the tried path and an error message.
-
-#### loaders
-
-A table containing the loaders for the package. You can add custom loaders to this table, much like the `package.loaders` table in Lua.
-
-```lua
----@type (fun(mod_name: string, env: table?): module|function|false, string)[]
-package.loaders
-```
 
 #### require
 
