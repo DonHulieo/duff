@@ -16,12 +16,14 @@ do
   end
 
   ---@enum (key) time_units
-  local time_units = {
-    ['S'] = is_server and 1 or 10,
-    ['ms'] = is_server and 1e3 or 1,
-    ['us'] = is_server and 1e6 or 1e3,
-    ['ns'] = is_server and 1e9 or 1e6
-  }
+  local time_units = {['S'] = 1, ['ms'] = 1e3, ['us'] = 1e6, ['ns'] = 1e9}
+
+  if not is_server then
+    time_units['S'] = 10
+    time_units['ms'] = 1
+    time_units['us'] = 1e3
+    time_units['ns'] = 1e6
+  end
 
   ---@param unit time_units The unit of time to display the results in.
   ---@param dec_places integer? The number of decimal places to display the results to. <br> If `dec_places` is not provided, it defaults to `2`.
