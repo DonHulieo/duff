@@ -5,7 +5,7 @@
 ---@field ishalf fun(val: number): boolean Returns true if `val` is a half number. <br> e.g. `1.5`, `-1.5`
 ---@field isint fun(val: number): boolean Returns true if `val` is an integer.
 ---@field sign fun(val: number): integer Returns `1` if `val` is positive, `-1` if `val` is negative.
----@field lerp fun(a: number, b: number, t: number): number Interpolates between `a` and `b` by the ratio `t`.
+---@field lerp fun(a: number, b: number, t: number): number Interpolates between `a` and `b` by the ratio `t`. <br> [Linear Interpolation](https://en.wikipedia.org/wiki/Linear_interpolation#Programming_language_support)
 ---@field round fun(val: number, increment: integer?): integer `val` rounded to the nearest integer. <br> `increment` if provided, rounds to the nearest multiple of `increment`.
 ---@field seedrng fun(): integer Seeds the random number generator with a unique seed based on the current time.
 ---@field random fun(m: integer , n: integer?): integer `m` minimum or maximum (from 1). <br> `n` maximum if m and n are provided. <br> Returns a random number between `m` and `n`.
@@ -82,7 +82,7 @@ do
   ---@param a number The first value to interpolate.
   ---@param b number The second value to interpolate.
   ---@param t number The interpolation value.
-  local function lerp(a, b, t)
+  local function lerp(a, b, t) -- Linear interpolation between `a` and `b` by the ratio `t`. <br> [Linear Interpolation](https://en.wikipedia.org/wiki/Linear_interpolation#Programming_language_support)
     return (1 - t) * a + t * b
   end
 
