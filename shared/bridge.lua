@@ -22,6 +22,9 @@
 ---@field removelocalentity fun(entities: integer|integer[], targets: string|string[]?) Removes the target from `entities` with the specified `targets`. <br> **Note**: This is a client-only function.
 ---@field addboxzone fun(data: {center: vector3, size: vector3, heading: number?, debug: boolean?}, options: {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: (fun(entity: integer, distance: number): boolean?)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?}[]): integer|string Adds a box zone with the specified `data` and `options`. <br> **Note**: This is a client-only function. 
 ---@field removezone fun(id: integer|string) Removes the zone with the specified `id`. <br> **Note**: This is a client-only function.
+---@field registermenu fun(id: string, title: string, options: {header: string, description: string, icon: string, disabled: boolean?, onSelect: fun()?, event_type: string?, event: string?, args: table?}[]) Registers a menu with the specified `id`, `title` and `options`. <br> **Note**: This is a client-only function.
+---@field openmenu fun(id: string, data: table?) Opens the menu with the specified `id` and `data`. <br> **Note**: This is a client-only function.
+---@field closemenu fun() Closes the currently open menu. <br> **Note**: This is a client-only function.
 do
   local load, load_resource_file = load, LoadResourceFile
   local package = duff?.package or load(load_resource_file('duff', 'shared/package.lua'), '@duff/shared/package.lua', 't', _ENV)()
@@ -30,6 +33,7 @@ do
   local Inventories = {['ox_inventory'] = 'ox', ['qb-inventory'] = 'qb'}
   local Libs = {['ox_lib'] = 'ox'}
   local Targets = {['ox_target'] = 'ox', ['qb-target'] = 'qb'}
+  local Menus = {['qb-menu'] = 'qb'}
   local is_server = IsDuplicityVersion() == 1
 
   --------------------- INTERNAL ---------------------
@@ -94,6 +98,7 @@ do
   local INVENTORY = for_each(Inventories, is_resource_present) or FRAMEWORK --[[@as string?]]
   local LIB = for_each(Libs, is_resource_present) --[[@as string?]]
   local TARGET = for_each(Targets, is_resource_present) --[[@as string?]]
+  local MENU = for_each(Menus, is_resource_present) --[[@as string?]]
   -- Each framework and/or resource has a different way of exporting their shared object.
   -- The `EXPORTS` table contains the possible exports for each framework and resource.
   -- Where `key` is the type of resource (ie. CORE, INV, TARG) and `value` is a table of possible exports.
@@ -102,7 +107,8 @@ do
   local EXPORTS = {
     CORE = {['esx'] = 'getSharedObject', ['qb'] = 'GetCoreObject'},
     INV = {['ox'] = 'ox_inventory', ['qb'] = 'qb-inventory'},
-    TARG = {['ox'] = 'ox_target', ['qb'] = 'qb-target'}
+    TARG = {['ox'] = 'ox_target', ['qb'] = 'qb-target'},
+    MENU = {['qb'] = 'qb-menu'}
   }
   -- Each framework has different events that are triggered when certain actions occur.
   -- The `EVENTS` table contains the possible events for each framework.
@@ -117,13 +123,14 @@ do
   }
   -- The `NO_METHODS` table contains the resources that do not have a method to call to get the shared object.
   -- Where `key` is the type of resource (ie. CORE, INV, TARG) and `value` is a table of resources that do not have a method.
-  local NO_METHODS = {['INV'] = {'ox', 'qb'}, ['TARGET'] = {'ox', 'qb'}}
+  local NO_METHODS = {['INV'] = {'ox', 'qb'}, ['TARGET'] = {'ox', 'qb'}, ['MENU'] = {'qb'}}
   EXPORTS = {
     CORE = {resource = get_key(Frameworks, FRAMEWORK), method = for_each(NO_METHODS.CORE, function(_, value) return value == FRAMEWORK end) == nil and EXPORTS.CORE[FRAMEWORK] or nil},
     INV = {resource = get_key(Inventories, INVENTORY), method = for_each(NO_METHODS.INV, function(_, value) return value == INVENTORY end) == nil and EXPORTS.INV[INVENTORY] or nil},
-    TARG = {resource = get_key(Targets, TARGET), method = for_each(NO_METHODS.TARGET, function(_, value) return value == TARGET end) == nil and EXPORTS.TARG[TARGET] or nil}
+    TARG = {resource = get_key(Targets, TARGET), method = for_each(NO_METHODS.TARGET, function(_, value) return value == TARGET end) == nil and EXPORTS.TARG[TARGET] or nil},
+    MENU = {resource = get_key(Menus, MENU), method = for_each(NO_METHODS.MENU, function(_, value) return value == MENU end) == nil and EXPORTS.MENU[MENU] or nil}
   }
-  local Core, Lib, Inv = consume_export(EXPORTS, 'CORE') --[[@as table]], consume_export(EXPORTS, 'LIB'), consume_export(EXPORTS, 'INV') --[[@as ox_inventory|table?]]
+  local Core, Lib, Inv, Menu = consume_export(EXPORTS, 'CORE') --[[@as table]], consume_export(EXPORTS, 'LIB'), consume_export(EXPORTS, 'INV') --[[@as ox_inventory|table?]], consume_export(EXPORTS, 'MENU') --[[@as table?]]
   local PlayerData = nil
 
   ---@return string FRAMEWORK The name of the framework being used.
@@ -662,7 +669,7 @@ do
   ---@param data {center: vector3, size: vector3, heading: number?, debug: boolean?} The data for the box zone.
   ---@param options {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: (fun(entity: integer, distance: number): boolean?)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?}[] The options for the target.
   ---@return integer|string? box_zone The ID of the box zone. <br> If using ox_target, the integer ID of the box zone is returned. <br> If using qb-target, the string name of the box zone is returned.
-  local function add_box_zone(data, options)
+  local function add_box_zone(data, options) -- **Note**: This is a client-only function.
     if is_server then error('called a client only function \'addboxzone\'', 2) end
     Target = get_targ_object()
     if not data or type(data) ~= 'table' then error('bad argument #1 to \'addboxzone\' (table expected, got '..type(data)..')', 2) end
@@ -697,7 +704,7 @@ do
   end
 
   ---@param id string|integer The ID of the box zone to remove.
-  local function remove_zone(id)
+  local function remove_zone(id) -- **Note**: This is a client-only function.
     if is_server then error('called a client only function \'removezone\'', 2) end
     Target = get_targ_object()
     if not id or (type(id) ~= 'string' and type(id) ~= 'number') then error('bad argument #1 to \'removeboxzone\' (string or number expected, got '..type(id)..')', 2) end
@@ -705,6 +712,173 @@ do
       Target:removeZone(id)
     elseif TARGET == 'qb' then
       Target:RemoveZone(id)
+    end
+  end
+
+  ---@return table Menu The menu object being used.
+  local function get_menu_obj() -- **Note**: This is a client-only function.
+    if is_server then error('called a client only function', 2) end
+    Menu = Menu or consume_export(EXPORTS, 'MENU')
+    if not Menu then error('menu object is invalid', 2) end
+    return Menu
+  end
+
+  local PATTERNS = LIB == 'ox' and {
+    ['TEXT'] = {
+      {'<pre>%s?(.-)%s?</pre>', '```\n%1\n```'},
+      {'<(h[1-6])>%s?(.-)%s?</%1>', function(tag, text)
+        local level = tonumber(tag:sub(2)) or 1
+        return string.rep('#', level)..' '..text
+      end},
+      {'<b>%s?(.-)%s?</b>', '**%1**'},
+      {'<strong>%s?(.-)%s?</strong>', '**%1**'},
+      {'<i>%s?(.-)%s?</i>', '*%1*'},
+      {'<em>%s?(.-)%s?</em>', '*%1*'},
+      {'<tt>%s?(.-)%s?</tt>', '`%1`'},
+      {'<code>%s?(.-)%s?</code>', '```\n%1\n```'}
+    },
+    ['LINK'] = {
+      {'<a href=%p?(.-)%p?>(.-)</a>', '[%2](%1)'}
+    },
+    ['LIST'] = {
+      {'<ul>(.-)</ul>', '%1'},
+      {'<li>(.-)</li>', '- %1'}
+    },
+    ['BLOCKQUOTE'] = {
+      {'<blockquote>(.-)</blockquote>', '> %1'}
+    },
+    ['IMAGE'] = {
+      {'<img src=%p?(.-)%p? alt=%p?(.-)%p?>', '![%2](%1)'},
+      {'<img src=%p?(.-)%p? width=%p?%w+%%?%p? height=%p?%w+%%?%p?>', '![image](%1)'}
+    },
+    ['FORMAT'] = {
+      {'<p>(.-)</p>', '%1'},
+      {'<center>(.-)</center>', '%1'},
+      {'<br>', '\n'}
+    }
+  } or {
+    ['TEXT'] = {
+      {'```(.-)```', '<pre>%1</pre>'},
+      {'#%s?(.-)\n', '<h1>%1</h1>\n'},
+      {'##%s?(.-)\n', '<h2>%1</h2>\n'},
+      {'###%s?(.-)\n', '<h3>%1</h3>\n'},
+      {'####%s?(.-)\n', '<h4>%1</h4>\n'},
+      {'#####%s?(.-)\n', '<h5>%1</h5>\n'},
+      {'######%s?(.-)\n', '<h6>%1</h6>\n'},
+      {'%*%*%s?(.-)%s?%*%*', '<strong>%1</strong>'},
+      {'%*%s?(.-)%s?%*', '<em>%1</em>'},
+      {'__%s?(.-)%s?__', '<u>%1</u>'},
+      {'~~%s?(.-)%s?~~', '<s>%1</s>'}
+    },
+    ['LINK'] = {
+      {'%[(.-)%]%((.-)%)', '<a href="%2">%1</a>'}
+    },
+    ['LIST'] = {
+      {'\n%- (.-)', '<li>%1</li>'},
+      {'<li>(.-)</li>', '<ul>%1</ul>'}
+    },
+    ['BLOCKQUOTE'] = {
+      {'\n> (.-)', '<blockquote>%1</blockquote>'},
+      {'<blockquote>(.-)</blockquote>', '<blockquote>%1</blockquote>'}
+    },
+    ['IMAGE'] = {
+      {'!%[(.-)%]%((.-)%)', '<img src="%2" alt="%1">'}
+    },
+    ['FORMAT'] = {
+      {'\n', '<br>'}
+    }
+  }
+
+  ---@param text string The text to convert.
+  ---@return string converted_text The converted text.
+  local function convert_text(text) -- Converts HTML <---> Markdown & Markdown <---> HTML.
+    for _, pattern_type in pairs(PATTERNS) do
+      for i = 1, #pattern_type do
+        local pattern = pattern_type[i]
+        local tag, sub = pattern[1], pattern[2]
+        text = text:gsub(tag, sub)
+      end
+    end
+    return text
+  end
+
+  ---@param func_name string The name of the function calling this function.
+  ---@param options {header: string, description: string, icon: string, istitle: boolean?, disabled: boolean?, hasSubMenu: boolean?, onSelect: fun()?, event_type: string?, event: string?, args: table?}[]
+  local function convert_menu_options(func_name, options)
+    if not options or type(options) ~= 'table' then error('bad argument #2 to \''..func_name..'\' (table expected, got '..type(options)..')', 2) end
+    local converted_options = {}
+    for i = 1, #options do
+      local option = options[i]
+      if not option or type(option) ~= 'table' then error('bad argument #2 to \''..func_name..'\' (table expected, got '..type(option)..')', 2) end
+      if not option.header or type(option.header) ~= 'string' then error('bad argument #2 to \''..func_name..'\' (options must contain a header)', 2) end
+      if not option.description or type(option.description) ~= 'string' then error('bad argument #2 to \''..func_name..'\' (options must contain a description)', 2) end
+      converted_options[i] = LIB == 'ox' and {
+        title = convert_text(option.header),
+        description = convert_text(option.description),
+        icon = option.icon,
+        disabled = option.disabled,
+        arrow = option.hasSubMenu,
+        onSelect = option.onSelect,
+        event = option.event_type == 'client' and option.event or nil,
+        serverEvent = option.event_type == 'server' and option.event or nil,
+        args = option.args
+      } or {
+        header = convert_text(option.header),
+        txt = convert_text(option.description),
+        icon = option.icon,
+        isMenuHeader = option.istitle,
+        disabled = option.disabled,
+        params = {
+          isAction = option.onSelect ~= nil,
+          action = option.onSelect,
+          event = option.event,
+          isServer = option.event and option.event_type == 'server',
+          args = option.args
+        }
+      }
+    end
+    return converted_options
+  end
+
+  local RegisteredMenus = not is_server and {} or nil
+  ---@param id string The ID of the menu to register.
+  ---@param title string The title of the menu.
+  ---@param options {header: string, description: string, icon: string, istitle: boolean?, disabled: boolean?, hasSubMenu: boolean?, onSelect: fun()?, event_type: string?, event: string?, args: table?}[] The options for the menu.
+  local function register_menu(id, title, options) -- **Note**: This is a client-only function.
+    if is_server then error('called a client only function \'registermenu\'', 2) end
+    if not id or type(id) ~= 'string' then error('bad argument #1 to \'registermenu\' (string expected, got '..type(id)..')', 2) end
+    if not title or type(title) ~= 'string' then error('bad argument #2 to \'registermenu\' (string expected, got '..type(title)..')', 2) end
+    if not options or type(options) ~= 'table' then error('bad argument #3 to \'registermenu\' (table expected, got '..type(options)..')', 2) end
+    if LIB == 'ox' then
+      Lib = get_lib_object()
+      Lib.registerContext({id = id, title = convert_text(title), options = convert_menu_options('registermenu', options)})
+    elseif FRAMEWORK == 'qb' then
+      RegisteredMenus[id] = convert_menu_options('registermenu', merge_arrays({{header = title, description = '', icon = '', istitle = true}}, options))
+    end
+  end
+
+  ---@param id string The ID of the menu to open.
+  local function open_menu(id) -- **Note**: This is a client-only function.
+    if is_server then error('called a client only function \'openmenu\'', 2) end
+    if not id or type(id) ~= 'string' then error('bad argument #1 to \'openmenu\' (string expected, got '..type(id)..')', 2) end
+    if LIB == 'ox' then
+      Lib = get_lib_object()
+      Lib.showContext(id)
+    elseif FRAMEWORK == 'qb' then ---@cast RegisteredMenus -?
+      Menu = get_menu_obj()
+      if not RegisteredMenus[id] then error('bad argument #1 to \'openmenu\' (menu \''..id..'\' not registered)', 2) end
+      Menu.openMenu(RegisteredMenus[id])
+    end
+  end
+
+  local function close_menu() -- **Note**: This is a client-only function.
+    if is_server then error('called a client only function', 2) end
+    if LIB == 'ox' then
+      Lib = get_lib_object()
+      Lib.hideContext()
+    elseif FRAMEWORK == 'qb' then
+      Menu = get_menu_obj()
+      Menu.closeMenu()
     end
   end
 
@@ -734,11 +908,15 @@ do
     bridge.createuseableitem = create_useable_item
     bridge.additem = add_item
     bridge.removeitem = remove_item
+    bridge.hasitem = has_item
   else
     bridge.addlocalentity = add_local_entity
     bridge.removelocalentity = remove_local_entity
     bridge.addboxzone = add_box_zone
     bridge.removezone = remove_zone
+    bridge.registermenu = register_menu
+    bridge.openmenu = open_menu
+    bridge.closemenu = close_menu
   end
 
   return bridge
