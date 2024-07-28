@@ -45,6 +45,7 @@ do
   ---@field async fun(func: function, ...: any): any Calls and returns the result of a function asynchronously.
   ---@field bench fun(unit: time_units, dec_places: integer?, iterations: integer?, fn: function, ...: any) Benchmarks a function for a given number of iterations, finding the average execution time and printing the results.
   ---@field checkversion fun(resource: string?, version: string?, git: string, repo: string?): promise Returns a promise that resolves with a table containing the version information.
+  ---@field switch fun(t: {[any]: (fun(...): any), default: (fun(...): any)}, v: any, ...: any): fun(...): any
   ---@field array CArray
   ---@field blips CBlips
   ---@field bridge CBridge
