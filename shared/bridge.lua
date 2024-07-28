@@ -17,6 +17,7 @@
 ---@field createuseableitem fun(name: string, cb: fun(src: number|string)) Creates a useable item, `name` that calls the `cb` function when used. <br> **Note**: This is a server-only function.
 ---@field additem fun(player: integer|string?, item: string, amount: integer): boolean? Adds `item` to the player's inventory. <br> **Note**: This is a server-only function.
 ---@field removeitem fun(player: integer|string?, item: string, amount: integer): boolean? Removes `item` from the player's inventory. <br> **Note**: This is a server-only function.
+---@field hasitem fun(player: integer|string?, item: string, amount: integer?): boolean? Returns whether the player has `item` in their inventory. <br> **Note**: This is a server-only function.
 ---@field addlocalentity fun(entities: integer|integer[], options: {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: (fun(entity: number, distance: number): boolean?)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]}[]) Adds a target to `entities` with the specified `options`. <br> **Note**: This is a client-only function.
 ---@field removelocalentity fun(entities: integer|integer[], targets: string|string[]?) Removes the target from `entities` with the specified `targets`. <br> **Note**: This is a client-only function.
 ---@field addboxzone fun(data: {center: vector3, size: vector3, heading: number?, debug: boolean?}, options: {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: (fun(entity: integer, distance: number): boolean?)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?}[]): integer|string Adds a box zone with the specified `data` and `options`. <br> **Note**: This is a client-only function. 
@@ -556,6 +557,28 @@ do
       removed = Inv:RemoveItem(player, item, amount, false, 'duff shared bridge removed item:' ..item) or false
     end
     return removed
+  end
+
+  ---@param player integer|string? The `player` to check has the item for. <br> If `player` is nil, the source is used.
+  ---@param item string The name of the item to check for.
+  ---@param amount number? The amount of the item to check for. <br> If `amount` is nil, the default amount is 1.
+  ---@return boolean has_item Whether the `player` has the specified `item`.
+  local function has_item(player, item, amount) -- **Note**: This is a server-only function.
+    if not is_server then error('called a server only function \'hasitem\'', 2) end
+    player = validate_source('hasitem', player or source)
+    if not get_item(item) then error('bad argument #2 to \'hasitem\' (item \''..item..'\' not valid)', 2) end
+    Inv = get_inv_object()
+    local item_in_inv = false
+    amount = amount or 1
+    if INVENTORY == 'ox' then
+      item_in_inv = Inv:HasItem(player, item, amount)
+    elseif INVENTORY == 'esx' then
+      local player_data = get_player_data(player)
+      item_in_inv = player_data.hasItem(item, amount)
+    elseif INVENTORY == 'qb' then
+      item_in_inv = Inv:HasItem(player, item, amount)
+    end
+    return item_in_inv
   end
 
   --------------------- CLIENT ---------------------
