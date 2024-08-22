@@ -18,6 +18,7 @@
 ---@field additem fun(player: integer|string?, item: string, amount: integer): boolean? Adds `item` to the player's inventory. <br> **Note**: This is a server-only function.
 ---@field removeitem fun(player: integer|string?, item: string, amount: integer): boolean? Removes `item` from the player's inventory. <br> **Note**: This is a server-only function.
 ---@field hasitem fun(player: integer|string?, item: string, amount: integer?): boolean? Returns whether the player has `item` in their inventory. <br> **Note**: This is a server-only function.
+---@field getplayeritems fun(player: integer|string?): {[string]: {name: string, label: string, weight: number, useable: boolean, unique: boolean}} Returns `player`'s inventory items. <br> **Note**: This is a server-only function.
 ---@field addlocalentity fun(entities: integer|integer[], options: {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: (fun(entity: number, distance: number): boolean?)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]}[]) Adds a target to `entities` with the specified `options`. <br> **Note**: This is a client-only function.
 ---@field removelocalentity fun(entities: integer|integer[], targets: string|string[]?) Removes the target from `entities` with the specified `targets`. <br> **Note**: This is a client-only function.
 ---@field addboxzone fun(data: {center: vector3, size: vector3, heading: number?, debug: boolean?}, options: {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: (fun(entity: integer, distance: number): boolean?)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?}[]): integer|string Adds a box zone with the specified `data` and `options`. <br> **Note**: This is a client-only function. 
@@ -177,8 +178,9 @@ do
   end
 
   ---@param player integer|string? The source of the player. <br> `player` is a server-side only argument, and if not provided, the source is used.
+  ---@param level integer? The error level to log the message at.
   ---@return table PlayerData The player data for `player`.
-  local function get_player_data(player)
+  local function get_player_data(player, level)
     Core = get_core_object()
     local player_data = nil
     if is_server then
@@ -200,7 +202,7 @@ do
         player_data = PlayerData
       end
     end
-    if not player_data then error('error calling \'getplayer\' (player data is invalid)', 2) end
+    if not player_data then error('error calling \'getplayer\' (player data is invalid)', level or 2) end
     return player_data
   end
 
@@ -264,7 +266,7 @@ do
   ---@return string|integer identifier The identifier of the `player`. <br> If called from the server, `identifier` is either the player's FiveM identifier or the player's identifier from the framework being used. <br> If called from the client, `identifier` is the player's server ID or the player's identifier from the framework being used.
   local function get_player_identifier(player)
     player = player or source or PlayerId()
-    local player_data = FRAMEWORK and get_player_data(player)
+    local player_data = FRAMEWORK and get_player_data(player, 3)
     local identifier = nil
     if is_server then
       identifier = not player_data and GetPlayerIdentifierByType(player, 'fivem')
@@ -289,7 +291,7 @@ do
   ---@return string name The name of the `player`.
   local function get_player_name(player)
     player = player or source or -1
-    local player_data = FRAMEWORK and get_player_data(player)
+    local player_data = FRAMEWORK and get_player_data(player, 3)
     local name = ''
     if is_server then
       if FRAMEWORK == 'esx' then ---@cast player_data -?
@@ -310,7 +312,7 @@ do
   ---@param player integer|string? The `player` to retrieve the job data for. <br> `player` is a server-side only argument, and is the player's server ID. <br> If `player` is nil, the source is used.
   ---@return {name: string, label: string, grade: number, grade_name: string, grade_label: string, job_type: string, salary: number}? job_data The job data for the `player`.
   local function get_job_data(player)
-    local player_data = get_player_data(player)
+    local player_data = get_player_data(player, 3)
     local found_data = nil
     if is_server then
       if FRAMEWORK == 'esx' then
@@ -332,7 +334,7 @@ do
   ---@param player integer|string? The `player` to retrieve the gang data for. <br> `player` is a server-side only argument, and is the player's server ID. <br> If `player` is nil, the source is used.
   ---@return {name: string, label: string, grade: number, grade_name: string}? gang_data The gang data for the `player`.
   local function get_gang_data(player)
-    local player_data = get_player_data(player)
+    local player_data = get_player_data(player, 3)
     local found_data = nil
     if is_server then
       if FRAMEWORK == 'qb' then
@@ -373,7 +375,7 @@ do
   ---@param player integer|string? The `player` to check if they are downed. <br> If `player` is nil, the source is used. <br> `player` is a server-side only argument.
   ---@return boolean isDowned Whether the `player` is downed.
   local function is_player_downed(player)
-    local player_data = get_player_data(player)
+    local player_data = get_player_data(player, 3)
     local is_downed = false
     if is_server then
       if FRAMEWORK == 'esx' then
@@ -532,7 +534,7 @@ do
     if INVENTORY == 'ox' then
       added = Inv:CanCarryItem(player, item, amount) and Inv:AddItem(player, item, amount) or false
     elseif INVENTORY == 'esx' then
-      local player_data = get_player_data(player)
+      local player_data = get_player_data(player, 3)
       if player_data.canCarryItem(item, amount) then player_data.addInventoryItem(item, amount) end
       added = player_data.hasItem(item, amount)
     elseif INVENTORY == 'qb' then
@@ -556,7 +558,7 @@ do
     if INVENTORY == 'ox' then
       removed = Inv:RemoveItem(player, item, amount) or false
     elseif INVENTORY == 'esx' then
-      local player_data = get_player_data(player)
+      local player_data = get_player_data(player, 3)
       player_data.removeInventoryItem(item, amount)
       removed = not player_data.hasItem(item, amount)
     elseif INVENTORY == 'qb' then
@@ -580,12 +582,46 @@ do
     if INVENTORY == 'ox' then
       item_in_inv = Inv:HasItem(player, item, amount)
     elseif INVENTORY == 'esx' then
-      local player_data = get_player_data(player)
+      local player_data = get_player_data(player, 3)
       item_in_inv = player_data.hasItem(item, amount)
     elseif INVENTORY == 'qb' then
       item_in_inv = Inv:HasItem(player, item, amount)
     end
     return item_in_inv
+  end
+
+  ---@param player integer|string? The `player` to retrieve the inventory for. <br> If `player` is nil, the source is used.
+  ---@return {[string]: {name: string, label: string, weight: number, useable: boolean, unique: boolean}} inventory The inventory for the `player`.
+  local function get_player_items(player) -- **Note**: This is a server-only function.
+    if not is_server then error('called a server only function \'getplayeritems\'', 2) end
+    player = validate_source('getplayeritems', player or source)
+    Inv = get_inv_object()
+    if not Items then Items = get_all_items() end
+    local inventory = {}
+    if INVENTORY == 'ox' then
+      local found = Inv:GetInventoryItems(player)
+      if not found then error('error calling \'getplayeritems\' (inventory not valid)', 2) end
+      for name in pairs(found) do
+        inventory[name] = Items[name]
+      end
+    elseif INVENTORY == 'esx' then
+      local player_data = get_player_data(player, 3)
+      local found = player_data.getInventory()
+      if not found then error('error calling \'getplayeritems\' (inventory not valid)', 2) end
+      for i = 1, #found do
+        local item = found[i]
+        inventory[item.name] = Items[item.name]
+      end
+    elseif INVENTORY == 'qb' then
+      local player_data = get_player_data(player, 3)
+      local found = player_data.PlayerData.items
+      if not found then error('error calling \'getplayeritems\' (inventory not valid)', 2) end
+      for i = 1, #found do
+        local item = found[i]
+        inventory[item.name] = Items[item.name]
+      end
+    end
+    return inventory
   end
 
   --------------------- CLIENT ---------------------
@@ -909,6 +945,7 @@ do
     bridge.additem = add_item
     bridge.removeitem = remove_item
     bridge.hasitem = has_item
+    bridge.getplayeritems = get_player_items
   else
     bridge.addlocalentity = add_local_entity
     bridge.removelocalentity = remove_local_entity
