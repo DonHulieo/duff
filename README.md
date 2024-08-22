@@ -81,11 +81,16 @@ Well, this is the solution for you! This is a collection of *optimised utility m
         - [createuseableitem](#createuseableitem)
         - [additem](#additem)
         - [removeitem](#removeitem)
+        - [hasitem](#hasitem)
+        - [getplayeritems](#getplayeritems)
       - [Client Functions (bridge)](#client-functions-bridge)
         - [addlocalentity](#addlocalentity)
         - [removelocalentity](#removelocalentity)
         - [addboxzone](#addboxzone)
         - [removezone](#removezone)
+        - [registermenu](#registermenu)
+        - [openmenu](#openmenu)
+        - [closemenu](#closemenu)
     - [CLocale](#clocale)
       - [Importing CLocale](#importing-clocale)
       - [set](#set)
@@ -915,6 +920,41 @@ function bridge.removeitem(player, item, amount)
 - `amount` - The amount of the item to remove, defaults to `1`.
 - `returns: boolean` - Whether the item was removed.
 
+##### hasitem
+
+Checks if the `player` has an item in their inventory.
+
+```lua
+---@param player integer|string?
+---@param item string
+---@param amount integer?
+---@return boolean has_item
+function bridge.hasitem(player, item, amount)
+```
+
+- `player` - The `player` server ID to check the item of.
+- `item` - The name of the item to check.
+- `amount` - The amount of the item to check for, defaults to `1`.
+- `returns: boolean` - Whether the player has the item.
+
+##### getplayeritems
+
+Retrieves the `player` inventory.
+
+```lua
+---@param player integer|string?
+---@return {[string]: {name: string, label: string, weight: number, useable: boolean, unique: boolean}} player_items
+function bridge.getplayeritems(player)
+```
+
+- `player` - The `player` server ID to retrieve the inventory of.
+- `returns: table` - The player inventory.
+  - `name` - The name of the item.
+  - `label` - The label of the item.
+  - `weight` - The weight of the item.
+  - `useable` - Whether the item is useable.
+  - `unique` - Whether the item is unique.
+
 #### Client Functions (bridge)
 
 ##### addlocalentity
@@ -992,6 +1032,50 @@ function bridge.removezone(zone)
 ```
 
 - `zone` - The zone to remove. If using `ox_target`, the integer ID of the zone is used. If using `qb-target`, the string name of the zone is used.
+
+##### registermenu
+
+Registers a menu.
+
+```lua
+---@param id string
+---@param title string
+---@param options {header: string, description: string, icon: string, disabled: boolean?, onSelect: fun()?, event_type: string?, event: string?, args: table?}[]
+function bridge.registermenu(id, title, options)
+```
+
+- `id` - The ID of the menu.
+- `title` - The title of the menu.
+- `options` - The options for the menu. `options` is an array of tables with the following fields;
+  - `header` - The header of the menu.
+  - `description` - The description of the menu.
+  - `icon` - The icon of the menu.
+  - `disabled` - Whether the menu is disabled or `nil`.
+  - `onSelect` - The function to call when the menu is selected or `nil`.
+  - `event_type` - The event type of the menu or `nil`.
+  - `event` - The event of the menu or `nil`.
+  - `args` - The arguments to pass to the menu or `nil`.
+
+##### openmenu
+
+Opens a registered menu.
+
+```lua
+---@param id string
+---@param data table?
+function bridge.openmenu(id, data)
+```
+
+- `id` - The ID of the menu to open.
+- `data` - The data to pass to the menu
+
+##### closemenu
+
+Closes the currently open menu.
+
+```lua
+function bridge.closemenu()
+```
 
 ### CLocale
 
