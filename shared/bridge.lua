@@ -474,8 +474,8 @@ do
       if not found_items then error('error calling \'getallitems\' (items not valid)', 2) end
       for name, data in pairs(found_items) do
         local client_data, server_data = data.client, data.server
-        local useable = not data.consume and (client_data?.status or client_data?.useTime or client_data?.export or server_data?.export) or data.consume == 1
-        Items[name] = {name = name, label = data.label, weight = data.weight or 0, useable = useable, unique = data.stack == nil and true or data.stack}
+        local useable = not data.consume and (client_data?.status or client_data?.useTime or client_data?.export or server_data?.export) or data.consume == 1       
+        Items[name:lower()] = {name = name, label = data.label, weight = data.weight or 0, useable = useable, unique = data.stack == nil and true or data.stack}
       end
     elseif INVENTORY == 'esx' then
       found_items = MySQL.Sync.fetchAll('SELECT * FROM items')
