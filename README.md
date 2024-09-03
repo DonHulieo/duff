@@ -93,6 +93,18 @@ Well, this is the solution for you! This is a collection of *optimised utility m
         - [registermenu](#registermenu)
         - [openmenu](#openmenu)
         - [closemenu](#closemenu)
+    - [CKDTree](#ckdtree)
+      - [Importing CKDTree](#importing-ckdtree)
+    - [new](#new)
+    - [build (kdtree)](#build-kdtree)
+    - [insert](#insert)
+    - [contains](#contains)
+    - [remove](#remove)
+    - [neighbour](#neighbour)
+    - [neighbours](#neighbours)
+    - [range](#range)
+    - [tofile](#tofile)
+    - [fromfile](#fromfile)
     - [CLocale](#clocale)
       - [Importing CLocale](#importing-clocale)
       - [set](#set)
@@ -165,7 +177,7 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [bytype](#bytype)
       - [getblips](#getblips)
       - [getinfo](#getinfo)
-      - [remove](#remove)
+      - [remove (blips)](#remove-blips)
     - [CStreaming](#cstreaming)
       - [Importing CStreaming](#importing-cstreaming)
       - [loadanimdict](#loadanimdict)
@@ -1089,6 +1101,175 @@ Closes the currently open menu.
 ```lua
 function bridge.closemenu()
 ```
+
+### CKDTree
+
+CKDTree is a class that provides a KD-Tree implementation for use in spatial searches, but uses an integer-key array for holding each parent and it's children. For more information on KD-Trees, see the [Wikipedia page](https://en.wikipedia.org/wiki/K-d_tree).
+
+*This is a shared module, and can be used on both the client, server and shared enviroment.*
+
+#### Importing CKDTree
+
+```lua
+-- Using the `require` function from `ox_lib`
+---@module 'duff.shared.kdtree'
+local kdtree = lib.require '@duff.shared.kdtree'
+
+-- Attaching the kdtree to a local variable from CDuff
+local kdtree = duff.kdtree
+```
+
+### new
+
+Creates a new KD-Tree.
+
+```lua
+---@param dimensions integer
+---@return KDTree tree
+function kdtree.new(dimensions)
+```
+
+- `dimensions` - The number of dimensions for the KD-Tree.
+- `returns: CKDTree` - The new KD-Tree instance.
+
+### build (kdtree)
+
+Builds the KD-Tree.
+
+```lua
+---@param points (vector|number[])[]|CKDTree
+---@return KDTree tree
+function kdtree.build(points)
+```
+
+- `points` - The points to build the KD-Tree from.
+- `returns: CKDTree` - The KD-Tree instance.
+  
+### insert
+
+Inserts a point into the KD-Tree. Avoid using this function directly as it can cause the tree to become unbalanced.
+
+```lua
+---@param self CKDTree
+---@param point vector|number[]
+function kdtree.insert(self, point)
+```
+
+- `self` - The KD-Tree instance.
+- `point` - The point to insert.
+
+### contains
+
+Checks if the KD-Tree contains a point.
+
+```lua
+---@param self CKDTree
+---@param point vector|number[]
+---@param margin number?
+---@return boolean contains, integer? node_index
+function kdtree.contains(self, point, margin)
+```
+
+- `self` - The KD-Tree instance.
+- `point` - The point to check.
+- `margin` - The margin of error for the search. Default: `1e-10`.
+- `returns: boolean, integer` - Whether the KD-Tree contains the point and the index of the point.
+
+### remove
+
+Removes a point from the KD-Tree. Avoid using this function directly as it can cause the tree to become unbalanced.
+
+```lua
+---@param self CKDTree
+---@param point vector|number[]
+---@return boolean removed, integer? node_index
+function kdtree.remove(self, point)
+```
+
+- `self` - The KD-Tree instance.
+- `point` - The point to remove.
+- `returns: boolean, integer` - Whether the point was removed and the index of the point.
+
+### neighbour
+
+Finds the nearest point in the KD-Tree to a given point.
+
+```lua
+---@param self CKDTree
+---@param point vector|number[]
+---@param radius number?
+---@return vector|number? nearest_point, number? best_distance
+function kdtree.neighbour(self, point, radius)
+```
+
+- `self` - The KD-Tree instance.
+- `point` - The point to find the nearest point to.
+- `radius` - The radius to search within.
+- `returns: vector|number, number` - The nearest point and the distance to it.
+
+### neighbours
+
+Finds the nearest points in the KD-Tree to a given point.
+
+```lua
+---@param self CKDTree
+---@param point vector|number[]
+---@param radius number?
+---@param limit integer?
+---@return {dist: number, coords: vector|number[]}[] best_points
+function kdtree.neighbours(self, point, radius, limit)
+```
+
+- `self` - The KD-Tree instance.
+- `point` - The point to find the nearest points to.
+- `radius` - The radius to search within.
+- `limit` - The limit of points to return.
+- `returns: table` - The nearest points and their distances.
+
+### range
+
+Finds all points in the KD-Tree within a given range of a point.
+
+```lua
+---@param self CKDTree
+---@param min vector|number[]
+---@param max vector|number[]
+---@return (vector|number[])[] points
+function kdtree.range(self, min, max)
+```
+
+- `self` - The KD-Tree instance.
+- `min` - The minimum point.
+- `max` - The maximum point.
+- `returns: table` - The points within the range.
+
+### tofile
+
+Saves the KD-Tree to a file.
+
+```lua
+---@param self CKDTree
+---@param path string
+---@return boolean saved
+function kdtree.tofile(self, path)
+```
+
+- `self` - The KD-Tree instance.
+- `path` - The path to save the KD-Tree to.
+- `returns: boolean` - Whether the KD-Tree was saved.
+
+### fromfile
+
+Loads the KD-Tree from a file.
+
+```lua
+---@param path string
+---@return KDTree tree
+function kdtree.fromfile(path)
+```
+
+- `path` - The path to load the KD-Tree from.
+- `returns: CKDTree` - The KD-Tree instance.
 
 ### CLocale
 
@@ -2087,7 +2268,7 @@ function blips.getinfo(blip)
 }
 ```
 
-#### remove
+#### remove (blips)
 
 Removes a blip or an array of blips.
 
