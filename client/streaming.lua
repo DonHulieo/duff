@@ -14,6 +14,8 @@
 ---@field async.loadmodel fun(model: string|number): boolean? Loads a model without blocking the main thread.
 ---@field loadptfx fun(fx: string): boolean Loads a particle effect asset.
 ---@field async.loadptfx fun(fx: string): boolean? Loads a particle effect asset without blocking the main thread.
+---@field loadtexturedict fun(dict: string): boolean Loads a streamed texture dictionary.
+---@field async.loadtexturedict fun(dict: string): boolean? Loads a streamed texture dictionary without blocking the main thread.
 do
   local game_timer = GetGameTimer
   local load, load_resource_file = load, LoadResourceFile
@@ -176,6 +178,20 @@ do
     return async_fn(req_ptfx, fx)
   end
 
+  ---@param dict string The streamed texture dictionary to load.
+  ---@return boolean loaded Whether the streamed texture dictionary was loaded.
+  local function req_streamed_texture_dict(dict)
+    if not is_valid('loadstreamedtexturedict', dict, 'string') then return false end
+    return load_asset(dict, HasStreamedTextureDictLoaded, RequestStreamedTextureDict)
+  end
+
+  ---@param dict string The streamed texture dictionary to load.
+  ---@return boolean? loaded Whether the streamed texture dictionary was loaded.
+  local function async_req_streamed_texture_dict(dict)
+    if not is_valid('async.loadstreamedtexturedict', dict, 'string') then return false end
+    return async_fn(req_streamed_texture_dict, dict)
+  end
+
   return {
     async = {
       loadanimdict = async_req_anim_dict,
@@ -184,7 +200,8 @@ do
       loadcollision = async_req_collision,
       loadipl = async_req_ipl,
       loadmodel = async_req_model,
-      loadptfx = async_req_ptfx
+      loadptfx = async_req_ptfx,
+      loadtexturedict = async_req_streamed_texture_dict
     },
     loadanimdict = req_anim_dict,
     loadanimset = req_anim_set,
@@ -192,6 +209,7 @@ do
     loadcollision = req_collision,
     loadipl = req_ipl,
     loadmodel = req_model,
-    loadptfx = req_ptfx
+    loadptfx = req_ptfx,
+    loadtexturedict = req_streamed_texture_dict
   }
 end
