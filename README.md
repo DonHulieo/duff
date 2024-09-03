@@ -31,6 +31,8 @@ Well, this is the solution for you! This is a collection of *optimised utility m
   - [Table of Contents](#table-of-contents)
   - [Credits](#credits)
   - [Installation](#installation)
+    - [Dependencies (CBridge Users)](#dependencies-cbridge-users)
+    - [Initial Setup](#initial-setup)
   - [Documentation](#documentation)
     - [Check Version](#check-version)
     - [Importing CDuff](#importing-cduff)
@@ -207,6 +209,17 @@ Well, this is the solution for you! This is a collection of *optimised utility m
 - [lume](https://github.com/rxi/lume/blob/master/README.md#lumetrace)
 
 ## Installation
+
+### Dependencies (CBridge Users)
+
+**In order to use the CBridge class, you must have the following resources(s) installed:**
+
+- [qb-core](https://github.com/qbcore-framework/qb-core) v1.2.6 or [es_extended](https://github.com/esx-framework/esx_core/releases/tag/1.10.2) v1.10.2
+- [qb-inventory](https://github.com/qbcore-framework/qb-inventory) v2.0.0 or [ox_inventory](https://github.com/overextended/ox_inventory/releases/tag/v2.40.1) v2.40.1
+- [ox_lib](https://github.com/overextended/ox_lib/releases/tag/v3.25.0) v3.25.0 or [qb-menu](https://github.com/qbcore-framework/qb-menu) v1.20.0
+- [qb-target](https://github.com/qbcore-framework/qb-target) v5.5.0 or [ox_target](https://github.com/overextended/ox_target/releases/tag/v1.17.0) v1.17.0
+
+### Initial Setup
 
 - Always use the latest FiveM artifacts (tested on 6683), you can find them [here](https://runtime.fivem.net/artifacts/fivem/build_server_windows/master/).
 - Download the latest version from releases.
