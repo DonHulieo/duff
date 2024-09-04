@@ -95,16 +95,16 @@ Well, this is the solution for you! This is a collection of *optimised utility m
         - [closemenu](#closemenu)
     - [CKDTree](#ckdtree)
       - [Importing CKDTree](#importing-ckdtree)
-    - [new](#new)
-    - [build (kdtree)](#build-kdtree)
-    - [insert](#insert)
-    - [contains](#contains)
-    - [remove](#remove)
-    - [neighbour](#neighbour)
-    - [neighbours](#neighbours)
-    - [range](#range)
-    - [tofile](#tofile)
-    - [fromfile](#fromfile)
+      - [new](#new)
+      - [build (kdtree)](#build-kdtree)
+      - [insert](#insert)
+      - [contains](#contains)
+      - [remove](#remove)
+      - [neighbour](#neighbour)
+      - [neighbours](#neighbours)
+      - [range](#range)
+      - [tofile](#tofile)
+      - [fromfile](#fromfile)
     - [CLocale](#clocale)
       - [Importing CLocale](#importing-clocale)
       - [set](#set)
@@ -1119,7 +1119,7 @@ local kdtree = lib.require '@duff.shared.kdtree'
 local kdtree = duff.kdtree
 ```
 
-### new
+#### new
 
 Creates a new KD-Tree.
 
@@ -1132,7 +1132,7 @@ function kdtree.new(dimensions)
 - `dimensions` - The number of dimensions for the KD-Tree.
 - `returns: CKDTree` - The new KD-Tree instance.
 
-### build (kdtree)
+#### build (kdtree)
 
 Builds the KD-Tree.
 
@@ -1145,7 +1145,7 @@ function kdtree.build(points)
 - `points` - The points to build the KD-Tree from.
 - `returns: CKDTree` - The KD-Tree instance.
   
-### insert
+#### insert
 
 Inserts a point into the KD-Tree. Avoid using this function directly as it can cause the tree to become unbalanced.
 
@@ -1158,7 +1158,7 @@ function kdtree.insert(self, point)
 - `self` - The KD-Tree instance.
 - `point` - The point to insert.
 
-### contains
+#### contains
 
 Checks if the KD-Tree contains a point.
 
@@ -1175,7 +1175,7 @@ function kdtree.contains(self, point, margin)
 - `margin` - The margin of error for the search. Default: `1e-10`.
 - `returns: boolean, integer` - Whether the KD-Tree contains the point and the index of the point.
 
-### remove
+#### remove
 
 Removes a point from the KD-Tree. Avoid using this function directly as it can cause the tree to become unbalanced.
 
@@ -1190,7 +1190,7 @@ function kdtree.remove(self, point)
 - `point` - The point to remove.
 - `returns: boolean, integer` - Whether the point was removed and the index of the point.
 
-### neighbour
+#### neighbour
 
 Finds the nearest point in the KD-Tree to a given point.
 
@@ -1207,7 +1207,7 @@ function kdtree.neighbour(self, point, radius)
 - `radius` - The radius to search within.
 - `returns: vector|number, number` - The nearest point and the distance to it.
 
-### neighbours
+#### neighbours
 
 Finds the nearest points in the KD-Tree to a given point.
 
@@ -1226,7 +1226,7 @@ function kdtree.neighbours(self, point, radius, limit)
 - `limit` - The limit of points to return.
 - `returns: table` - The nearest points and their distances.
 
-### range
+#### range
 
 Finds all points in the KD-Tree within a given range of a point.
 
@@ -1243,7 +1243,7 @@ function kdtree.range(self, min, max)
 - `max` - The maximum point.
 - `returns: table` - The points within the range.
 
-### tofile
+#### tofile
 
 Saves the KD-Tree to a file.
 
@@ -1258,7 +1258,7 @@ function kdtree.tofile(self, path)
 - `path` - The path to save the KD-Tree to.
 - `returns: boolean` - Whether the KD-Tree was saved.
 
-### fromfile
+#### fromfile
 
 Loads the KD-Tree from a file.
 
