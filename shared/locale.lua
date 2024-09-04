@@ -173,7 +173,7 @@ do
     resource = resource or current_resource
     file = file or ('locales.'..dialect) --[[@as string]]
     local translations = require(resource..'.'..file)
-    recursive_load(nil, translations)
+    recursive_load(file:match('[^.]+$'), translations)
   end
 
   ---@param key string The key to translate.
