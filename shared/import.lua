@@ -50,6 +50,7 @@ do
   ---@field blips CBlips
   ---@field bridge CBridge
   ---@field bin CBin
+  ---@field interval CInterval
   ---@field kdtree CKDTree
   ---@field locale CLocale
   ---@field math CMath
