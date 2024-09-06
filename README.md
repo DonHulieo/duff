@@ -93,6 +93,16 @@ Well, this is the solution for you! This is a collection of *optimised utility m
         - [registermenu](#registermenu)
         - [openmenu](#openmenu)
         - [closemenu](#closemenu)
+    - [CInterval](#cinterval)
+      - [Importing CInterval](#importing-cinterval)
+      - [interval](#interval)
+      - [create](#create)
+      - [start](#start)
+      - [pause](#pause)
+      - [stop](#stop)
+      - [resume](#resume)
+      - [update](#update)
+      - [destroy](#destroy)
     - [CKDTree](#ckdtree)
       - [Importing CKDTree](#importing-ckdtree)
       - [new](#new)
@@ -1101,6 +1111,163 @@ Closes the currently open menu.
 ```lua
 function bridge.closemenu()
 ```
+
+### CInterval
+
+CInterval is a class that has methods for creating and managing timer. It is used to call a function repeatedly, with a fixed time delay between each call.
+
+*This is a shared module, and can be used on both the client, server and shared enviroment.*
+
+#### Importing CInterval
+
+```lua
+-- Using the `require` function from `ox_lib`
+---@module 'duff.shared.interval'
+local interval = lib.require '@duff.shared.interval'
+
+-- Attaching the interval to a local variable from CDuff
+local interval = duff.interval
+```
+
+#### interval
+
+The `interval` class is used to create and manage intervals.
+
+```lua
+---@class interval
+---@field idx integer
+---@field callback fun(...: any): callback_data: any?
+---@field time integer
+---@field limit integer
+---@field paused boolean
+---@field stopped boolean
+---@field update (fun(callback_data: any?): any?)?
+---@field thread function?
+---@field RESOURCE string
+---@field data any?
+```
+
+- `idx` - The index of the interval.
+- `callback` - The function to call.
+- `time` - The time in milliseconds between each call. Default: `1000`.
+- `limit` - The number of times to call the function. Default: `-1` (infinite).
+- `paused` - Whether the interval is paused.
+- `stopped` - Whether the interval is stopped.
+- `update` - The function to call when the interval is updated.
+- `thread` - The thread function of the interval.
+- `RESOURCE` - The owning resource of the interval.
+- `data` - The data of the interval.
+
+#### create
+
+Creates a new interval.
+
+```lua
+---@param callback fun(...: any): callback_data: any?
+---@param time integer?
+---@param limit integer?
+---@return interval interval, integer idx
+function interval.create(callback, time, limit)
+```
+
+- `callback` - The function to call.
+- `time` - The time in milliseconds between each call. Default: `1000`.
+- `limit` - The number of times to call the function. Default: `-1` (infinite).
+- `returns: interval, integer` - The interval instance and the index of the interval.
+
+#### start
+
+Starts the interval.
+
+```lua
+---@param idx integer
+---@param update (fun(callback_data: any?): any)?
+---@param ... any
+---@return interval interval
+function interval.start(idx, update, ...)
+```
+
+- `idx` - The index of the interval.
+- `update` - The function to call when the interval is updated.
+- `...` - The arguments to pass to the interval.
+- `returns: interval` - The interval instance.
+
+#### pause
+
+Pauses the interval.
+
+```lua
+---@param idx integer
+---@param pause boolean?
+---@return boolean state
+function interval.pause(idx, pause)
+```
+
+- `idx` - The index of the interval.
+- `pause` - Whether to pause the interval. Toggle if not provided.
+- `returns: boolean` - Whether the interval is paused.
+
+#### stop
+
+Stops the interval.
+
+```lua
+---@param idx integer
+---@return interval interval
+function interval.stop(idx)
+```
+
+- `idx` - The index of the interval.
+- `returns: interval` - The interval instance.
+
+#### resume
+
+Resumes a stopped interval.
+
+```lua
+---@param idx integer
+---@param update (fun(callback_data: any?): any)?
+---@param ... any
+---@return interval interval
+function interval.resume(idx, update, ...)
+```
+
+- `idx` - The index of the interval.
+- `update` - The function to call when the interval is updated.
+- `...` - The arguments to pass to the interval.
+- `returns: interval` - The interval instance.
+
+#### update
+
+Updates the interval.
+
+```lua
+---@param idx integer
+---@param callback fun(...: any): callback_data: any?
+---@param update (fun(callback_data: any?): any)?
+---@param time integer?
+---@param limit integer?
+---@return interval interval, integer idx
+function interval.update(idx, callback, update, time, limit)
+```
+
+- `idx` - The index of the interval.
+- `callback` - The function to call.
+- `update` - The function to call when the interval is updated.
+- `time` - The time in milliseconds between each call. Default: `1000`.
+- `limit` - The number of times to call the function. Default: `-1` (infinite).
+- `returns: interval, integer` - The interval instance and the index of the interval.
+
+#### destroy
+
+Destroys the interval.
+
+```lua
+---@param idx interval|integer
+function interval.destroy(idx)
+```
+
+- `idx` - The interval instance or the index of the interval.
 
 ### CKDTree
 
