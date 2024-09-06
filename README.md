@@ -188,6 +188,13 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [getblips](#getblips)
       - [getinfo](#getinfo)
       - [remove (blips)](#remove-blips)
+    - [CScaleform](#cscaleform)
+      - [Importing CScaleform](#importing-cscaleform)
+      - [arguments](#arguments)
+      - [callmain](#callmain)
+      - [callfrontend](#callfrontend)
+      - [callfrontendheader](#callfrontendheader)
+      - [callhud](#callhud)
     - [CStreaming](#cstreaming)
       - [Importing CStreaming](#importing-cstreaming)
       - [loadanimdict](#loadanimdict)
@@ -1114,7 +1121,7 @@ function bridge.closemenu()
 
 ### CInterval
 
-CInterval is a class that has methods for creating and managing timer. It is used to call a function repeatedly, with a fixed time delay between each call.
+CInterval is an object that has methods for creating and managing timer. It is used to call a function repeatedly, with a fixed time delay between each call.
 
 *This is a shared module, and can be used on both the client, server and shared enviroment.*
 
@@ -2445,6 +2452,96 @@ function blips.remove(blips)
 ```
 
 - `blips` - The blip handle or an array of blip handles.
+
+### CScaleform
+
+CScaleform is an object containing functions for managing scaleforms. It provides functions for creating, setting, and rendering scaleforms.
+
+*This is a client module, and can only be used in the client enviroment.*
+
+#### Importing CScaleform
+
+```lua
+-- Using the `require` function from `ox_lib`
+---@module 'duff.client.scaleform'
+local scaleform = lib.require '@duff.client.scaleform'
+
+-- Attaching the scaleform to a local variable from CDuff
+local scaleform = duff.scaleform
+```
+
+#### arguments
+
+The var args passed to the scaleforms is parsed, with each method being called with the correct arguments. This means there's special handling for certain types of arguments.
+
+- `string` - Checks if the string is one of three brief types (`dialogue_brief|help_brief|mission_brief`), if so, it adds the param with `ScaleformMovieMethodAddParamLatestBriefString` otherwise it adds the param with `BeginTextCommandScaleformString`.
+- `number` - Adds the param with `ScaleformMovieMethodAddParamInt` if the number is an integer, otherwise it adds the param with `ScaleformMovieMethodAddParamFloat`.
+- `boolean` - Adds the param with `ScaleformMovieMethodAddParamBool`.
+- `{texture: boolean, name: string}` - Adds the param with `ScaleformMovieMethodAddParamTextureNameString`.
+
+#### callmain
+
+Calls Scaleforms with `BeginScaleformMovieMethod`.
+
+```lua
+---@param scaleform_handle integer
+---@param method string
+---@param ... any
+---@return any? result
+function scaleform.callmain(scaleform_handle, method, ...)
+```
+
+- `scaleform_handle` - The scaleform handle.
+- `method` - The method to call.
+- `...` - The arguments to pass to the method.
+- `returns: any` - The result of the method.
+
+#### callfrontend
+
+Calls Scaleforms with `BeginScaleformMovieMethodOnFrontend`.
+
+```lua
+---@param method string
+---@param ... any
+---@return any? result
+function scaleform.callfrontend(method, ...)
+```
+
+- `method` - The method to call.
+- `...` - The arguments to pass to the method.
+- `returns: any?` - The result of the method.
+
+#### callfrontendheader
+
+Calls Scaleforms with `BeginScaleformMovieMethodOnFrontendHeader`.
+
+```lua
+---@param method string
+---@param ... any
+---@return any? result
+function scaleform.callfrontendheader(method, ...)
+```
+
+- `method` - The method to call.
+- `...` - The arguments to pass to the method.
+- `returns: any?` - The result of the method.
+
+#### callhud
+
+Calls Scaleforms with `BeginScaleformScriptHudMovieMethod`.
+
+```lua
+---@param hud_component integer
+---@param method string
+---@param ... any
+---@return any? result
+function scaleform.callhud(hud_component, method, ...)
+```
+
+- `hud_component` - The HUD component to call.
+- `method` - The method to call.
+- `...` - The arguments to pass to the method.
+- `returns: any?` - The result of the method.
 
 ### CStreaming
 
