@@ -57,6 +57,7 @@ do
   ---@field package CPackage
   ---@field pools CPools
   ---@field streaming CStreaming
+  ---@field scaleform CScaleform
   ---@field scopes CScopes
   ---@field vector CVector
   ---@field mapzones CMapZones
