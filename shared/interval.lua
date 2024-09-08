@@ -87,7 +87,7 @@ do
   end
 
   ---@param interval_id integer
-  ---@param pause boolean
+  ---@param pause boolean?
   ---@return boolean state
   local function pause_thread(interval_id, pause)
     local interval = Intervals[interval_id] --[[@as interval]]
