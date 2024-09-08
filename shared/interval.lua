@@ -22,6 +22,7 @@ do
   ---@field update (fun(callback_data: any?): any?)?
   ---@field thread function?
   ---@field RESOURCE string
+  ---@field INVOKING string?
   ---@field data any?
 
   -------------------------------- FUNCTIONS --------------------------------
@@ -46,7 +47,8 @@ do
       limit = limit or -1,
       paused = false,
       stopped = false,
-      RESOURCE = RES_NAME
+      RESOURCE = RES_NAME,
+      INVOKING = GetInvokingResource()
     }
     Intervals[idx] = interval
     return interval, idx
@@ -71,7 +73,7 @@ do
       update = update or interval.update
       while not stop do
         if interval.paused then goto continue end
-        if not callback or interval.stopped or limit and limit ~= -1 and timer(start, limit) then break end
+        if not callback or interval.stopped or limit and limit ~= -1 and timer(start, limit) then return end
         data = callback(table.unpack(args))
         if update then update(data) end
         interval.data = data
@@ -145,10 +147,21 @@ do
 
   ---@param resource string
   local function clear_res_threads(resource)
-    if resource ~= RES_NAME then return end
-    for i = #Intervals, 1, -1 do
-      local interval = Intervals[i] --[[@as interval]]
-      if interval.RESOURCE == resource then destroy_thread(interval) end
+    if resource == RES_NAME then
+      for i = #Intervals, 1, -1 do
+        local interval = Intervals[i] --[[@as interval]]
+        if interval.RESOURCE == resource then destroy_thread(interval) end
+      end
+    elseif resource == 'duff' then
+      for i = #Intervals, 1, -1 do
+        local interval = Intervals[i] --[[@as interval]]
+        destroy_thread(interval)
+      end
+    else
+      for i = #Intervals, 1, -1 do
+        local interval = Intervals[i] --[[@as interval]]
+        if interval.INVOKING == resource then destroy_thread(interval) end
+      end
     end
   end
 
