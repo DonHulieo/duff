@@ -14,11 +14,13 @@ Well, this is the solution for you! This is a collection of *optimised utility m
 - **Async:** A function that allows you to call and return functions asynchronously, using promises.
 - **Bench:** Benches the performance of a function, and returns the time taken to execute the function.
 - **Bridge:** Provides common functions between different frameworks and libraries for use in creating cross-framework scripts.
+- **Interval:** A class for creating and managing intervals, allowing you to start, pause, stop and resume timers on threads.
 - **Locale:** A localisation and translation module, based on the i18n.lua library by kikito.
 - **Math:** An addition to the lua math library, expanding of some of the functions and adding some new ones. Most notably, an improved `math.random` function.
 - **Vector:** A vector class for the creation and manipulation of vectors, as well as exposing functions to the server environment not normally available.
 - **Blips:** A blip helper class for managing blips, aiding in the retrieval and removal of blips.
 - **Pools:** A pool class for managing pools, aiding in the retrieval of peds, vehicles, objects and pickups.
+- **Scaleform:** A scaleform class for managing scaleforms, aiding in the creation and manipulation of scaleforms.
 - **Streaming:** A streaming class for loading various game assets, including animations, audio, collisions, ipls, models and ptfx.
 - **Scope:** A scope class for manipulating players scopes, allowing triggering events around a player and their scope.
 - **Zone:** A server-side zone class for GTA V's map zones, allowing you to check if a player is in a specific zone, and trigger events based on that.
@@ -1151,6 +1153,7 @@ The `interval` class is used to create and manage intervals.
 ---@field update (fun(callback_data: any?): any?)?
 ---@field thread function?
 ---@field RESOURCE string
+---@field INVOKING string?
 ---@field data any?
 ```
 
@@ -1163,6 +1166,7 @@ The `interval` class is used to create and manage intervals.
 - `update` - The function to call when the interval is updated.
 - `thread` - The thread function of the interval.
 - `RESOURCE` - The owning resource of the interval.
+- `INVOKING` - The invoking resource of the interval (if any).
 - `data` - The data of the interval.
 
 #### create
