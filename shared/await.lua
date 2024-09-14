@@ -1,4 +1,4 @@
----@type fun(fn: function, ...: any) Calls and returns the result of a function asynchronously.
+---@type fun(fn: function, ...: any) Calls and awaits a the return of a function.
 do
   local Citizen, promise, table = Citizen, promise, table
   local type, error = type, error
@@ -15,7 +15,7 @@ do
   end
 
   ---@async
-  ---@param fn function The function to call asynchronously.
+  ---@param fn function The function to await.
   ---@param ... any The arguments to pass to the function.
   ---@return ...? The return values of the function.
   return function(fn, ...)
