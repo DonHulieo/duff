@@ -268,29 +268,11 @@ Checks a resource's version against the latest released version on GitHub.
 ---@param version string? @The version to check against or the current version if nil.
 ---@param github string @The GitHub profile to check the version.
 ---@param repository string? @The GitHub repository to check the version or the invoking resource if nil.
----@return promise @A promise that resolves with the resource and version if an update is available, or rejects with an error message.
 exports.duff:checkversion(resource, version, github, repository)
 
 -- Using '@duff/shared/import.lua' in your `fxmanifest.lua`
 duff.checkversion(resource, version, github, repository)
 ```
-
-The promise resolves with the resource and version if an update is available, or rejects with an error message.
-
-```lua
----@type data {resource: string, version: string}
----@type error string|'^1Unable to determine current resource version for `%s` ^0'|'^1Unable to check for updates for `%s` ^0'|'^2`%s` is running latest version.^0'
-duff.checkversion('duff', '1.0.0', 'donhulieo', 'duff'):next(function(data)
-  print('An update is available for ' .. data.resource .. ' (' .. data.version .. ')')
-end, function(error)
-  print('An error occured: ' .. error)
-end)
-```
-
-- There are three error messages that can be returned;
-  - `'^1Unable to determine current resource version for \` resource `\ ^0'` | If the current version can not be determined.
-  - `'^1Unable to check for updates for \` resource `\ ^0'` | If the github repository can not be found.
-  - `'^2\` resource `\ is running latest version.^0'` | If the resource is up to date.
 
 ### Importing CDuff
 
