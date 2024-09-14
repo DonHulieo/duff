@@ -1,3 +1,4 @@
+---@type fun(t: {[any]: (fun(...): any), default: (fun(...): any)}, v: any, ...: any): fun(...): any
 do
   local type, error = type, error
 
