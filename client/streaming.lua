@@ -1,26 +1,26 @@
 ---@class CStreaming
----@field async {[string]: fun(...: any): any?}
+---@field await {[string]: fun(...: any): any?}
 ---@field loadanimdict fun(dict: string): boolean Loads an animation dictionary.
----@field async.loadanimdict fun(dict: string): boolean? Loads an animation dictionary without blocking the main thread.
+---@field await.loadanimdict fun(dict: string): boolean? Loads an animation dictionary without blocking the main thread.
 ---@field loadanimset fun(set: string): boolean Loads an animation set.
----@field async.loadanimset fun(set: string): boolean? Loads an animation set without blocking the main thread.
+---@field await.loadanimset fun(set: string): boolean? Loads an animation set without blocking the main thread.
 ---@field loadaudio fun(bank: string, networked: boolean): boolean Loads an audio bank.
----@field async.loadaudio fun(bank: string, networked: boolean): boolean? Loads an audio bank without blocking the main thread.
+---@field await.loadaudio fun(bank: string, networked: boolean): boolean? Loads an audio bank without blocking the main thread.
 ---@field loadcollision fun(model: string|number): boolean Loads collision for a model.
----@field async.loadcollision fun(model: string|number): boolean? Loads collision for a model without blocking the main thread.
+---@field await.loadcollision fun(model: string|number): boolean? Loads collision for a model without blocking the main thread.
 ---@field loadipl fun(ipl: string): boolean Loads an IPL.
----@field async.loadipl fun(ipl: string): boolean? Loads an IPL without blocking the main thread.
+---@field await.loadipl fun(ipl: string): boolean? Loads an IPL without blocking the main thread.
 ---@field loadmodel fun(model: string|number): boolean Loads a model.
----@field async.loadmodel fun(model: string|number): boolean? Loads a model without blocking the main thread.
+---@field await.loadmodel fun(model: string|number): boolean? Loads a model without blocking the main thread.
 ---@field loadptfx fun(fx: string): boolean Loads a particle effect asset.
----@field async.loadptfx fun(fx: string): boolean? Loads a particle effect asset without blocking the main thread.
+---@field await.loadptfx fun(fx: string): boolean? Loads a particle effect asset without blocking the main thread.
 ---@field loadtexturedict fun(dict: string): boolean Loads a streamed texture dictionary.
----@field async.loadtexturedict fun(dict: string): boolean? Loads a streamed texture dictionary without blocking the main thread.
+---@field await.loadtexturedict fun(dict: string): boolean? Loads a streamed texture dictionary without blocking the main thread.
 do
   local game_timer = GetGameTimer
   local load, load_resource_file = load, LoadResourceFile
   local require = duff?.package.require or load(load_resource_file('duff', 'shared/package.lua'), '@duff/shared/package.lua', 't', _ENV)().require
-  local async_fn, math = duff?.async or require 'duff.shared.async', duff?.math or require 'duff.shared.math'
+  local await_fn, math = duff?.await or require 'duff.shared.await', duff?.math or require 'duff.shared.math'
   local timer = math.timer
   local type, error = type, error
   local does_anim_dict_exist, has_anim_dict_loaded, request_anim_dict = DoesAnimDictExist, HasAnimDictLoaded, RequestAnimDict
@@ -71,9 +71,9 @@ do
 
   ---@param dict string The animation dictionary to load.
   ---@return boolean? loaded Whether the animation dictionary was loaded.
-  local function async_req_anim_dict(dict)
-    if not is_valid('async.loadanimdict', dict, 'string', does_anim_dict_exist, 'invalid animation dictionary requested') then return false end
-    return async_fn(req_anim_dict, dict)
+  local function await_req_anim_dict(dict)
+    if not is_valid('await.loadanimdict', dict, 'string', does_anim_dict_exist, 'invalid animation dictionary requested') then return false end
+    return await_fn(req_anim_dict, dict)
   end
 
   ---@param set string The animation set to load.
@@ -85,9 +85,9 @@ do
 
   ---@param set string The animation set to load.
   ---@return boolean? loaded Whether the animation set was loaded.
-  local function async_req_anim_set(set)
-    if not is_valid('async.loadanimset', set, 'string', does_anim_dict_exist, 'invalid animation set requested') then return false end
-    return async_fn(req_anim_set, set)
+  local function await_req_anim_set(set)
+    if not is_valid('await.loadanimset', set, 'string', does_anim_dict_exist, 'invalid animation set requested') then return false end
+    return await_fn(req_anim_set, set)
   end
 
   ---@param bank string The audio bank to load.
@@ -105,9 +105,9 @@ do
   ---@param bank string The audio bank to load.
   ---@param networked boolean Whether the audio bank is networked.
   ---@return boolean? loaded Whether the audio bank was loaded.
-  local function async_req_audio_bank(bank, networked)
-    if not is_valid('async.loadaudio', bank, 'string') then return false end
-    return async_fn(req_audio_bank, bank, networked)
+  local function await_req_audio_bank(bank, networked)
+    if not is_valid('await.loadaudio', bank, 'string') then return false end
+    return await_fn(req_audio_bank, bank, networked)
   end
 
   ---@param model string|number The model to load collision for.
@@ -122,12 +122,12 @@ do
 
   ---@param model string|number The model to load collision for.
   ---@return boolean? loaded Whether the collision was loaded.
-  local function async_req_collision(model)
-    if not is_valid('async.loadcollision', model, {['string'] = true, ['number'] = true}, function(fnd_mod)
+  local function await_req_collision(model)
+    if not is_valid('await.loadcollision', model, {['string'] = true, ['number'] = true}, function(fnd_mod)
       model = type(fnd_mod) == 'number' and fnd_mod or joaat(fnd_mod) & 0xFFFFFFFF
       return is_model_in_cd(model) and is_model_in_valid(model) end, 'invalid model requested')
     then return false end
-    return async_fn(req_collision, model)
+    return await_fn(req_collision, model)
   end
 
   ---@param ipl string The IPL to load.
@@ -139,9 +139,9 @@ do
 
   ---@param ipl string The IPL to load.
   ---@return boolean? loaded Whether the IPL was loaded.
-  local function async_req_ipl(ipl)
-    if not is_valid('async.loadipl', ipl, 'string') then return false end
-    return async_fn(req_ipl, ipl)
+  local function await_req_ipl(ipl)
+    if not is_valid('await.loadipl', ipl, 'string') then return false end
+    return await_fn(req_ipl, ipl)
   end
 
   ---@param model string|number The model to load.
@@ -156,12 +156,12 @@ do
 
   ---@param model string|number The model to load.
   ---@return boolean? loaded Whether the model was loaded.
-  local function async_req_model(model)
-    if not is_valid('async.loadmodel', model, {['string'] = true, ['number'] = true}, function(fnd_mod)
+  local function await_req_model(model)
+    if not is_valid('await.loadmodel', model, {['string'] = true, ['number'] = true}, function(fnd_mod)
       model = type(fnd_mod) == 'number' and fnd_mod or joaat(fnd_mod) & 0xFFFFFFFF
       return is_model_in_cd(model) and is_model_in_valid(model) end, 'invalid model requested')
     then return false end
-    return async_fn(req_model, model)
+    return await_fn(req_model, model)
   end
 
   ---@param fx string The particle effect asset to load.
@@ -173,9 +173,9 @@ do
 
   ---@param fx string The particle effect asset to load.
   ---@return boolean? loaded Whether the particle effect asset was loaded.
-  local function async_req_ptfx(fx)
-    if not is_valid('async.loadptfx', fx, 'string') then return false end
-    return async_fn(req_ptfx, fx)
+  local function await_req_ptfx(fx)
+    if not is_valid('await.loadptfx', fx, 'string') then return false end
+    return await_fn(req_ptfx, fx)
   end
 
   ---@param dict string The streamed texture dictionary to load.
@@ -187,21 +187,21 @@ do
 
   ---@param dict string The streamed texture dictionary to load.
   ---@return boolean? loaded Whether the streamed texture dictionary was loaded.
-  local function async_req_streamed_texture_dict(dict)
-    if not is_valid('async.loadstreamedtexturedict', dict, 'string') then return false end
-    return async_fn(req_streamed_texture_dict, dict)
+  local function await_req_streamed_texture_dict(dict)
+    if not is_valid('await.loadstreamedtexturedict', dict, 'string') then return false end
+    return await_fn(req_streamed_texture_dict, dict)
   end
 
   return {
-    async = {
-      loadanimdict = async_req_anim_dict,
-      loadanimset = async_req_anim_set,
-      loadaudio = async_req_audio_bank,
-      loadcollision = async_req_collision,
-      loadipl = async_req_ipl,
-      loadmodel = async_req_model,
-      loadptfx = async_req_ptfx,
-      loadtexturedict = async_req_streamed_texture_dict
+    await = {
+      loadanimdict = await_req_anim_dict,
+      loadanimset = await_req_anim_set,
+      loadaudio = await_req_audio_bank,
+      loadcollision = await_req_collision,
+      loadipl = await_req_ipl,
+      loadmodel = await_req_model,
+      loadptfx = await_req_ptfx,
+      loadtexturedict = await_req_streamed_texture_dict
     },
     loadanimdict = req_anim_dict,
     loadanimset = req_anim_set,
