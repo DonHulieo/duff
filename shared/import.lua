@@ -30,7 +30,7 @@ do
   local function call(duff, index, ...)
     local module = rawget(duff, index) or import(duff, index)
     if not module then
-      local method = function(...) return export[index](...) end
+      local method = function(...) return export[index](nil, ...) end
       if not ... then duff[index] = method end
       module = method
     end
