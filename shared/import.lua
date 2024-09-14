@@ -42,7 +42,7 @@ do
   ---@field _URL string
   ---@field _DESCRIPTION string
   ---@field _DEBUG boolean
-  ---@field async fun(func: function, ...: any): any Calls and returns the result of a function asynchronously.
+  ---@field await fun(func: function, ...: any): any Calls and awaits a the return of a function.
   ---@field bench fun(unit: time_units, dec_places: integer?, iterations: integer?, fn: function, ...: any) Benchmarks a function for a given number of iterations, finding the average execution time and printing the results.
   ---@field checkversion fun(resource: string?, version: string?, git: string, repo: string?) Checks the version of a resource against a git repository.
   ---@field switch fun(t: {[any]: (fun(...): any), default: (fun(...): any)}, v: any, ...: any): fun(...): any
