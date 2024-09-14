@@ -11,7 +11,7 @@ Well, this is the solution for you! This is a collection of *optimised utility m
 
 - **Package** A recreation of the Lua `package` library in pure lua, allowing you to import and use modules in your scripts.
 - **Array:** A FP array class for the creation and manipulation of consecutive integer indexed arrays, similar to the Array class in JavaScript.
-- **Async:** A function that allows you to call and return functions asynchronously, using promises.
+- **Await:** A function that allows you to call and await a functions return values, using promises.
 - **Bench:** Benches the performance of a function, and returns the time taken to execute the function.
 - **Bridge:** Provides common functions between different frameworks and libraries for use in creating cross-framework scripts.
 - **Interval:** A class for creating and managing intervals, allowing you to start, pause, stop and resume timers on threads.
@@ -58,9 +58,9 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [filter](#filter)
       - [foreach](#foreach)
       - [reverse](#reverse)
-    - [async](#async)
-      - [Importing async](#importing-async)
-      - [async (function)](#async-function)
+    - [await](#await)
+      - [Importing await](#importing-await)
+      - [await (function)](#await-function)
     - [bench](#bench)
       - [Importing bench](#importing-bench)
       - [bench (function)](#bench-function)
@@ -615,30 +615,30 @@ function array.reverse(self, length)
 - `length` - The length of the array.
 - `returns: any[]` - The reversed array.
 
-### async
+### await
 
-async is a function that allows you to call and return functions asynchronously, using promises.
+await is a function that allows you to call and return a functions return values, using promises.
 
-#### Importing async
+#### Importing await
 
 ```lua
 -- Using the `require` function from `ox_lib`
----@module 'duff.shared.async'
-local async = lib.require '@duff.shared.async'
+---@module 'duff.shared.await'
+local await = lib.require '@duff.shared.await'
 
--- Attaching async to a local variable from CDuff
-local async = duff.async
+-- Attaching await to a local variable from CDuff
+local await = duff.await
 ```
 
-#### async (function)
+#### await (function)
 
-Calls and returns functions asynchronously, using promises.
+Calls and awaits a the return of a function.
 
 ```lua
 ---@param func fun(...): any
 ---@param ... any
 ---@return ...?
-function async(func, ...)
+function await(func, ...)
 ```
 
 - `func` - The function to call.
@@ -2555,10 +2555,9 @@ Loads an animation dictionary.
 ---@return boolean loaded
 function streaming.loadanimdict(dict)
 
----@async
 ---@param dict string
 ---@return boolean? loaded
-function streaming.async.loadanimdict(dict)
+function streaming.await.loadanimdict(dict)
 ```
 
 - `dict` - The animation dictionary to load.
@@ -2573,10 +2572,9 @@ Loads an animation set.
 ---@return boolean loaded
 function streaming.loadanimset(set)
 
----@async
 ---@param set string
 ---@return boolean? loaded
-function streaming.async.loadanimset(set)
+function streaming.await.loadanimset(set)
 ```
 
 - `set` - The animation set to load.
@@ -2592,11 +2590,10 @@ Loads a Ambient, Mission or Script audio bank.
 ---@return boolean loaded
 function streaming.loadaudio(bank, networked)
 
----@async
 ---@param bank string
 ---@param networked boolean?
 ---@return boolean? loaded
-function streaming.async.loadaudio(bank, networked)
+function streaming.await.loadaudio(bank, networked)
 ```
 
 - `bank` - The audio bank to load.
@@ -2612,10 +2609,9 @@ Loads a collision for a model.
 ---@return boolean loaded
 function streaming.loadcollision(model)
 
----@async
 ---@param model string|number
 ---@return boolean? loaded
-function streaming.async.loadcollision(model)
+function streaming.await.loadcollision(model)
 ```
 
 - `model` - The model to load the collision for, can be either;
@@ -2632,10 +2628,9 @@ Loads an IPL.
 ---@return boolean loaded
 function streaming.loadipl(ipl)
 
----@async
 ---@param ipl string
 ---@return boolean? loaded
-function streaming.async.loadipl(ipl)
+function streaming.await.loadipl(ipl)
 ```
 
 - `ipl` - The IPL to load.
@@ -2650,10 +2645,9 @@ Loads a model.
 ---@return boolean loaded
 function streaming.loadmodel(model)
 
----@async
 ---@param model string|number
 ---@return boolean? loaded
-function streaming.async.loadmodel(model)
+function streaming.await.loadmodel(model)
 ```
 
 - `model` - The model to load, can be either;
@@ -2670,10 +2664,9 @@ Loads a particle effect.
 ---@return boolean loaded
 function streaming.loadptfx(fx)
 
----@async
 ---@param fx string
 ---@return boolean? loaded
-function streaming.async.loadptfx(fx)
+function streaming.await.loadptfx(fx)
 ```
 
 - `fx` - The particle effect to load.
