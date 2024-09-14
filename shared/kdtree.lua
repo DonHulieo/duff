@@ -371,21 +371,23 @@ do
   ---@param v any The value to convert to a string.
   ---@param sep string The separator between values.
   ---@return string str The string representation of the value.
-  local function upack_to_string(v, sep)
+  local function unpack_to_string(v, sep)
     local str = ''
     local length = len(v)
     for i = 1, length do
       local val = v[i]
-      val = type(val) == 'string' and ('"'..val..'"') or type(val) == 'table' and '{'..upack_to_string(val, ', ')..'}' or val
+      val = type(val) == 'string' and ("'"..val.."'") or type(val) == 'table' and '{'..unpack_to_string(val, ', ')..'}' or val
       str = str..(val..(i == length and '' or sep))
     end
     if type(v) == 'table' then
       for k, val in pairs(v) do
         if type(k) ~= 'number' then
-          if type(val) ~= 'table' then
+          if type(val) == 'string' then
+            str = str..sep..(k..' = \''..val..'\'')
+          elseif type(val) ~= 'table' then
             str = str..sep..(k..' = '..val)
           else
-            str = str..sep..(k..' = {'..upack_to_string(val, ', ')..'}')
+            str = str..sep..(k..' = {'..unpack_to_string(val, ', ')..'}')
           end
         end
       end
@@ -402,7 +404,7 @@ do
     local length = #nodes
     for i = 1, length do
       local node = tree.nodes[i]
-      local point = type(node.point) == 'table' and '{'..upack_to_string(node.point, ', ')..'}' or 'vector'..len(node.point)..'('..upack_to_string(node.point, ', ')..')'
+      local point = type(node.point) == 'table' and '{'..unpack_to_string(node.point, ', ')..'}' or 'vector'..len(node.point)..'('..unpack_to_string(node.point, ', ')..')'
       file_str = file_str..'\t\t{\n\t\t\tpoint = '..point..',\n\t\t\tdepth = '..node.depth..',\n\t\t\tleft = '..tostring(node.left)..',\n\t\t\tright = '..tostring(node.right)..'\n\t\t}'..(i == length and '' or ',')..'\n'
     end
     file_str = file_str..'\t}\n}'
