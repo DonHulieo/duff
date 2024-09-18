@@ -34,7 +34,9 @@ do
       if ped_type and not is_func then --[[@cast ped_type -function]] error('bad argument #1 to \'getpeds\' (expected nil or function, got '..type(ped_type)..')', 2) end
     end
     local def_filter = not is_func --[[@cast ped_type +integer|-function]] and function(ped, index) return not ped_type or GetPedType(ped) == ped_type end or ped_type  --[[@as fun(ped: integer, index: integer): boolean]]
-    return filter(is_server and all_peds() or get_pool('CPed'), def_filter, true)
+    local peds = is_server --[[@cast all_peds -?]] and all_peds() --[[@as integer[]=]] or get_pool('CPed') --[[@as integer[]=]]
+    if not peds or not next(peds) then error('error calling \'getpeds\' (no peds found)', 2) end
+    return filter(peds, def_filter, true)
   end
 
   ---@param vehicle_type integer|string|(fun(vehicle: integer, index: integer): boolean)? Can be a filter function, a vehicle type (client only) or vehicle class (server only). <br> If `vehicle_type` is a function with the signature `(vehicle: integer, index: integer): boolean`, it will be used to filter the vehicles. <br> If `vehicle_type` is a number, it will filter the vehicles by their class. <br> Vehicle classes can be found [here](https://docs.fivem.net/natives/?_0x29439776AAA00A62). <br> If `vehicle_type` is a string, it will filter the vehicles by their type. <br> Vehicle types can be found [here](https://docs.fivem.net/natives/?_0xA273060E).
@@ -51,7 +53,9 @@ do
       if vehicle_type and not is_func and param_type ~= 'number' then --[[@cast vehicle_type -function]] error('bad argument #1 to \'getvehicles\' (expected nil, number or function, got '..type(vehicle_type)..')', 2) end
       def_filter = not is_func --[[@cast vehicle_type +integer|-function]] and function(vehicle, index) return not vehicle_type or GetVehicleClass(vehicle) == vehicle_type end or vehicle_type --[[@as fun(vehicle: integer, index: integer): boolean]]
     end
-    return filter(is_server --[[@cast all_vehs -?]] and all_vehs() --[[@as integer[]=]] or get_pool('CVehicle'), def_filter, true)
+    local vehicles = is_server --[[@cast all_vehs -?]] and all_vehs() --[[@as integer[]=]] or get_pool('CVehicle') --[[@as integer[]=]]
+    if not vehicles or not next(vehicles) then error('error calling \'getvehicles\' (no vehicles found)', 2) end
+    return filter(vehicles, def_filter, true)
   end
 
   ---@param filter_fn (fun(object: integer, index: integer): boolean)? The function to filter the objects. <br> If not provided, all objects will be returned.
@@ -59,7 +63,9 @@ do
   local function get_objects(filter_fn)
     if is_server and not all_objs then error('error calling \'getobjects\' (native at index _0x6886C3FE not found)', 2) end ---@cast all_objs -?
     if filter_fn and not is_fun(filter_fn) then error('bad argument #1 to \'getobjects\' (expected nil or function, got '..type(filter_fn)..')', 2) end
-    return filter(is_server and all_objs() or get_pool('CObject'), filter_fn, true)
+    local objs = is_server --[[@cast all_objs -?]] and all_objs() --[[@as integer[]=]] or get_pool('CObject') --[[@as integer[]=]]
+    if not objs or not next(objs) then error('error calling \'getobjects\' (no objects found)', 2) end
+    return filter(objs, filter_fn, true)
   end
 
   ---@param hash (fun(pickup: integer, index: integer): boolean)|string|number|? The function to filter the pickups, the hash of the pickup to filter by or `nil`. <br> If `hash` is a function with the signature `(pickup: integer, index: integer): boolean`, it will be used to filter the pickups. <br> If `hash` is a string or number, it will filter the pickups by their hash. <br> If `hash` is `nil`, all pickups will be returned.
