@@ -146,6 +146,7 @@ do
   ---@param tree CKDTree|(vector|number[])[] The KD-Tree or points to build the KD-Tree from.
   ---@return CKDTree tree The KD-Tree.
   local function build(tree)
+    if not tree.root and not tree[1] then error('bad argument #1 to \'build\' (tree is empty)', 2) end
     local nodes = tree?.root and get_nodes(tree, tree.root, {}) or tree
     local dims = tree?.dims or len(nodes[1])
     return build_tree(NewTree(dims), dims, nodes, 0)
@@ -154,6 +155,7 @@ do
   ---@param tree CKDTree The KD-Tree.
   ---@param target vector|number[] The target point.
   local function insert(tree, target) -- **Note** This can unbalance the tree after multiple insertions, use `build` to rebalance.
+    if not target[1] then error('bad argument #2 to \'insert\' (target array is empty)', 2) end
     tree.dims = tree.dims or len(target)
     tree.root = insert_node(tree, tree.root, target, 0)
   end
@@ -201,8 +203,8 @@ do
   ---@param margin number? The margin of error for the search. <br> If the distance between the target and a point is greater than the margin, the point is not found. <br> Default: `1e-10`.
   ---@return boolean contains, integer? index Whether the KD-Tree contains the target point and its index.
   local function contains(tree, target, margin)
-    if not tree.root then error('bad argument #1 to \'range\' (tree is empty)', 2) end
-    if not target[1] then error('bad argument #2 to \'range\' (target array is empty)', 2) end
+    if not tree.root then error('bad argument #1 to \'contains\' (tree is empty)', 2) end
+    if not target[1] then error('bad argument #2 to \'contains\' (target array is empty)', 2) end
     local index = search_node(tree, tree.root, target, 0, margin)
     return index and true or false, index
   end
@@ -220,7 +222,7 @@ do
   ---@param target vector|number[] The target point.
   ---@return vector|number[]? removed, integer? node_id Whether the point was removed and its node ID.
   local function remove(tree, target) -- **Note** This will unbalance the tree, use `build` to rebalance.
-    if not tree.root then error('bad argument #1 to \'range\' (tree is empty)', 2) end
+    if not tree.root then error('bad argument #1 to \'remove\' (tree is empty)', 2) end
     if not target[1] then error('bad argument #2 to \'remove\' (target array is empty)', 2) end
     local dims = tree.dims or len(target)
     local removed, node_id = nil, nil
@@ -258,8 +260,8 @@ do
   ---@param radius number? The maximum distance from the target point.
   ---@return vector|number[]? best, number best_dist The closest point to the target point and its distance.
   local function nearest_neighbour(tree, target, radius)
-    if not tree.root then error('bad argument #1 to \'range\' (tree is empty)', 2) end
-    if not target[1] then error('bad argument #2 to \'nearest_neighbour\' (target array is empty)', 2) end
+    if not tree.root then error('bad argument #1 to \'neighbour\' (tree is empty)', 2) end
+    if not target[1] then error('bad argument #2 to \'neighbour\' (target array is empty)', 2) end
     local best, best_dist = nil, radius or math.huge
     local dims = len(target)
     ---@param node_id integer? The ID of the node.
@@ -287,6 +289,8 @@ do
   ---@param radius number? The maximum distance from the target point.
   ---@return {dist: number, coords: vector|number[]}[] best The closest points to the target point.
   local function nearest_neighbours(tree, target, radius)
+    if not tree.root then error('bad argument #1 to \'neighbours\' (tree is empty)', 2) end
+    if not target[1] then error('bad argument #2 to \'neighbours\' (target array is empty)', 2) end
     local dims = len(target)
     local best = {}
     local best_i = 0
@@ -332,8 +336,8 @@ do
   ---@return (vector|number[])[]? results The points within the range.
   local function range(tree, min, max)
     if not tree.root then error('bad argument #1 to \'range\' (tree is empty)', 2) end
-    if not min?[1] then error('bad argument #1 to \'range\' (min array is empty)', 2) end
-    if not max?[1] then error('bad argument #2 to \'range\' (max array is empty)', 2) end
+    if not min?[1] then error('bad argument #2 to \'range\' (min array is empty)', 2) end
+    if not max?[1] then error('bad argument #3 to \'range\' (max array is empty)', 2) end
     local l, r = len(min), len(max)
     local dims = l + ((r - l) >> 1)
     local results = {}
