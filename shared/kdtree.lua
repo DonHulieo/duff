@@ -285,27 +285,12 @@ do
   ---@param tree CKDTree The KD-Tree.
   ---@param target vector|number[] The target point.
   ---@param radius number? The maximum distance from the target point.
-  ---@param k integer? The number of neighbours to return.
   ---@return {dist: number, coords: vector|number[]}[] best The closest points to the target point.
-  local function nearest_neighbours(tree, target, radius, k)
-    if not tree.root then error('bad argument #1 to \'range\' (tree is empty)', 2) end
-    if not target[1] then error('bad argument #2 to \'nearest_neighbours\' (target array is empty)', 2) end
+  local function nearest_neighbours(tree, target, radius)
     local dims = len(target)
     local best = {}
+    local best_i = 0
     radius = radius or math.huge
-    k = k or 1
-    for i = 1, k do best[i] = {dist = radius, coords = nil} end
-    ---@param dist number The distance between the target and the point.
-    ---@param best_coords vector|number[] The point to insert.
-    local function insert_best(dist, best_coords)
-      for i = 1, k do
-        if dist < best[i].dist then
-          for j = k, i + 1, -1 do best[j] = best[j - 1] end
-          best[i] = {dist = dist, coords = best_coords}
-          break
-        end
-      end
-    end
     ---@param node_id integer? The ID of the node.
     ---@param depth integer The depth of the current node.
     local function find_closest_k(node_id, depth)
@@ -313,7 +298,8 @@ do
       local node = tree.nodes[node_id]
       local point = node.point
       local dist = get_dist(point, target)
-      insert_best(dist, point)
+      best_i += 1
+      best[best_i] = {dist = dist, coords = point}
       local axis = (depth % dims) + 1
       local dir = get_dir(target, point, axis)
       find_closest_k(node[dir], depth + 1)
@@ -323,7 +309,7 @@ do
     end
     find_closest_k(tree.root, 0)
     for i = #best, 1, -1 do
-      if best[i] and best[i].dist >= radius then best[i] = nil end
+      if best[i] and best[i].dist >= radius then table.remove(best, i) end
     end
     return best
   end
