@@ -72,13 +72,13 @@ do
       local data = nil
       update = update or interval.update
       while not stop do
+        Wait(time)
         if interval.paused then goto continue end
         if not callback or interval.stopped or limit and limit ~= -1 and timer(start, limit) then return end
         data = callback(table.unpack(args))
         if update then update(data) end
         interval.data = data
         ::continue::
-        Wait(time)
       end
       interval.update = update
       interval.thread = nil
@@ -142,24 +142,21 @@ do
     local idx = type(interval) == 'table' and interval.idx or Intervals[interval] and interval --[[@as integer]]
     if not idx then error('bad argument #1 to \'destroy\' (interval not found)', 2) end
     stop_thread(idx)
-    table.remove(Intervals, idx)
+    Intervals[idx] = nil
   end
 
   ---@param resource string
   local function clear_res_threads(resource)
     if resource == RES_NAME then
-      for i = #Intervals, 1, -1 do
-        local interval = Intervals[i] --[[@as interval]]
+      for _, interval in ipairs(Intervals) do
         if interval.RESOURCE == resource then destroy_thread(interval) end
       end
     elseif resource == 'duff' then
-      for i = #Intervals, 1, -1 do
-        local interval = Intervals[i] --[[@as interval]]
+      for _, interval in ipairs(Intervals) do
         destroy_thread(interval)
       end
     else
-      for i = #Intervals, 1, -1 do
-        local interval = Intervals[i] --[[@as interval]]
+      for _, interval in ipairs(Intervals) do
         if interval.INVOKING == resource then destroy_thread(interval) end
       end
     end
