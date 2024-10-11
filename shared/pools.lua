@@ -35,7 +35,7 @@ do
     end
     local def_filter = not is_func --[[@cast ped_type +integer|-function]] and function(ped, index) return not ped_type or GetPedType(ped) == ped_type end or ped_type  --[[@as fun(ped: integer, index: integer): boolean]]
     local peds = is_server --[[@cast all_peds -?]] and all_peds() --[[@as integer[]=]] or get_pool('CPed') --[[@as integer[]=]]
-    if not peds or not next(peds) then error('error calling \'getpeds\' (no peds found)', 2) end
+    if not peds or not next(peds) then warn('error calling \'getpeds\' (no peds found)') end
     return filter(peds, def_filter, true)
   end
 
@@ -54,7 +54,7 @@ do
       def_filter = not is_func --[[@cast vehicle_type +integer|-function]] and function(vehicle, index) return not vehicle_type or GetVehicleClass(vehicle) == vehicle_type end or vehicle_type --[[@as fun(vehicle: integer, index: integer): boolean]]
     end
     local vehicles = is_server --[[@cast all_vehs -?]] and all_vehs() --[[@as integer[]=]] or get_pool('CVehicle') --[[@as integer[]=]]
-    if not vehicles or not next(vehicles) then error('error calling \'getvehicles\' (no vehicles found)', 2) end
+    if not vehicles or not next(vehicles) then warn('error calling \'getvehicles\' (no vehicles found)') end
     return filter(vehicles, def_filter, true)
   end
 
@@ -64,7 +64,7 @@ do
     if is_server and not all_objs then error('error calling \'getobjects\' (native at index _0x6886C3FE not found)', 2) end ---@cast all_objs -?
     if filter_fn and not is_fun(filter_fn) then error('bad argument #1 to \'getobjects\' (expected nil or function, got '..type(filter_fn)..')', 2) end
     local objs = is_server --[[@cast all_objs -?]] and all_objs() --[[@as integer[]=]] or get_pool('CObject') --[[@as integer[]=]]
-    if not objs or not next(objs) then error('error calling \'getobjects\' (no objects found)', 2) end
+    if not objs or not next(objs) then warn('error calling \'getobjects\' (no objects found)') end
     return filter(objs, filter_fn, true)
   end
 
