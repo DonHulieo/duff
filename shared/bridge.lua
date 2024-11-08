@@ -42,11 +42,13 @@ do
 
   --------------------- INTERNAL ---------------------
 
+  local invalid_states = {['missing'] = true, ['unknown'] = true, ['stopped'] = true, ['stopping'] = true}
+
   ---@param resource string The name of the resource.
   ---@return boolean is_present Whether the resource is present.
   local function is_resource_present(resource)
     local state = get_resource_state(resource)
-    return state ~= 'missing' and state ~= 'unknown' and (state == 'started' or state == 'starting')
+    return not invalid_states[state] and (state == 'started' or state == 'starting')
   end
 
   ---@param table table<any, any>|any? The table to iterate over.
