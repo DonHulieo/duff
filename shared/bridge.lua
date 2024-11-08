@@ -9,6 +9,7 @@
 ---@field getplayername fun(player: integer|string?): string Returns the name of `player`. <br> If `player` is nil, the source's (server) or client's (client) player name is returned.
 ---@field getjob fun(player: integer|string?): {name: string, label: string, grade: number, grade_name: string, grade_label: string, job_type: string, salary: number}? Returns the job data for `player`. <br> If `player` is nil, the source's (server) or client's (client) player job data is returned.
 ---@field doesplayerhavegroup fun(player: integer|string?, groups: string|string[]): boolean? Returns whether `player` has the specified group(s). <br> If `player` is nil, the source's (server) or client's (client) player group(s) are checked.
+---@field getplayermoney fun(player: integer|string?, money_type: string): integer Returns the amount of money `player` has. <br> If `player` is nil, the source's (server) or client's (client) player money is returned.
 ---@field isplayerdowned fun(player: integer|string?): boolean Returns whether the `player` is downed. <br> If `player` is nil, the source's (server) or client's (client) player downed status is checked.
 ---@field createcallback fun(name: string, cb: function) Creates a callback, `name` that triggers the `cb` function when called.
 ---@field triggercallback fun(player: integer|string?, name: string, cb: function, ...: any) Triggers the callback, `name` with the specified arguments. <br> If triggered from the server, the `player` argument is required and is the client to trigger the callback for.
@@ -19,6 +20,8 @@
 ---@field removeitem fun(player: integer|string?, item: string, amount: integer): boolean? Removes `item` from the player's inventory. <br> **Note**: This is a server-only function.
 ---@field hasitem fun(player: integer|string?, item: string, amount: integer?): boolean? Returns whether the player has `item` in their inventory. <br> **Note**: This is a server-only function.
 ---@field getplayeritems fun(player: integer|string?): {[string]: {name: string, label: string, weight: number, useable: boolean, unique: boolean}} Returns `player`'s inventory items. <br> **Note**: This is a server-only function.
+---@field addplayermoney fun(player: integer|string?, money_type: string, amount: integer): boolean? Adds `amount` to `player`'s `money_type`. <br> **Note**: This is a server-only function.
+---@field removeplayermoney fun(player: integer|string?, money_type: string, amount: integer): boolean? Removes `amount` from `player`'s `money_type`. <br> **Note**: This is a server-only function.
 ---@field addlocalentity fun(entities: integer|integer[], options: {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: (fun(entity: number, distance: number): boolean?)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]}[]) Adds a target to `entities` with the specified `options`. <br> **Note**: This is a client-only function.
 ---@field removelocalentity fun(entities: integer|integer[], targets: string|string[]?) Removes the target from `entities` with the specified `targets`. <br> **Note**: This is a client-only function.
 ---@field addboxzone fun(data: {center: vector3, size: vector3, heading: number?, debug: boolean?}, options: {name: string?, label: string, icon: string?, distance: number?, item: string?, canInteract: (fun(entity: integer, distance: number): boolean?)?, onSelect: fun()?, event_type: string?, event: string?, jobs: string|string[]?, gangs: string|string[]?}[]): integer|string Adds a box zone with the specified `data` and `options`. <br> **Note**: This is a client-only function. 
@@ -372,6 +375,32 @@ do
     return false
   end
 
+  ---@param player integer|string? The `player` to check for the specified group(s). <br> If `player` is nil, the source is used. <br> `player` is a server-side only argument.
+  ---@param money_type string The type of money to check for. <br> If `money_type` is 'cash', the player's cash is checked. <br> If `money_type` is 'bank', the player's bank is checked.
+  ---@return integer money The amount of money the `player` has.
+  local function get_player_money(player, money_type)
+    local player_data = get_player_data(player, 3)
+    local money = 0
+    if is_server then
+      if FRAMEWORK == 'esx' then
+        money_type = money_type == 'cash' and 'money' or money_type
+        money = player_data.getAccount(money_type)
+      elseif FRAMEWORK == 'qb' then
+        money_type = money_type == 'money' and 'cash' or money_type
+        money = player_data.PlayerData.money[money_type]
+      end
+    else
+      if FRAMEWORK == 'esx' then
+        money_type = money_type == 'cash' and 'money' or money_type
+        money = player_data.accounts[money_type]
+      elseif FRAMEWORK == 'qb' then
+        money_type = money_type == 'money' and 'cash' or money_type
+        money = player_data.money[money_type]
+      end
+    end
+    return money
+  end
+
   ---@param player integer|string? The `player` to check if they are downed. <br> If `player` is nil, the source is used. <br> `player` is a server-side only argument.
   ---@return boolean isDowned Whether the `player` is downed.
   local function is_player_downed(player)
@@ -622,6 +651,60 @@ do
       end
     end
     return inventory
+  end
+
+  ---@param player integer|string? The `player` to add money to. <br> If `player` is nil, the source is used.
+  ---@param money_type string The type of money to add. <br> If `money_type` is 'cash', the player's has cash added. <br> If `money_type` is 'bank', the player's bank has money added to it.
+  ---@param amount number The amount of money to add.
+  ---@return boolean added Whether the money was added to the `player`.
+  local function add_player_money(player, money_type, amount) -- **Note**: This is a server-only function.
+    if not is_server then error('called a server only function \'addmoney\'', 2) end
+    player = validate_source('addmoney', player or source)
+    if not money_type or type(money_type) ~= 'string' then error('bad argument #2 to \'addmoney\' (string expected, got '..type(money_type)..')', 2) end
+    if not amount or type(amount) ~= 'number' then error('bad argument #3 to \'addmoney\' (number expected, got '..type(amount)..')', 2) end
+    Core = get_core_object()
+    local added = false
+    if INVENTORY == 'esx' then
+      local player_data = get_player_data(player, 3)
+      money_type = money_type == 'cash' and 'money' or money_type
+      local prev = player_data.getAccount(money_type)
+      player_data.addAccountMoney(money_type, amount)
+      added = get_player_money(player, money_type) == prev + amount
+    elseif INVENTORY == 'qb' then
+      local player_data = get_player_data(player, 3)
+      money_type = money_type == 'money' and 'cash' or money_type
+      local prev = player_data.PlayerData.money[money_type]
+      player_data.Functions.AddMoney(money_type, amount, 'duff shared bridge added money:' ..money_type)
+      added = get_player_money(player, money_type) == prev + amount
+    end
+    return added
+  end
+
+  ---@param player integer|string? The `player` to remove money from. <br> If `player` is nil, the source is used.
+  ---@param money_type string The type of money to remove. <br> If `money_type` is 'cash', the player's cash is removed. <br> If `money_type` is 'bank', the player's bank has money removed from it.
+  ---@param amount number The amount of money to remove.
+  ---@return boolean removed Whether the money was removed from the `player`.
+  local function remove_player_money(player, money_type, amount) -- **Note**: This is a server-only function.
+    if not is_server then error('called a server only function \'removemoney\'', 2) end
+    player = validate_source('removemoney', player or source)
+    if not money_type or type(money_type) ~= 'string' then error('bad argument #2 to \'removemoney\' (string expected, got '..type(money_type)..')', 2) end
+    if not amount or type(amount) ~= 'number' then error('bad argument #3 to \'removemoney\' (number expected, got '..type(amount)..')', 2) end
+    Core = get_core_object()
+    local removed = false
+    if INVENTORY == 'esx' then
+      local player_data = get_player_data(player, 3)
+      money_type = money_type == 'cash' and 'money' or money_type
+      local prev = player_data.getAccount(money_type)
+      player_data.removeAccountMoney(money_type, amount)
+      removed = get_player_money(player, money_type) == prev - amount
+    elseif INVENTORY == 'qb' then
+      local player_data = get_player_data(player, 3)
+      money_type = money_type == 'money' and 'cash' or money_type
+      local prev = player_data.PlayerData.money[money_type]
+      player_data.Functions.RemoveMoney(money_type, amount, 'duff shared bridge removed money:' ..money_type)
+      removed = get_player_money(player, money_type) == prev - amount
+    end
+    return removed
   end
 
   --------------------- CLIENT ---------------------
@@ -932,6 +1015,7 @@ do
     getplayername = get_player_name,
     getjob = get_job_data,
     doesplayerhavegroup = does_player_have_group,
+    getplayermoney = get_player_money,
     isplayerdowned = is_player_downed,
     createcallback = create_callback,
     triggercallback = trigger_callback
@@ -946,6 +1030,8 @@ do
     bridge.removeitem = remove_item
     bridge.hasitem = has_item
     bridge.getplayeritems = get_player_items
+    bridge.addplayermoney = add_player_money
+    bridge.removeplayermoney = remove_player_money
   else
     bridge.addlocalentity = add_local_entity
     bridge.removelocalentity = remove_local_entity
