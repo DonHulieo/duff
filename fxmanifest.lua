@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'DonHulieo'
 description 'Don\'s Utility Functions for FiveM'
-version '1.2.0'
+version '1.2.1'
 url 'https://github.com/DonHulieo/duff'
 
 server_script 'server/init.lua'
