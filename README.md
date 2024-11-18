@@ -76,6 +76,7 @@ Well, this is the solution for you! This is a collection of *optimised utility m
         - [getplayername](#getplayername)
         - [getjob](#getjob)
         - [doesplayerhavegroup](#doesplayerhavegroup)
+        - [getplayermoney](#getplayermoney)
         - [isplayerdowned](#isplayerdowned)
         - [createcallback](#createcallback)
         - [triggercallback](#triggercallback)
@@ -87,6 +88,8 @@ Well, this is the solution for you! This is a collection of *optimised utility m
         - [removeitem](#removeitem)
         - [hasitem](#hasitem)
         - [getplayeritems](#getplayeritems)
+        - [addplayermoney](#addplayermoney)
+        - [removeplayermoney](#removeplayermoney)
       - [Client Functions (bridge)](#client-functions-bridge)
         - [addlocalentity](#addlocalentity)
         - [removelocalentity](#removelocalentity)
@@ -828,6 +831,20 @@ function bridge.doesplayerhavegroup(player, groups)
 - `groups` - The group(s) to check for.
 - `returns: boolean` - Whether the player has the group.
 
+##### getplayermoney
+
+Retrieves the player money.
+
+```lua
+---@param player integer|string?
+---@param money_type string
+---@return integer money
+function bridge.getplayermoney(player, money_type)
+```
+
+- `player` - The `player` server ID to retrieve the money of, if client side, this can be left as `nil`.
+- `money_type` - Either `cash` or `bank`.
+
 ##### isplayerdowned
 
 Checks if the player is downed.
@@ -980,6 +997,40 @@ function bridge.getplayeritems(player)
   - `weight` - The weight of the item.
   - `useable` - Whether the item is useable.
   - `unique` - Whether the item is unique.
+
+##### addplayermoney
+
+Adds money to the `player`.
+
+```lua
+---@param player integer|string?
+---@param money_type string
+---@param amount integer
+---@return boolean? added
+function bridge.addplayermoney(player, money_type, amount)
+```
+
+- `player` - The `player` server ID to add money to.
+- `money_type` - Either `cash` or `bank`.
+- `amount` - The amount of money to add.
+- `returns: boolean` - Whether the money was added.
+
+##### removeplayermoney
+
+Removes money from the `player`.
+
+```lua
+---@param player integer|string?
+---@param money_type string
+---@param amount integer
+---@return boolean? removed
+function bridge.removeplayermoney(player, money_type, amount)
+```
+
+- `player` - The `player` server ID to remove money from.
+- `money_type` - Either `cash` or `bank`.
+- `amount` - The amount of money to remove.
+- `returns: boolean` - Whether the money was removed.
 
 #### Client Functions (bridge)
 
