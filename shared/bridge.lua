@@ -220,6 +220,7 @@ do
   ---@return {name: string, label: string, grade: number, grade_name: string, grade_label: string, job_type: string, salary: number} job_data The converted job data.
   local function convert_job_data(func_name, data)
     if not data then error('error calling \''..func_name..'\' (attempting to convert nil job data)', 3) end
+    if data.job_type then return data end
     local job_data = {name = data.name, label = data.label, grade = 0, grade_name = '', grade_label = '', job_type = '', salary = 0}
     if FRAMEWORK == 'esx' then
       job_data.grade = data.grade
