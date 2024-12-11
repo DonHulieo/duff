@@ -47,6 +47,7 @@ do
     local def_filter ---@type fun(vehicle: integer, index: integer): boolean
     if is_server then
       if not all_vehs then error('error calling \'getvehicles\' (native at index _0x332169F5 not found)', 2) end ---@cast all_vehs -?
+      if GetNumPlayerIndices() == 0 then return {} end
       if vehicle_type and not is_func and param_type ~= 'string' then --[[@cast vehicle_type -function]] error('bad argument #1 to \'getvehicles\' (expected nil, string or function, got '..type(vehicle_type)..')', 2) end
       def_filter = not is_func --[[@cast vehicle_type +integer|-function]] and function(vehicle, index) return not vehicle_type or GetVehicleType(vehicle) == vehicle_type end or vehicle_type --[[@as fun(vehicle: integer, index: integer): boolean]]
     else
