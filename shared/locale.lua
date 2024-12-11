@@ -4,6 +4,7 @@
 ---@field loadfile fun(resource: string?, file: string?) Loads `file` from `resource`, or current resource if nil, into the stored translations.
 ---@field translate fun(key: string, data: table?): string Translates `key` with optional `data`. <br> Returns the translation if found, or `data.default` if not.
 ---@field t fun(key: string, data: table?): string Alias for `translate`.
+---@field doeskeyexist fun(key: string): boolean Returns whether `key` exists in the stored translations.
 do
   local current_resource = GetCurrentResourceName()
   local load, load_resource_file = load, LoadResourceFile
@@ -192,5 +193,9 @@ do
     return data.default
   end
 
-  return {set = set, load = load_table, loadfile = load_file, translate = translate, t = translate}
+  ---@param key string The key to translate.
+  ---@return boolean exists
+  local function does_key_exist(key) return translate(key) ~= nil end
+
+  return {set = set, load = load_table, loadfile = load_file, translate = translate, t = translate, doeskeyexist = does_key_exist}
 end
