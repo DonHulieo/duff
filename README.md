@@ -126,6 +126,7 @@ Well, this is the solution for you! This is a collection of *optimised utility m
       - [load](#load)
       - [loadfile](#loadfile)
       - [translate](#translate)
+      - [doeskeyexist](#doeskeyexist)
     - [CMath](#cmath)
       - [Importing the CMath](#importing-the-cmath)
       - [between](#between)
@@ -1609,6 +1610,19 @@ function locale.translate(key, data)
 - `key` - The key to translate.
 - `data` - A table containing data to replace placeholders in the translation.
 - `returns: string` - The translated value.
+
+#### doeskeyexist
+
+Checks if a key exists in the translation table.
+
+```lua
+---@param key string
+---@return boolean exists
+function locale.doeskeyexist(key)
+```
+
+- `key` - The key to check.
+- `returns: boolean` - Whether the key exists.
 
 ### CMath
 
